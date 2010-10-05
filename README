@@ -1,0 +1,59 @@
+-----------------------------
+1 Hudson Debian packages
+-----------------------------
+
+Hudson can be installed as a Debian package, which enables:
+
+* Automatic upgrade of Hudson via apt
+* /etc/init.d hook up to start Hudson on boot 
+
+To use the repository, first add the key to your system:
+
+	wget -O /tmp/key http://hudson-ci.org/debian/hudson-ci.org.key
+	sudo apt-key add /tmp/key
+
+Install dependencies
+
+	sudo apt-get install daemon
+
+Then install Hudson
+
+	wget -O /tmp/hudson.deb http://hudson-ci.org/latest/debian/hudson.deb
+	sudo dpkg --install /tmp/hudson.deb
+
+Once the package is installed, apt-get update; apt-get install hudson will update Hudson. See Wiki for more information.
+
+
+-----------------------------
+2 Install Hudson plugins
+----------------------------- 
+
+Loginto hudson at localhost:8080 and add the following plugins
+
+* Email-ext plugin
+* Git Plugin
+* Github plugin
+
+-----------------------------
+3 Configure Hudson
+----------------------------- 
+create ssh-key and upload it to github
+
+	ssh-keygen
+	
+tell github who hudson is
+
+	git config --global user.email florian.weisshardt@ipa.fhg.de
+	git config --global user.name ipa320
+	
+allow hudson user to permanently use sudo rights by adding this line at the end of /etc/sudoers
+
+hudson ALL=(ALL) NOPASSWD: ALL
+
+-----------------------------
+4 Generate hudson jobs
+----------------------------- 
+
+execute hudson_generate_job.sh
+
+	hudson_generate_job.sh GITHUBUSER REPOSITORY ROSRELEASE

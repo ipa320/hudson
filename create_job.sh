@@ -6,13 +6,25 @@
 # $3 ROSRELEASE
 if [ $# != 3 ]; then
 	echo "ERROR: Wrong number of parameters"
-	echo "Usage: hudson_generate_job.sh GITHUBUSER REPOSITORY ROSRELEASE"
+	echo "Usage: generate_job.sh GITHUBUSER REPOSITORY ROSRELEASE"
 	exit 1
 else
-	echo "Generating hudson config with"
+	echo "Creating hudson config with"
 	echo "Github user name       = " $1
 	echo "Github repository name = " $2
 	echo "ROS release            = " $3
+	JOBNAME=$2_$3_$1
+fi
+
+# check, if job already exists
+if [ -d /var/lib/hudson/jobs/$JOBNAME ]; then
+	read -p "Job already exists, overwriting configuration? (y/N)"
+	if [[ $REPLY = [yY] ]]; then
+		echo "Overwriting job $JOBNAME"
+	else
+		echo "Aborting..."
+		exit 1
+	fi
 fi
 
 # create new job directory
@@ -28,3 +40,7 @@ sudo sed -i "s/---ROSRELEASE---/$3/g" /var/lib/hudson/jobs/$2_$3_$1/config.xml
 
 # change owner to hudson
 sudo chown -R hudson.hudson /var/lib/hudson/jobs
+
+echo ""
+echo "Job $JOBNAME created."
+echo "Restart Hudson to include new job."
