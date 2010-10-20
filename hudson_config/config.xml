@@ -4,7 +4,26 @@
   <numExecutors>1</numExecutors>
   <mode>NORMAL</mode>
   <useSecurity>true</useSecurity>
-  <authorizationStrategy class="hudson.security.FullControlOnceLoggedInAuthorizationStrategy"/>
+  <authorizationStrategy class="hudson.security.GlobalMatrixAuthorizationStrategy">
+    <permission>hudson.model.Computer.Configure:authenticated</permission>
+    <permission>hudson.model.Computer.Delete:authenticated</permission>
+    <permission>hudson.model.Hudson.Administer:authenticated</permission>
+    <permission>hudson.model.Hudson.Read:anonymous</permission>
+    <permission>hudson.model.Hudson.Read:authenticated</permission>
+    <permission>hudson.model.Item.Build:authenticated</permission>
+    <permission>hudson.model.Item.Configure:authenticated</permission>
+    <permission>hudson.model.Item.Create:authenticated</permission>
+    <permission>hudson.model.Item.Delete:authenticated</permission>
+    <permission>hudson.model.Item.Read:anonymous</permission>
+    <permission>hudson.model.Item.Read:authenticated</permission>
+    <permission>hudson.model.Item.Workspace:authenticated</permission>
+    <permission>hudson.model.Run.Delete:authenticated</permission>
+    <permission>hudson.model.Run.Update:authenticated</permission>
+    <permission>hudson.model.View.Configure:authenticated</permission>
+    <permission>hudson.model.View.Create:authenticated</permission>
+    <permission>hudson.model.View.Delete:authenticated</permission>
+    <permission>hudson.scm.SCM.Tag:authenticated</permission>
+  </authorizationStrategy>
   <securityRealm class="hudson.security.HudsonPrivateSecurityRealm">
     <disableSignup>true</disableSignup>
   </securityRealm>
