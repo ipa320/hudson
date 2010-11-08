@@ -13,7 +13,7 @@ else
 	echo "Github user name       = " $1
 	echo "Github repository name = " $2
 	echo "ROS release            = " $3
-	JOBNAME=$2_$3_$1
+	JOBNAME=$3_$1_$2
 fi
 
 # check, if job already exists
@@ -28,15 +28,15 @@ if [ -d /var/lib/hudson/jobs/$JOBNAME ]; then
 fi
 
 # create new job directory
-sudo mkdir -p /var/lib/hudson/jobs/$2_$3_$1
+sudo mkdir -p /var/lib/hudson/jobs/$JOBNAME
 
 # copy config file
-sudo cp config.xml /var/lib/hudson/jobs/$2_$3_$1/config.xml
+sudo cp config.xml /var/lib/hudson/jobs/$JOBNAME/config.xml
 
 # generate config file
-sudo sed -i "s/---GITHUBUSER---/$1/g" /var/lib/hudson/jobs/$2_$3_$1/config.xml
-sudo sed -i "s/---REPOSITORY---/$2/g" /var/lib/hudson/jobs/$2_$3_$1/config.xml
-sudo sed -i "s/---ROSRELEASE---/$3/g" /var/lib/hudson/jobs/$2_$3_$1/config.xml
+sudo sed -i "s/---GITHUBUSER---/$1/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
+sudo sed -i "s/---REPOSITORY---/$2/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
+sudo sed -i "s/---ROSRELEASE---/$3/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
 
 # change owner to hudson
 sudo chown -R hudson.hudson /var/lib/hudson/jobs

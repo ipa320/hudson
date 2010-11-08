@@ -1,10 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <hudson>
-  <version>1.378</version>
+  <version>1.380</version>
   <numExecutors>1</numExecutors>
   <mode>NORMAL</mode>
-  <authorizationStrategy class="hudson.security.AuthorizationStrategy$Unsecured"/>
-  <securityRealm class="hudson.security.SecurityRealm$None"/>
+  <useSecurity>true</useSecurity>
+  <authorizationStrategy class="hudson.security.FullControlOnceLoggedInAuthorizationStrategy"/>
+  <securityRealm class="hudson.security.HudsonPrivateSecurityRealm">
+    <disableSignup>true</disableSignup>
+  </securityRealm>
   <jdks/>
   <clouds/>
   <slaves/>
