@@ -4,15 +4,16 @@
 # $1 GITHUBUSER
 # $2 REPOSITORY
 # $3 ROSRELEASE
-if [ $# != 3 ]; then
+if [ $# != 3 || $# != 4 ]; then
 	echo "ERROR: Wrong number of parameters"
-	echo "Usage: generate_job.sh GITHUBUSER REPOSITORY ROSRELEASE"
+	echo "Usage: generate_job.sh GITHUBUSER REPOSITORY ROSRELEASE [EMAIL]"
 	exit 1
 else
 	echo "Creating hudson config with"
 	echo "Github user name       = " $1
 	echo "Github repository name = " $2
 	echo "ROS release            = " $3
+	echo "User email             = " $4
 	JOBNAME=$3_$1_$2
 fi
 
@@ -37,6 +38,7 @@ sudo cp config.xml /var/lib/hudson/jobs/$JOBNAME/config.xml
 sudo sed -i "s/---GITHUBUSER---/$1/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
 sudo sed -i "s/---REPOSITORY---/$2/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
 sudo sed -i "s/---ROSRELEASE---/$3/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
+sudo sed -i "s/---EMAIL---/$4/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
 
 # change owner to hudson
 sudo chown -R hudson.hudson /var/lib/hudson/jobs
