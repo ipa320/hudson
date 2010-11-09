@@ -4,17 +4,17 @@
 # $1 GITHUBUSER
 # $2 REPOSITORY
 # $3 ROSRELEASE
-if [ $# != 3 || $# != 4 ]; then
-	echo "ERROR: Wrong number of parameters"
-	echo "Usage: generate_job.sh GITHUBUSER REPOSITORY ROSRELEASE [EMAIL]"
-	exit 1
-else
+if [ $# == 3 ] || [ $# == 4 ]; then
 	echo "Creating hudson config with"
 	echo "Github user name       = " $1
 	echo "Github repository name = " $2
 	echo "ROS release            = " $3
 	echo "User email             = " $4
 	JOBNAME=$3_$1_$2
+else
+	echo "ERROR: Wrong number of parameters"
+	echo "Usage: generate_job.sh GITHUBUSER REPOSITORY ROSRELEASE [EMAIL]"
+	exit 1
 fi
 
 # check, if job already exists
