@@ -33,6 +33,7 @@ Loginto hudson at localhost:8080 and add the following plugins
 * Email-ext plugin
 * Git Plugin
 * Github plugin
+* View Job Filters
 
 -----------------------------
 3 Configure Hudson
