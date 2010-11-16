@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <hudson>
-  <version>1.381</version>
+  <version>1.384</version>
   <numExecutors>1</numExecutors>
   <mode>NORMAL</mode>
   <useSecurity>true</useSecurity>
@@ -41,11 +41,221 @@
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
     </hudson.model.AllView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>fmw</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*fmw.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>care-o-bot</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*care-o-bot.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>cob3_intern</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*cob3_intern.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>320</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*ipa320.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>BROKEN</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters>
+        <hudson.views.JobStatusFilter>
+          <includeExcludeTypeString>includeMatched</includeExcludeTypeString>
+          <unstable>false</unstable>
+          <failed>true</failed>
+          <aborted>false</aborted>
+          <disabled>false</disabled>
+          <stable>false</stable>
+        </hudson.views.JobStatusFilter>
+      </jobFilters>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>uhr</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[5]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*uhr.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>goa</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[5]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*goa.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>jsf</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[5]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*jsf.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>aub</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[5]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*abubeck.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>bnm</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*bnm.*</includeRegex>
+    </listView>
   </views>
   <primaryView>Alle</primaryView>
   <slaveAgentPort>0</slaveAgentPort>
   <label></label>
   <nodeProperties/>
   <globalNodeProperties/>
-  <disabledAdministrativeMonitors/>
+  <disabledAdministrativeMonitors>
+    <string>OldData</string>
+  </disabledAdministrativeMonitors>
 </hudson>
