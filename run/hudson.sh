@@ -34,7 +34,7 @@ sudo apt-get install ros-$RELEASE-care-o-bot -y
 
 # get .rosinstall file
 #cp /home/hudson/$REPOSITORY.rosinstall $WORKSPACE/../$REPOSITORY.rosinstall
-wget https://github.com/ipa-fmw/hudson/raw/master/run/$REPOSITORY.rosinstall -O $WORKSPACE/$REPOSITORY.rosinstall --no-check-certificate
+wget https://github.com/ipa320/hudson/raw/master/run/$REPOSITORY.rosinstall -O $WORKSPACE/../$REPOSITORY.rosinstall --no-check-certificate
 
 # generate .rosinstall file
 sed -i "s/---GITHUBUSER---/$GITHUBUSER/g" $WORKSPACE/../$REPOSITORY.rosinstall
