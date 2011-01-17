@@ -10,7 +10,7 @@ if [ $# == 3 ] || [ $# == 4 ]; then
 	echo "Github repository name = " $2
 	echo "ROS release            = " $3
 	echo "User email             = " $4
-	JOBNAME=$3_$1_$2
+	JOBNAME=$3--$1--$2
 else
 	echo "ERROR: Wrong number of parameters"
 	echo "Usage: generate_job.sh GITHUBUSER REPOSITORY ROSRELEASE [EMAIL]"
@@ -39,6 +39,7 @@ sudo sed -i "s/---GITHUBUSER---/$1/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
 sudo sed -i "s/---REPOSITORY---/$2/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
 sudo sed -i "s/---ROSRELEASE---/$3/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
 sudo sed -i "s/---EMAIL---/$4/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
+sudo sed -i "s/---JOBNAME---/$JOBNAME/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
 
 # change owner to hudson
 sudo chown -R hudson.hudson /var/lib/hudson/jobs

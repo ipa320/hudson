@@ -34,7 +34,7 @@
     </remoteRepositories>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>**</name>
+        <name>master</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <localBranch></localBranch>
@@ -65,7 +65,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>sh $WORKSPACE/hudson.sh ---ROSRELEASE---</command>
+      <command>sh /home/hudson/hudson.sh ---ROSRELEASE---</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
@@ -89,5 +89,5 @@
     </hudson.plugins.emailext.ExtendedEmailPublisher>
   </publishers>
   <buildWrappers/>
-  <customWorkspace>/home/hudson/---ROSRELEASE---/---GITHUBUSER---/---REPOSITORY---</customWorkspace>
+  <customWorkspace>/home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/---REPOSITORY---</customWorkspace>
 </project>
