@@ -40,7 +40,7 @@
       <mode>NORMAL</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
-        <host>10.0.1.101</host>
+        <host>cob-sim1</host>
         <port>22</port>
         <username>hudson</username>
         <privatekey></privatekey>
@@ -57,7 +57,7 @@
       <mode>NORMAL</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
-        <host>10.0.1.102</host>
+        <host>cob-sim2</host>
         <port>22</port>
         <username>hudson</username>
         <privatekey></privatekey>
@@ -74,7 +74,41 @@
       <mode>NORMAL</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
-        <host>10.0.1.103</host>
+        <host>cob-sim3</host>
+        <port>22</port>
+        <username>hudson</username>
+        <privatekey></privatekey>
+        <jvmOptions></jvmOptions>
+      </launcher>
+      <label></label>
+      <nodeProperties/>
+    </slave>
+    <slave>
+      <name>fmw-z600-1</name>
+      <description></description>
+      <remoteFS>/home/hudson/</remoteFS>
+      <numExecutors>1</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+        <host>fmw-z600-1</host>
+        <port>22</port>
+        <username>hudson</username>
+        <privatekey></privatekey>
+        <jvmOptions></jvmOptions>
+      </launcher>
+      <label></label>
+      <nodeProperties/>
+    </slave>
+    <slave>
+      <name>fmw-z600-2</name>
+      <description></description>
+      <remoteFS>/home/hudson/</remoteFS>
+      <numExecutors>1</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+        <host>fmw-z600-2</host>
         <port>22</port>
         <username>hudson</username>
         <privatekey></privatekey>
@@ -420,6 +454,46 @@
         <hudson.views.BuildButtonColumn/>
       </columns>
       <includeRegex>.*cob_simulation.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>cturtle</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*cturtle.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>unstable</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[17]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*unstable.*</includeRegex>
     </listView>
   </views>
   <primaryView>Alle</primaryView>
