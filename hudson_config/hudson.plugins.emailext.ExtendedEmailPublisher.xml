@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<hudson.plugins.emailext.ExtendedEmailPublisher_-DescriptorImpl>
+<hudson.plugins.emailext.ExtendedEmailPublisherDescriptor>
   <hudsonUrl>http://localhost:8080/</hudsonUrl>
   <adminAddress>address not configured yet &lt;nobody&gt;</adminAddress>
   <useSsl>false</useSsl>
@@ -12,4 +12,4 @@ Check console output at $BUILD_URL to view the results.&#xd;
 Last lines of console output:&#xd;
 ${BUILD_LOG,maxLines=60}</defaultBody>
   <overrideGlobalSettings>false</overrideGlobalSettings>
-</hudson.plugins.emailext.ExtendedEmailPublisher_-DescriptorImpl>
+</hudson.plugins.emailext.ExtendedEmailPublisherDescriptor>

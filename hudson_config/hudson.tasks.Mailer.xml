@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <hudson.tasks.Mailer_-DescriptorImpl>
-  <hudsonUrl>http://fmw-z600.ipa.fhg.de:8080/</hudsonUrl>
+  <hudsonUrl>http://gambit.ipa.fhg.de:8080/</hudsonUrl>
   <adminAddress>hudson@ipa.fhg.de</adminAddress>
   <smtpHost>io.ipa.fhg.de</smtpHost>
   <useSsl>false</useSsl>
