@@ -65,7 +65,9 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>sh /home/hudson/hudson.sh ---ROSRELEASE---</command>
+      <command>wget https://github.com/ipa320/hudson/raw/master/run/hudson.sh -O $WORKSPACE/../hudson.sh --no-check-certificate 
+chmod 755 $WORKSPACE/../hudson.sh
+sh $WORKSPACE/../hudson.sh ---ROSRELEASE---</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
