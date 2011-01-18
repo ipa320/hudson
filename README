@@ -36,7 +36,7 @@ Loginto hudson at localhost:8080 and add the following plugins
 * View Job Filters
 
 -----------------------------
-3 Configure Hudson
+3 Configure Hudson and slave nodes
 ----------------------------- 
 create ssh-key and upload it to github
 
@@ -55,6 +55,6 @@ hudson ALL=(ALL) NOPASSWD: ALL
 4 Generate hudson jobs
 ----------------------------- 
 
-execute hudson_generate_job.sh
+execute create job script
 
-	hudson_generate_job.sh GITHUBUSER REPOSITORY ROSRELEASE
+	./create_job.sh GITHUBUSER REPOSITORY ROSRELEASE [EMAIL]

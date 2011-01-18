@@ -13,7 +13,7 @@ if [ $# == 3 ] || [ $# == 4 ]; then
 	JOBNAME=$3--$1--$2
 else
 	echo "ERROR: Wrong number of parameters"
-	echo "Usage: generate_job.sh GITHUBUSER REPOSITORY ROSRELEASE [EMAIL]"
+	echo "Usage: create_job.sh GITHUBUSER REPOSITORY ROSRELEASE [EMAIL]"
 	exit 1
 fi
 
