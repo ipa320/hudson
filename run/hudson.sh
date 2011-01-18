@@ -1,13 +1,5 @@
 #!/bin/bash
 
-STACKS="
-cob_apps
-cob_common
-cob_driver
-cob_extern
-cob_simulation
-"
-
 # get the name of REPOSITORY and GITHUBUSER from JOB_NAME
 REPOSITORY="${JOB_NAME##*--}"
 INTERSTAGE="${JOB_NAME%--*}"
@@ -19,10 +11,10 @@ if [ $# != 1 ]; then
 	exit 1
 elif [ $1 = "boxturtle" ]; then
 	RELEASE=boxturtle
-elif [ $1 = "latest" ]; then
-	RELEASE=latest
 elif [ $1 = "cturtle" ]; then
 	RELEASE=cturtle
+elif [ $1 = "unstable" ]; then
+	RELEASE=unstable
 else
 	echo "ERROR: no valid ROS release specified"
 	exit 1
