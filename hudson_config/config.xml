@@ -457,7 +457,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>cturtle</name>
+      <name>release_cturtle</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -477,7 +477,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>unstable</name>
+      <name>release_unstable</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
