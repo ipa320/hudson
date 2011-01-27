@@ -21,8 +21,8 @@ else
 fi
 
 # installing ROS release
-sudo su - -c "apt-get update"
-sudo su - -c "apt-get install ros-$RELEASE-care-o-bot -y"
+sudo apt-get update
+sudo apt-get install ros-$RELEASE-care-o-bot -y
 
 # get .rosinstall file
 #cp /home/hudson/$REPOSITORY.rosinstall $WORKSPACE/../$REPOSITORY.rosinstall
