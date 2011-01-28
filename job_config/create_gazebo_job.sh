@@ -30,13 +30,13 @@ fi
 sudo mkdir -p /var/lib/hudson/jobs/$JOBNAME
 
 # copy config file
-sudo cp config.xml /var/lib/hudson/jobs/$JOBNAME/config.xml
+sudo cp config_gazebo.xml /var/lib/hudson/jobs/$JOBNAME/config.xml
 
 # generate config file
-sudo sed -i "s/---GITHUBUSER---/$1/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
-sudo sed -i "s/---REPOSITORY---/$2/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
-sudo sed -i "s/---EMAIL---/$4/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
-sudo sed -i "s/---JOBNAME---/$JOBNAME/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
+sudo sed -i "s/---GITHUBUSER---/$1/g" /var/lib/hudson/jobs/$JOBNAME/config_gazebo.xml
+sudo sed -i "s/---REPOSITORY---/$2/g" /var/lib/hudson/jobs/$JOBNAME/config_gazebo.xml
+sudo sed -i "s/---EMAIL---/$4/g" /var/lib/hudson/jobs/$JOBNAME/config_gazebo.xml
+sudo sed -i "s/---JOBNAME---/$JOBNAME/g" /var/lib/hudson/jobs/$JOBNAME/config_gazebo.xml
 
 # change owner to hudson
 sudo chown -R hudson.hudson /var/lib/hudson/jobs

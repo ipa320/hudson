@@ -67,7 +67,7 @@
     <hudson.tasks.Shell>
       <command>wget https://github.com/fmw-jk/hudson/raw/master/run/hudson_gazebo.sh -O $WORKSPACE/../hudson_gazebo.sh --no-check-certificate 
 chmod 755 $WORKSPACE/../hudson_gazebo.sh
-sh /home/hudson/hudson_gazebo.sh</command>
+sh $WORKSPACE/../hudson_gazebo.sh</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
