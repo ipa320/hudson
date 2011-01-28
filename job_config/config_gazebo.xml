@@ -65,7 +65,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>wget https://github.com/fmw-jk/hudson/raw/master/run/hudson_gazebo.sh -O $WORKSPACE/../hudson_gazebo.sh --no-check-certificate 
+      <command>wget https://github.com/---GITHUBUSER---/hudson/raw/master/run/hudson_gazebo.sh -O $WORKSPACE/../hudson_gazebo.sh --no-check-certificate 
 chmod 755 $WORKSPACE/../hudson_gazebo.sh
 sh $WORKSPACE/../hudson_gazebo.sh</command>
     </hudson.tasks.Shell>
