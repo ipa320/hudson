@@ -5,6 +5,19 @@ REPOSITORY="${JOB_NAME##*--}"
 INTERSTAGE="${JOB_NAME%--*}"
 GITHUBUSER="${INTERSTAGE#*--}"
 
+write_rosinstall(){
+	STACK="$1"
+	echo "- git: 
+    local-name: /home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/$STACK
+    uri: git://github.com/---GITHUBUSER---/$STACK.git
+    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
+}
+
+check_stack(){
+	STACK="$1"
+	wget --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/stack.xml --no-ckeck-certificate 2> $WORKSPACE/../wget_response.txt
+}
+
 
 # checking for ROS release
 if [ $# != 1 ]; then
@@ -38,23 +51,27 @@ echo "- other: {local-name: /opt/ros/---ROSRELEASE---/ros}
 case "$REPOSITORY" in
 	cob_extern|cob_common)
 		# check if stack is forked > true include into .rosinstall file / false use release
-		wget --spider https://github.com/"$GITHUBUSER"/"$REPOSITORY"/blob/master/stack.xml --no-ckeck-certificate 2> $WORKSPACE/../wget_response.txt 
+		check_stack $REPOSITORY
+#wget --spider https://github.com/"$GITHUBUSER"/"$REPOSITORY"/blob/master/stack.xml --no-ckeck-certificate 2> $WORKSPACE/../wget_response.txt 
 		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
-			echo "- git: 
-    local-name: /home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/---REPOSITORY---
-    uri: git://github.com/---GITHUBUSER---/---REPOSITORY---.git
-    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
+			write_rosinstall $REPOSITORY
+#echo "- git: 
+#    local-name: /home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/---REPOSITORY---
+#    uri: git://github.com/---GITHUBUSER---/---REPOSITORY---.git
+#    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
 		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
 			echo "Stack $REPOSITORY not forked to $GITHUBUSER on github.com. Using release stack instead."
 		fi
 	;;
 	cob_apps)
-		wget --spider https://github.com/"$GITHUBUSER"/cob_apps/blob/master/stack.xml --no-ckeck-certificate 2> $WORKSPACE/../wget_response.txt
+		check_stack cob_apps
+#wget --spider https://github.com/"$GITHUBUSER"/cob_apps/blob/master/stack.xml --no-ckeck-certificate 2> $WORKSPACE/../wget_response.txt
 		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
-			echo "- git: 
-    local-name: /home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/cob_apps
-    uri: git://github.com/---GITHUBUSER---/cob_apps.git
-    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
+			write_rosinstall cob_apps
+#echo "- git: 
+#    local-name: /home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/cob_apps
+#    uri: git://github.com/---GITHUBUSER---/cob_apps.git
+#    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
 		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
 			echo "Stack cob_apps not forked to $GITHUBUSER on github.com. Using release stack instead."
 		fi
