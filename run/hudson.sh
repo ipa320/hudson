@@ -13,6 +13,8 @@ elif [ $1 = "boxturtle" ]; then
 	RELEASE=boxturtle
 elif [ $1 = "cturtle" ]; then
 	RELEASE=cturtle
+elif [ $1 = "diamondback" ]; then
+	RELEASE=diamondback
 elif [ $1 = "unstable" ]; then
 	RELEASE=unstable
 else
