@@ -24,6 +24,8 @@ fi
 
 # installing ROS release
 sudo apt-get update
+sudo apt-get install python-setuptools -y
+sudo easy_install -U rosinstall
 sudo apt-get install ros-$RELEASE-care-o-bot -y
 
 # get .rosinstall file
