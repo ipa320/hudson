@@ -59,7 +59,6 @@ case "$REPOSITORY" in
 			exit 1
 		fi
 	;;
-
 	cob_apps)
 		check_stack cob_apps
 		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
@@ -69,7 +68,7 @@ case "$REPOSITORY" in
 			echo "ERROR: Stack cob_apps not forked to $GITHUBUSER on github.com. Aborting..."
 			exit 1
 		fi
-
+	;&
 	cob_simulation)
 		# check if stack is forked > true: include into .rosinstall file / false: check if it's reasonable to continue
 		check_stack cob_simulation
@@ -78,7 +77,7 @@ case "$REPOSITORY" in
 		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
 			check_abort cob_simulation
 		fi
-
+	;&
 	cob_driver)
 		check_stack cob_driver
 		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
