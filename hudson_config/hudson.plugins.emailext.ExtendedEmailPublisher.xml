@@ -7,6 +7,8 @@
   <defaultSubject>$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!</defaultSubject>
   <defaultBody>$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:&#xd;
 &#xd;
+Build on Slave: ${ENV,var=&quot;NODE_NAME&quot;}&#xd;
+&#xd;
 Check console output at $BUILD_URL to view the results.&#xd;
 &#xd;
 Last lines of console output:&#xd;

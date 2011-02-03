@@ -415,6 +415,26 @@
       </columns>
       <includeRegex>.*gazebo.*</includeRegex>
     </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>release_diamondback</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*diamondback.*</includeRegex>
+    </listView>
   </views>
   <primaryView>Alle</primaryView>
   <slaveAgentPort>0</slaveAgentPort>
