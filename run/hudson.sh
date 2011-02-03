@@ -1,26 +1,11 @@
 #!/bin/bash
 
-# get the name of REPOSITORY and GITHUBUSER from JOB_NAME
-REPOSITORY="${JOB_NAME##*--}"
-INTERSTAGE="${JOB_NAME%--*}"
-GITHUBUSER="${INTERSTAGE#*--}"
-
-# checking for ROS release
-if [ $# != 1 ]; then
-	echo "ERROR: no ROS release specified"
-	exit 1
-elif [ $1 = "boxturtle" ]; then
-	RELEASE=boxturtle
-elif [ $1 = "cturtle" ]; then
-	RELEASE=cturtle
-elif [ $1 = "diamondback" ]; then
-	RELEASE=diamondback
-elif [ $1 = "unstable" ]; then
-	RELEASE=unstable
-else
-	echo "ERROR: no valid ROS release specified"
-	exit 1
-fi
+# get the name of ROSRELEASE, GITHUBUSER and REPOSITORY from JOB_NAME
+REPOSITORY="${JOB_NAME##*__}"
+INTERSTAGE="${JOB_NAME%__*}"
+GITHUBUSER="${INTERSTAGE#*__}"
+INTERSTAGE2="${INTERSTAGE%__*}"
+RELEASE="${INTERSTAGE2#*__}"
 
 # installing ROS release
 sudo apt-get update
