@@ -1,16 +1,25 @@
 #!/usr/bin/env bash
 
 # checking input parameters
-# $1 GITHUBUSER
-
-if [ $# == 1 ] || [ $# == 2 ]; then
+if [ $# == 2 ] || [ $# == 3 ]; then
+	ROSRELEASE=$1
+	GITHUBUSER=$2
+	EMAIL=$3
+	JOBNAME=$ROSRELEASE\_\_$GITHUBUSER\_\_gazebo
 	echo "Creating hudson config with"
-	echo "Github user name       = " $1
-	echo "User email             = " $2
-	JOBNAME=gazebo-test__$1
+	echo "ROS release            = " $ROSRELEASE
+	echo "Github user name       = " $GITHUBUSER
+	echo "User email             = " $EMAIL
+	echo "Job name               = " $JOBNAME
 else
 	echo "ERROR: Wrong number of parameters"
-	echo "Usage: create_gazebo_job.sh GITHUBUSER [EMAIL]"
+	echo "Usage: create_gazebo_job.sh ROSRELEASE GITHUBUSER [EMAIL]"
+	exit 1
+fi
+
+# checking for ROS release
+if [[ "$ROSRELEASE" != "boxturtle" && "$ROSRELEASE" != "cturtle" && "$ROSRELEASE" != "diamondback" && "$ROSRELEASE" != "unstable" ]]; then
+	echo "ERROR: no valid ROS release specified"
 	exit 1
 fi
 
@@ -32,8 +41,9 @@ sudo mkdir -p /var/lib/hudson/jobs/$JOBNAME
 sudo cp config_gazebo.xml /var/lib/hudson/jobs/$JOBNAME/config.xml
 
 # generate config file
-sudo sed -i "s/---GITHUBUSER---/$1/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
-sudo sed -i "s/---EMAIL---/$2/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
+sudo sed -i "s/---GITHUBUSER---/$GITHUBUSER/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
+sudo sed -i "s/---ROSRELEASE---/$ROSRELEASE/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
+sudo sed -i "s/---EMAIL---/$EMAIL/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
 sudo sed -i "s/---JOBNAME---/$JOBNAME/g" /var/lib/hudson/jobs/$JOBNAME/config.xml
 
 # change owner to hudson

@@ -1,12 +1,16 @@
 #!/bin/bash
 
-# get the name of GITHUBUSER from JOB_NAME
-GITHUBUSER="${JOB_NAME##*__}"
+# get the name of ROSRELEASE and GITHUBUSER from JOB_NAME
 REPOSITORY=cob_apps
-RELEASE=cturtle
+INTERSTAGE="${JOB_NAME%__*}"
+GITHUBUSER="${INTERSTAGE#*__}"
+INTERSTAGE2="${INTERSTAGE%__*}"
+RELEASE="${INTERSTAGE2#*__}"
 
 # installing ROS release
 sudo apt-get update
+sudo apt-get install python-setuptools -y
+sudo easy_install -U rosinstall
 sudo apt-get install ros-$RELEASE-care-o-bot -y
 
 # get .rosinstall file
@@ -42,8 +46,8 @@ echo "-------------------------------------------------------"
 echo ""
 
 # installing dependencies and building
-rosdep install $REPOSITORY
-rosmake $REPOSITORY --skip-blacklist
+rosdep install $cob_bringup
+rosmake cob_bringup --skip-blacklist
 
 # export parameters
 export ROBOT=cob3-1
