@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # get the name of REPOSITORY and GITHUBUSER from JOB_NAME
-REPOSITORY="${JOB_NAME##*--}"
-INTERSTAGE="${JOB_NAME%--*}"
-GITHUBUSER="${INTERSTAGE#*--}"
+REPOSITORY="${JOB_NAME##*__}"
+INTERSTAGE="${JOB_NAME%__*}"
+GITHUBUSER="${INTERSTAGE#*__}"
+RELEASE="${INTERSTAGE%__*}"
 
 write_rosinstall(){
 	STACK="$1"
@@ -15,27 +16,25 @@ write_rosinstall(){
 
 check_stack(){
 	STACK="$1"
-	wget --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/stack.xml --no-ckeck-certificate 2> $WORKSPACE/../wget_response.txt
+	wget --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/stack.xml --no-check-certificate 2> $WORKSPACE/../wget_response.txt
 }
 
-
-# checking for ROS release
-if [ $# != 1 ]; then
-	echo "ERROR: no ROS release specified"
-	exit 1
-elif [ $1 = "boxturtle" ]; then
-	RELEASE=boxturtle
-elif [ $1 = "cturtle" ]; then
-	RELEASE=cturtle
-elif [ $1 = "unstable" ]; then
-	RELEASE=unstable
-else
-	echo "ERROR: no valid ROS release specified"
-	exit 1
-fi
+check_abort(){
+	STACK="$1"
+	if [ $REPOSITORY == $STACK ]; then
+		# if the repository isn't forked, it's senseless to continue
+		echo "ERROR: Stack $STACK not forked to $GITHUBUSER on github.com. Aborting..."
+		exit 1
+	else
+		# if the repository is just dependent on this stack 
+		echo "WARNING: Stack $STACK not forked to $GITHUBUSER on github.com. Using release stack instead."
+	fi
+}
 
 # installing ROS release
 sudo apt-get update
+sudo apt-get install python-setuptools -y
+sudo easy_install -U rosinstall
 sudo apt-get install ros-$RELEASE-care-o-bot -y
 
 # get .rosinstall file
@@ -50,71 +49,64 @@ echo "- other: {local-name: /opt/ros/---ROSRELEASE---/ros}
 # checking dependencies and writing in .rosinstall file
 case "$REPOSITORY" in
 	cob_extern|cob_common)
-		# check if stack is forked > true include into .rosinstall file / false use release
+		# check if stack is forked > true: include into .rosinstall file / false: abort
 		check_stack $REPOSITORY
-#wget --spider https://github.com/"$GITHUBUSER"/"$REPOSITORY"/blob/master/stack.xml --no-ckeck-certificate 2> $WORKSPACE/../wget_response.txt 
 		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
 			write_rosinstall $REPOSITORY
-#echo "- git: 
-#    local-name: /home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/---REPOSITORY---
-#    uri: git://github.com/---GITHUBUSER---/---REPOSITORY---.git
-#    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
 		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
-			echo "Stack $REPOSITORY not forked to $GITHUBUSER on github.com. Using release stack instead."
+			# it is senseless to continue building
+			echo "ERROR: Stack $REPOSITORY not forked to $GITHUBUSER on github.com. Aborting..."
+			exit 1
 		fi
 	;;
+
 	cob_apps)
 		check_stack cob_apps
-#wget --spider https://github.com/"$GITHUBUSER"/cob_apps/blob/master/stack.xml --no-ckeck-certificate 2> $WORKSPACE/../wget_response.txt
 		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
 			write_rosinstall cob_apps
-#echo "- git: 
-#    local-name: /home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/cob_apps
-#    uri: git://github.com/---GITHUBUSER---/cob_apps.git
-#    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
 		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
-			echo "Stack cob_apps not forked to $GITHUBUSER on github.com. Using release stack instead."
+			# it is senseless to continue building
+			echo "ERROR: Stack cob_apps not forked to $GITHUBUSER on github.com. Aborting..."
+			exit 1
 		fi
+
 	cob_simulation)
-		wget --spider https://github.com/"$GITHUBUSER"/cob_simulation/blob/master/stack.xml --no-ckeck-certificate 2> $WORKSPACE/../wget_response.txt
+		# check if stack is forked > true: include into .rosinstall file / false: check if it's reasonable to continue
+		check_stack cob_simulation
 		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
-			echo "- git: 
-    local-name: /home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/cob_simulation
-    uri: git://github.com/---GITHUBUSER---/cob_simulation.git
-    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
+			write_rosinstall cob_simulation
 		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
-			echo "Stack cob_simulation not forked to $GITHUBUSER on github.com. Using release stack instead."
+			check_abort cob_simulation
 		fi
+
 	cob_driver)
-		wget --spider https://github.com/"$GITHUBUSER"/cob_driver/blob/master/stack.xml --no-ckeck-certificate 2> $WORKSPACE/../wget_response.txt
+		check_stack cob_driver
 		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
-			echo "- git: 
-    local-name: /home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/cob_driver
-    uri: git://github.com/---GITHUBUSER---/cob_driver.git
-    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
+			write_rosinstall cob_driver
 		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
-			echo "Stack cob_driver not forked to $GITHUBUSER on github.com. Using release stack instead."
+			check_abort cob_driver
 		fi
-		wget --spider https://github.com/"$GITHUBUSER"/cob_extern/blob/master/stack.xml --no-ckeck-certificate 2> $WORKSPACE/../wget_response.txt
+
+		check_stack cob_extern
 		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
-			echo "- git: 
-    local-name: /home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/cob_extern
-    uri: git://github.com/---GITHUBUSER---/cob_extern.git
-    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
+			write_rosinstall cob_extern
 		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
+			# repository is for sure just dependent on stack > continue 
 			echo "Stack cob_extern not forked to $GITHUBUSER on github.com. Using release stack instead."
 		fi
-		wget --spider https://github.com/"$GITHUBUSER"/cob_common/blob/master/stack.xml --no-ckeck-certificate 2> $WORKSPACE/../wget_response.txt
+
+		check_stack cob_common
 		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
-			echo "- git: 
-    local-name: /home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/cob_common
-    uri: git://github.com/---GITHUBUSER---/cob_common.git
-    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
+			write_rosinstall cob_common
 		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
+			# repository is for sure just dependent on stack > continue
 			echo "Stack cob_common not forked to $GITHUBUSER on github.com. Using release stack instead."
 		fi
 	;;
 esac
+
+# delete unnecessary wget_response.txt
+rm $WORKSPACE/../wget_response.txt
 
 # generate .rosinstall file
 sed -i "s/---GITHUBUSER---/$GITHUBUSER/g" $WORKSPACE/../$REPOSITORY.rosinstall
