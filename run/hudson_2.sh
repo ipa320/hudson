@@ -6,6 +6,7 @@ INTERSTAGE="${JOB_NAME%__*}"
 GITHUBUSER="${INTERSTAGE#*__}"
 RELEASE="${INTERSTAGE%__*}"
 
+
 write_rosinstall(){
 	STACK="$1"
 	echo "- git: 
@@ -17,6 +18,7 @@ write_rosinstall(){
 check_stack(){
 	STACK="$1"
 	wget --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/stack.xml --no-check-certificate 2> $WORKSPACE/../wget_response.txt
+	return $(grep -c "200 OK" $WORKSPACE/../wget_response.txt)
 }
 
 check_abort(){
@@ -37,8 +39,6 @@ sudo apt-get install python-setuptools -y
 sudo easy_install -U rosinstall
 sudo apt-get install ros-$RELEASE-care-o-bot -y
 
-# get .rosinstall file
-#wget https://github.com/ipa320/hudson/raw/master/run/empty.rosinstall -O $WORKSPACE/../$REPOSITORY.rosinstall --no-check-certificate
 
 # create .rosinstall file
 echo "- other: {local-name: /opt/ros/---ROSRELEASE---/ros}
@@ -50,10 +50,10 @@ echo "- other: {local-name: /opt/ros/---ROSRELEASE---/ros}
 case "$REPOSITORY" in
 	cob_extern|cob_common)
 		# check if stack is forked > true: include into .rosinstall file / false: abort
-		check_stack $REPOSITORY
-		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
+		check_stack $REPOSITORY 
+		if [ $? != 0 ]; then
 			write_rosinstall $REPOSITORY
-		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
+		else
 			# it is senseless to continue building
 			echo "ERROR: Stack $REPOSITORY not forked to $GITHUBUSER on github.com. Aborting..."
 			exit 1
@@ -61,9 +61,9 @@ case "$REPOSITORY" in
 	;;
 	cob_apps)
 		check_stack cob_apps
-		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
+		if [ $? != 0 ]; then
 			write_rosinstall cob_apps
-		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
+		else
 			# it is senseless to continue building
 			echo "ERROR: Stack cob_apps not forked to $GITHUBUSER on github.com. Aborting..."
 			exit 1
@@ -72,34 +72,34 @@ case "$REPOSITORY" in
 	cob_simulation)
 		# check if stack is forked > true: include into .rosinstall file / false: check if it's reasonable to continue
 		check_stack cob_simulation
-		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
+		if [ $? != 0 ]; then
 			write_rosinstall cob_simulation
-		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
+		else
 			check_abort cob_simulation
 		fi
 	;&
 	cob_driver)
 		check_stack cob_driver
-		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
+		if [ $? != 0 ]; then
 			write_rosinstall cob_driver
-		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
+		else
 			check_abort cob_driver
 		fi
 
 		check_stack cob_extern
-		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
+		if [ $? != 0 ]; then
 			write_rosinstall cob_extern
-		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
+		else
 			# repository is for sure just dependent on stack > continue 
-			echo "Stack cob_extern not forked to $GITHUBUSER on github.com. Using release stack instead."
+			echo "WARNING: Stack cob_extern not forked to $GITHUBUSER on github.com. Using release stack instead."
 		fi
 
 		check_stack cob_common
-		if [ "grep -c "200 OK" $WORKSPACE/../wget_response.txt" != 0 ]; then
+		if [ $? != 0 ]; then
 			write_rosinstall cob_common
-		elif [ "grep -c "404 Not Found" $WORKSPACE/../wget_response.txt" != 0 ]; then
+		else
 			# repository is for sure just dependent on stack > continue
-			echo "Stack cob_common not forked to $GITHUBUSER on github.com. Using release stack instead."
+			echo "WARNING: Stack cob_common not forked to $GITHUBUSER on github.com. Using release stack instead."
 		fi
 	;;
 esac
