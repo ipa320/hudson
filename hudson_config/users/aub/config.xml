@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <user>
-  <fullName>Florian Weisshardt</fullName>
+  <fullName>Alexander Bubeck</fullName>
   <properties>
     <hudson.model.MyViewsProperty>
       <primaryViewName>Alle</primaryViewName>
@@ -14,10 +14,10 @@
       </views>
     </hudson.model.MyViewsProperty>
     <hudson.security.HudsonPrivateSecurityRealm_-Details>
-      <passwordHash>mzEUbb:11e2cccb8101b75e06266808d16b9636554ff11c3acd2fc4826d57cd7b0fe72b</passwordHash>
+      <passwordHash>PjUDUb:a5b943e0eefa9ca3fc413646de9ab8d97473c85840c20b9ac739920f4db616f0</passwordHash>
     </hudson.security.HudsonPrivateSecurityRealm_-Details>
     <hudson.tasks.Mailer_-UserProperty>
-      <emailAddress>fmw@ipa.fhg.de</emailAddress>
+      <emailAddress>aub@ipa.fhg.de</emailAddress>
     </hudson.tasks.Mailer_-UserProperty>
   </properties>
 </user>
