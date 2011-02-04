@@ -50,9 +50,11 @@ rosdep install $cob_bringup
 rosmake cob_bringup --skip-blacklist
 
 # export parameters
-export ROBOT=cob3-1
-export ROBOT_ENV=ipa-kitchen
 export SIMX=-r #no graphical output of gazebo
+export ROBOT_ENV=ipa-kitchen
 
 # rostest
+export ROBOT=cob3-1
+rostest cob_bringup sim.launch
+export ROBOT=cob3-2
 rostest cob_bringup sim.launch
