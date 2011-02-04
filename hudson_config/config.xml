@@ -37,7 +37,7 @@
       <description></description>
       <remoteFS>/home/hudson/</remoteFS>
       <numExecutors>1</numExecutors>
-      <mode>NORMAL</mode>
+      <mode>EXCLUSIVE</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
         <host>cob-sim1</host>
@@ -54,7 +54,7 @@
       <description></description>
       <remoteFS>/home/hudson/</remoteFS>
       <numExecutors>1</numExecutors>
-      <mode>NORMAL</mode>
+      <mode>EXCLUSIVE</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
         <host>cob-sim2</host>
@@ -117,9 +117,60 @@
       <label></label>
       <nodeProperties/>
     </slave>
+    <slave>
+      <name>chaos</name>
+      <description></description>
+      <remoteFS>/home/hudson</remoteFS>
+      <numExecutors>1</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+        <host>chaos.ipa.fhg.de</host>
+        <port>22</port>
+        <username>hudson</username>
+        <privatekey></privatekey>
+        <jvmOptions></jvmOptions>
+      </launcher>
+      <label></label>
+      <nodeProperties/>
+    </slave>
+    <slave>
+      <name>fmw-z600</name>
+      <description></description>
+      <remoteFS>/home/hudson/</remoteFS>
+      <numExecutors>1</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+        <host>fmw-z600.ipa.fhg.de</host>
+        <port>22</port>
+        <username>hudson</username>
+        <privatekey></privatekey>
+        <jvmOptions></jvmOptions>
+      </launcher>
+      <label></label>
+      <nodeProperties/>
+    </slave>
+    <slave>
+      <name>aeneas</name>
+      <description></description>
+      <remoteFS>/home/hudson/</remoteFS>
+      <numExecutors>1</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+        <host>aeneas</host>
+        <port>22</port>
+        <username>hudson</username>
+        <privatekey></privatekey>
+        <jvmOptions></jvmOptions>
+      </launcher>
+      <label></label>
+      <nodeProperties/>
+    </slave>
   </slaves>
-  <quietPeriod>5</quietPeriod>
-  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+  <quietPeriod>15</quietPeriod>
+  <scmCheckoutRetryCount>3</scmCheckoutRetryCount>
   <views>
     <hudson.model.AllView>
       <owner class="hudson" reference="../../.."/>
