@@ -61,20 +61,20 @@ else
 	echo "WARNING: Stack cob_driver not forked to $GITHUBUSER on github.com. Using release stack instead."
 fi
 
-check_stack cob_extern
-if [ $? != 0 ]; then
-	write_rosinstall cob_extern
-else
-	# repository is for sure just dependent on stack > continue 
-	echo "WARNING: Stack cob_extern not forked to $GITHUBUSER on github.com. Using release stack instead."
-fi
-
 check_stack cob_common
 if [ $? != 0 ]; then
 	write_rosinstall cob_common
 else
 	# repository is for sure just dependent on stack > continue
 	echo "WARNING: Stack cob_common not forked to $GITHUBUSER on github.com. Using release stack instead."
+fi
+
+check_stack cob_extern
+if [ $? != 0 ]; then
+	write_rosinstall cob_extern
+else
+	# repository is for sure just dependent on stack > continue 
+	echo "WARNING: Stack cob_extern not forked to $GITHUBUSER on github.com. Using release stack instead."
 fi
 
 # delete unnecessary wget_response.txt
@@ -115,10 +115,5 @@ echo "-------------------------------------------------------"
 echo ""
 
 # installing dependencies and building
-rosdep install cob_manipulation cob_navigation cob_robotcontrolcenter cob_sandbox cob_scenarios cob_svn cob_vision
-rosdep install cob_apps
-rosmake cob_manipulation cob_navigation cob_robotcontrolcenter cob_sandbox cob_scenarios cob_svn cob_vision
-rosmake cob_apps --skip-blacklist
-
-
-
+make ros-install
+make ros-skip-blacklist
