@@ -4,8 +4,22 @@
 REPOSITORY="${JOB_NAME##*__}"
 INTERSTAGE="${JOB_NAME%__*}"
 GITHUBUSER="${INTERSTAGE#*__}"
-INTERSTAGE2="${INTERSTAGE%__*}"
-RELEASE="${INTERSTAGE2#*__}"
+RELEASE="${INTERSTAGE%__*}"
+
+
+write_rosinstall(){
+	STACK="$1"
+	echo "- git: 
+    local-name: /home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/$STACK
+    uri: git://github.com/---GITHUBUSER---/$STACK.git
+    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
+}
+
+check_stack(){
+	STACK="$1"
+	wget --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/stack.xml --no-check-certificate 2> $WORKSPACE/../wget_response.txt
+	return $(grep -c "200 OK" $WORKSPACE/../wget_response.txt)
+}
 
 # installing ROS release
 sudo apt-get update
@@ -13,9 +27,51 @@ sudo apt-get install python-setuptools -y
 sudo easy_install -U rosinstall
 sudo apt-get install ros-$RELEASE-care-o-bot -y
 
-# get .rosinstall file
-#cp /home/hudson/$REPOSITORY.rosinstall $WORKSPACE/../$REPOSITORY.rosinstall
-wget https://github.com/ipa320/hudson/raw/master/run/$REPOSITORY.rosinstall -O $WORKSPACE/../$REPOSITORY.rosinstall --no-check-certificate
+# create .rosinstall file
+echo "- other: {local-name: /opt/ros/---ROSRELEASE---/ros}
+- other: {local-name: /opt/ros/---ROSRELEASE---/stacks}
+" > $WORKSPACE/../$REPOSITORY.rosinstall
+
+# check if stack is forked > true: include into .rosinstall file / false: check if it's reasonable to continue
+check_stack cob_extern
+if [ $? != 0 ]; then
+	write_rosinstall cob_extern
+else
+	# repository is for sure just dependent on stack > continue 
+	echo "WARNING: Stack cob_extern not forked to $GITHUBUSER on github.com. Using release stack instead."
+fi
+
+check_stack cob_common
+if [ $? != 0 ]; then
+	write_rosinstall cob_common
+else
+	# repository is for sure just dependent on stack > continue
+	echo "WARNING: Stack cob_common not forked to $GITHUBUSER on github.com. Using release stack instead."
+fi
+
+check_stack cob_driver
+if [ $? != 0 ]; then
+	write_rosinstall cob_driver
+else
+	echo "WARNING: Stack cob_driver not forked to $GITHUBUSER on github.com. Using release stack instead."
+fi
+
+check_stack cob_simulation
+if [ $? != 0 ]; then
+	write_rosinstall cob_simulation
+else
+	echo "WARNING: Stack cob_simulation not forked to $GITHUBUSER on github.com. Using release stack instead."
+fi
+
+check_stack cob_apps
+if [ $? != 0 ]; then
+	write_rosinstall cob_apps
+else
+	echo "WARNING: Stack cob_apps not forked to $GITHUBUSER on github.com. Using release stack instead."
+fi
+
+# delete unnecessary wget_response.txt
+rm $WORKSPACE/../wget_response.txt
 
 # generate .rosinstall file
 sed -i "s/---GITHUBUSER---/$GITHUBUSER/g" $WORKSPACE/../$REPOSITORY.rosinstall

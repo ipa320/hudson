@@ -27,17 +27,13 @@ sudo apt-get install python-setuptools -y
 sudo easy_install -U rosinstall
 sudo apt-get install ros-$RELEASE-care-o-bot -y
 
-
 # create .rosinstall file
 echo "- other: {local-name: /opt/ros/---ROSRELEASE---/ros}
 - other: {local-name: /opt/ros/---ROSRELEASE---/stacks}
 " > $WORKSPACE/../$REPOSITORY.rosinstall
 
-
 # checking dependencies and writing in .rosinstall file
 write_rosinstall cob3_intern
-
-
 
 # check if stack is forked > true: include into .rosinstall file / false: check if it's reasonable to continue
 check_stack cob_extern

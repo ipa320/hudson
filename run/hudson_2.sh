@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# get the name of REPOSITORY and GITHUBUSER from JOB_NAME
+# get the name of ROSRELEASE, GITHUBUSER and REPOSITORY from JOB_NAME
 REPOSITORY="${JOB_NAME##*__}"
 INTERSTAGE="${JOB_NAME%__*}"
 GITHUBUSER="${INTERSTAGE#*__}"

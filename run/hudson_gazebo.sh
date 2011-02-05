@@ -4,8 +4,22 @@
 REPOSITORY=cob_apps
 INTERSTAGE="${JOB_NAME%__*}"
 GITHUBUSER="${INTERSTAGE#*__}"
-INTERSTAGE2="${INTERSTAGE%__*}"
-RELEASE="${INTERSTAGE2#*__}"
+RELEASE="${INTERSTAGE%__*}"
+
+
+write_rosinstall(){
+	STACK="$1"
+	echo "- git: 
+    local-name: /home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/$STACK
+    uri: git://github.com/---GITHUBUSER---/$STACK.git
+    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
+}
+
+check_stack(){
+	STACK="$1"
+	wget --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/stack.xml --no-check-certificate 2> $WORKSPACE/../wget_response.txt
+	return $(grep -c "200 OK" $WORKSPACE/../wget_response.txt)
+}
 
 # installing ROS release
 sudo apt-get update
