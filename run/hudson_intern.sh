@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# get the name of REPOSITORY and GITHUBUSER from JOB_NAME
+# get the name of ROSRELEASE, GITHUBUSER and REPOSITORY from JOB_NAME
 REPOSITORY="${JOB_NAME##*__}"
 INTERSTAGE="${JOB_NAME%__*}"
 GITHUBUSER="${INTERSTAGE#*__}"
@@ -88,11 +88,10 @@ sed -i "s/---REPOSITORY---/$REPOSITORY/g" $WORKSPACE/../$REPOSITORY.rosinstall
 
 # perform clean rosinstall
 rm $WORKSPACE/.rosinstall
-rm $WORKSPACE/../setup.sh
 rosinstall $WORKSPACE $WORKSPACE/../$REPOSITORY.rosinstall $WORKSPACE --delete-changed-uris
 
 # setup ROS environment
-. $WORKSPACE/setup.sh
+. $WORKSPACE/setup.bash
 
 # define amount of ros prozesses during build for multi-prozessor machines
 COUNT=$(cat /proc/cpuinfo | grep 'processor' | wc -l)
