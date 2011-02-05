@@ -37,28 +37,15 @@ echo "- other: {local-name: /opt/ros/---ROSRELEASE---/ros}
 # checking dependencies and writing in .rosinstall file
 write_rosinstall cob3_intern
 
-check_stack cob_apps
-if [ $? != 0 ]; then
-	write_rosinstall cob_apps
-else
-	# it is senseless to continue building
-	echo "WARNING: Stack cob_apps not forked to $GITHUBUSER on github.com. Using release stack instead."
-	exit 1
-fi
+
 
 # check if stack is forked > true: include into .rosinstall file / false: check if it's reasonable to continue
-check_stack cob_simulation
+check_stack cob_extern
 if [ $? != 0 ]; then
-	write_rosinstall cob_simulation
+	write_rosinstall cob_extern
 else
-	echo "WARNING: Stack cob_simulation not forked to $GITHUBUSER on github.com. Using release stack instead."
-fi
-
-check_stack cob_driver
-if [ $? != 0 ]; then
-	write_rosinstall cob_driver
-else
-	echo "WARNING: Stack cob_driver not forked to $GITHUBUSER on github.com. Using release stack instead."
+	# repository is for sure just dependent on stack > continue 
+	echo "WARNING: Stack cob_extern not forked to $GITHUBUSER on github.com. Using release stack instead."
 fi
 
 check_stack cob_common
@@ -69,12 +56,25 @@ else
 	echo "WARNING: Stack cob_common not forked to $GITHUBUSER on github.com. Using release stack instead."
 fi
 
-check_stack cob_extern
+check_stack cob_driver
 if [ $? != 0 ]; then
-	write_rosinstall cob_extern
+	write_rosinstall cob_driver
 else
-	# repository is for sure just dependent on stack > continue 
-	echo "WARNING: Stack cob_extern not forked to $GITHUBUSER on github.com. Using release stack instead."
+	echo "WARNING: Stack cob_driver not forked to $GITHUBUSER on github.com. Using release stack instead."
+fi
+
+check_stack cob_simulation
+if [ $? != 0 ]; then
+	write_rosinstall cob_simulation
+else
+	echo "WARNING: Stack cob_simulation not forked to $GITHUBUSER on github.com. Using release stack instead."
+fi
+
+check_stack cob_apps
+if [ $? != 0 ]; then
+	write_rosinstall cob_apps
+else
+	echo "WARNING: Stack cob_apps not forked to $GITHUBUSER on github.com. Using release stack instead."
 fi
 
 # delete unnecessary wget_response.txt
