@@ -60,7 +60,6 @@ sed -i "s/---REPOSITORY---/$REPOSITORY/g" $WORKSPACE/../$REPOSITORY.rosinstall
 
 # perform clean rosinstall
 rm $WORKSPACE/.rosinstall
-rm $WORKSPACE/../.rosinstall
 rosinstall $WORKSPACE $WORKSPACE/../$REPOSITORY.rosinstall $WORKSPACE --delete-changed-uris
 
 # setup ROS environment
