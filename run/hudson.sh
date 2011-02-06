@@ -35,6 +35,9 @@ echo "- other: {local-name: /opt/ros/---ROSRELEASE---/ros}
 # get dependencies
 rm $WORKSPACE/../$REPOSITORY.deps
 wget https://github.com/ipa320/hudson/raw/master/run/"$REPOSITORY".deps -O $WORKSPACE/../$REPOSITORY.deps --no-check-certificate
+
+echo ""
+echo "--------------------------------------------------------------------------------"
 while read myline
 do
   # check if stack is forked > true: include into .rosinstall file / false: check if it's reasonable to continue
@@ -42,12 +45,14 @@ do
   check_stack $myline
   if [ $? != 0 ]; then
     write_rosinstall $myline
+    echo "  INFO: Using stack $myline from $GITHUBUSER at github.com"
   else
     # repository is for sure just dependent on stack > continue 
-    echo "WARNING: Stack cob_extern not forked to $GITHUBUSER on github.com. Using release stack instead."
+    echo "  WARNING: Stack $myline not forked to $GITHUBUSER at github.com. Using release stack instead."
   fi
-
 done < $WORKSPACE/../$REPOSITORY.deps
+echo "--------------------------------------------------------------------------------"
+echo ""
 
 # delete unnecessary wget_response.txt
 rm $WORKSPACE/../wget_response.txt
