@@ -38,6 +38,7 @@ wget https://github.com/ipa320/hudson/raw/master/run/"$REPOSITORY".deps -O $WORK
 
 echo ""
 echo "--------------------------------------------------------------------------------"
+echo "Checking dependencies for $REPOSITORY"
 while read myline
 do
   # check if stack is forked > true: include into .rosinstall file / false: check if it's reasonable to continue
