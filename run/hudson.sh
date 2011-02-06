@@ -38,6 +38,7 @@ wget https://github.com/ipa320/hudson/raw/master/run/"$REPOSITORY".deps -O $WORK
 while read myline
 do
   # check if stack is forked > true: include into .rosinstall file / false: check if it's reasonable to continue
+  echo "Performing check on stack: $myline"
   check_stack $myline
   if [ $? != 0 ]; then
     write_rosinstall $myline
