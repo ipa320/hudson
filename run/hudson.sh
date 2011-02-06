@@ -47,7 +47,7 @@ do
     echo "WARNING: Stack cob_extern not forked to $GITHUBUSER on github.com. Using release stack instead."
   fi
 
-done < $REPOSITORY.deps
+done < $WORKSPACE/../$REPOSITORY.deps
 
 # delete unnecessary wget_response.txt
 rm $WORKSPACE/../wget_response.txt
