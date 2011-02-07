@@ -180,7 +180,7 @@
     </hudson.model.AllView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>ipa-fmw</name>
+      <name>u_fmw</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -200,7 +200,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>ipa320</name>
+      <name>u_320</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -248,7 +248,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>ipa-uhr</name>
+      <name>u_uhr</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -268,7 +268,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>ipa-goa</name>
+      <name>u_goa</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -288,7 +288,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>ipa-jsf</name>
+      <name>u_jsf</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -308,7 +308,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>abubeck</name>
+      <name>u_aub</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -328,7 +328,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>ipa-bnm</name>
+      <name>u_bnm</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -348,7 +348,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>cpc-pk</name>
+      <name>u_cpc-pk</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -368,7 +368,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>ipa-uhr-fm</name>
+      <name>u_uhr-fm</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -388,7 +388,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>release_cturtle</name>
+      <name>r_cturtle</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -408,7 +408,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>release_unstable</name>
+      <name>r_unstable</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -428,7 +428,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>fmw-jk</name>
+      <name>u_fmw-jk</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -468,7 +468,7 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>release_diamondback</name>
+      <name>r_diamondback</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
@@ -485,6 +485,146 @@
         <hudson.views.BuildButtonColumn/>
       </columns>
       <includeRegex>.*diamondback.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>u_taj-dm</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*ipa-taj-dm.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>c_e</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*cob_extern.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>c_c</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[17]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*cob_common.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>c_d</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[17]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*cob_driver.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>c_s</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[17]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*cob_simulation.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>c_a</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[17]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*cob_apps.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>c_i</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[17]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*cob3_intern.*</includeRegex>
     </listView>
   </views>
   <primaryView>Alle</primaryView>
