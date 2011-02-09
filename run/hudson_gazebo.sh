@@ -95,6 +95,9 @@ echo ""
 rosdep install $cob_bringup
 rosmake cob_bringup --skip-blacklist
 
+# cleanup gazebo tmp dir
+rm -rf /tmp/gazebo*
+
 # export parameters
 export SIMX=-r #no graphical output of gazebo
 export ROBOT_ENV=ipa-kitchen
