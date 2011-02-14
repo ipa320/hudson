@@ -92,7 +92,7 @@ echo "-------------------------------------------------------"
 echo ""
 
 # installing dependencies and building
-rosdep install $cob_bringup
+rosdep install cob_bringup
 rosmake cob_bringup --skip-blacklist
 
 # cleanup gazebo tmp dir
