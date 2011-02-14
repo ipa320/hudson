@@ -92,5 +92,5 @@ echo "-------------------------------------------------------"
 echo ""
 
 # installing dependencies and building
-rosdep install $REPOSITORY
+rosdep install $REPOSITORY -y
 rosmake $REPOSITORY --skip-blacklist
