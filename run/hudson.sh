@@ -93,4 +93,4 @@ echo ""
 
 # installing dependencies and building
 rosdep install $REPOSITORY -y
-rosmake $REPOSITORY --skip-blacklist
+rosmake $REPOSITORY --skip-blacklist --profile
