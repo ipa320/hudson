@@ -128,7 +128,6 @@
         <host>fmw-z600.ipa.fhg.de</host>
         <port>22</port>
         <username>hudson</username>
-        <password>qau7KLbgvj1YLN04R4uvzg==</password>
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
