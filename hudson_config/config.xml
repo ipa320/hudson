@@ -80,7 +80,7 @@
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
-      <label>gazebo</label>
+      <label></label>
       <nodeProperties/>
     </slave>
     <slave>
@@ -118,23 +118,6 @@
       <nodeProperties/>
     </slave>
     <slave>
-      <name>chaos</name>
-      <description></description>
-      <remoteFS>/home/hudson</remoteFS>
-      <numExecutors>1</numExecutors>
-      <mode>NORMAL</mode>
-      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
-      <launcher class="hudson.plugins.sshslaves.SSHLauncher">
-        <host>chaos.ipa.fhg.de</host>
-        <port>22</port>
-        <username>hudson</username>
-        <privatekey></privatekey>
-        <jvmOptions></jvmOptions>
-      </launcher>
-      <label></label>
-      <nodeProperties/>
-    </slave>
-    <slave>
       <name>fmw-z600</name>
       <description></description>
       <remoteFS>/home/hudson/</remoteFS>
@@ -145,10 +128,11 @@
         <host>fmw-z600.ipa.fhg.de</host>
         <port>22</port>
         <username>hudson</username>
+        <password>qau7KLbgvj1YLN04R4uvzg==</password>
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
-      <label></label>
+      <label>gazebo</label>
       <nodeProperties/>
     </slave>
     <slave>
@@ -160,6 +144,23 @@
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
         <host>aeneas</host>
+        <port>22</port>
+        <username>hudson</username>
+        <privatekey></privatekey>
+        <jvmOptions></jvmOptions>
+      </launcher>
+      <label></label>
+      <nodeProperties/>
+    </slave>
+    <slave>
+      <name>chaos</name>
+      <description></description>
+      <remoteFS>/home/hudson/</remoteFS>
+      <numExecutors>1</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+        <host>chaos.ipa.fhg.de</host>
         <port>22</port>
         <username>hudson</username>
         <privatekey></privatekey>
@@ -634,5 +635,6 @@
   <globalNodeProperties/>
   <disabledAdministrativeMonitors>
     <string>OldData</string>
+    <string>hudson.node_monitors.MonitorMarkedNodeOffline</string>
   </disabledAdministrativeMonitors>
 </hudson>
