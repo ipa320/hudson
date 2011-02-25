@@ -22,6 +22,7 @@ check_stack(){
 }
 
 # installing ROS release
+sudo apt-get autoclean
 sudo apt-get update
 sudo apt-get install python-setuptools -y
 sudo easy_install -U rosinstall
