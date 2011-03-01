@@ -34,6 +34,7 @@ Loginto hudson at localhost:8080 and add the following plugins
 * Git Plugin
 * Github plugin
 * View Job Filters
+* Post build task
 
 -----------------------------
 3 Configure Hudson and slave nodes
