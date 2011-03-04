@@ -66,11 +66,11 @@ sed -i "s/---JOBNAME---/$JOB_NAME/g" $WORKSPACE/../$REPOSITORY.rosinstall
 sed -i "s/---REPOSITORY---/$REPOSITORY/g" $WORKSPACE/../$REPOSITORY.rosinstall
 
 # perform clean rosinstall
-rm $WORKSPACE/.rosinstall
-rosinstall $WORKSPACE $WORKSPACE/../$REPOSITORY.rosinstall $WORKSPACE --delete-changed-uris
+rm $WORKSPACE/../.rosinstall
+rosinstall $WORKSPACE/../ $WORKSPACE/../$REPOSITORY.rosinstall $WORKSPACE --delete-changed-uris
 
 # setup ROS environment
-. $WORKSPACE/setup.sh
+. $WORKSPACE/../setup.sh
 
 # define amount of ros prozesses during build for multi-prozessor machines
 COUNT=$(cat /proc/cpuinfo | grep 'processor' | wc -l)
