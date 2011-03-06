@@ -11,7 +11,7 @@ write_rosinstall(){
 	STACK="$1"
 	echo "- git: 
     local-name: $STACK
-    uri: git://github.com/---GITHUBUSER---/$STACK.git
+    uri: git@github.com:---GITHUBUSER---/$STACK.git
     branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
 }
 
