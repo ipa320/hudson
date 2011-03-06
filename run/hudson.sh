@@ -17,7 +17,9 @@ write_rosinstall(){
 
 check_stack(){
 	STACK="$1"
-	wget --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/stack.xml --no-check-certificate 2> $WORKSPACE/../wget_response.txt
+	user=`git config --global github.user`
+	token=`git config --global github.token`
+	wget --post-data "login=$user&token=$token" --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/Makefile --no-check-certificate 2> $WORKSPACE/../wget_response.txt
 	return $(grep -c "200 OK" $WORKSPACE/../wget_response.txt)
 }
 
