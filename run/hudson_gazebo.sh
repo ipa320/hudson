@@ -110,3 +110,5 @@ export ROBOT=cob3-1
 rostest cob_bringup sim.launch
 export ROBOT=cob3-2
 rostest cob_bringup sim.launch
+export ROBOT=desire
+rostest cob_bringup sim.launch
