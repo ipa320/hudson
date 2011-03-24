@@ -103,7 +103,7 @@ rm -rf /tmp/gazebo*
 
 # export parameters
 export SIMX=-r #no graphical output of gazebo
-export ENV_MODE=
+export ENV_MODE= #kind of texture --> normal texture (empty) or simple ("-simple")
 export ROBOT_ENV=ipa-kitchen
 
 # rostest
