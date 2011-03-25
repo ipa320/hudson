@@ -101,15 +101,25 @@ rosmake cob_bringup --skip-blacklist --profile
 # cleanup gazebo tmp dir
 rm -rf /tmp/gazebo*
 
+# include TurboVNC and VirtualGL directories to $PATH
+export PATH=/opt/TurboVNC/bin:/opt/VirtualGL/bin:$PATH
+
+#export environment variable
+export ENV_MODE=
+
+#kill old VNCserver
+vncserver -kill :5
+
+#start VNCserver
+vncserver :5
+export DISPLAY=:5
+
 # export parameters
-export SIMX=-r #no graphical output of gazebo
-export ENV_MODE= #kind of texture --> normal texture (empty) or simple ("-simple")
 export ROBOT_ENV=ipa-kitchen
 
-# rostest
+# rostest via VirtualGL
 export ROBOT=cob3-1
-rostest cob_bringup sim.launch
-export ROBOT=cob3-2
-rostest cob_bringup sim.launch
-#export ROBOT=desire
-#rostest cob_bringup sim.launch
+vglrun rostest cob_bringup sim.launch
+#export ROBOT=cob3-2
+#vglrun -d :5 rostest cob_bringup sim.launch
+

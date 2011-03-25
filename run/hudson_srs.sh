@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# get the name of ROSRELEASE and GITHUBUSER from JOB_NAME
-REPOSITORY=cob_apps
+# get the name of ROSRELEASE, GITHUBUSER and REPOSITORY from JOB_NAME
+REPOSITORY="${JOB_NAME##*__}"
 INTERSTAGE="${JOB_NAME%__*}"
 GITHUBUSER="${INTERSTAGE#*__}"
 RELEASE="${INTERSTAGE%__*}"
@@ -95,21 +95,5 @@ echo "-------------------------------------------------------"
 echo ""
 
 # installing dependencies and building
-rosdep install cob_bringup -y
-rosmake cob_bringup --skip-blacklist --profile
-
-# cleanup gazebo tmp dir
-rm -rf /tmp/gazebo*
-
-# export parameters
-export SIMX=-r #no graphical output of gazebo
-export ENV_MODE= #kind of texture --> normal texture (empty) or simple ("-simple")
-export ROBOT_ENV=ipa-kitchen
-
-# rostest
-export ROBOT=cob3-1
-rostest cob_bringup sim.launch
-export ROBOT=cob3-2
-rostest cob_bringup sim.launch
-#export ROBOT=desire
-#rostest cob_bringup sim.launch
+rosdep install $REPOSITORY -y
+rosmake $REPOSITORY --skip-blacklist --profile
