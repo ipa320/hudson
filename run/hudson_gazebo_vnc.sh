@@ -104,9 +104,6 @@ rm -rf /tmp/gazebo*
 # include TurboVNC and VirtualGL directories to $PATH
 export PATH=/opt/TurboVNC/bin:/opt/VirtualGL/bin:$PATH
 
-#export environment variable
-export ENV_MODE=
-
 #kill old VNCserver
 vncserver -kill :5
 
