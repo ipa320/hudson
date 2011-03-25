@@ -60,9 +60,6 @@
     <hudson.triggers.TimerTrigger>
       <spec>@midnight</spec>
     </hudson.triggers.TimerTrigger>
-    <hudson.triggers.SCMTrigger>
-      <spec>*/10 * * * *</spec>
-    </hudson.triggers.SCMTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
   <builders>
