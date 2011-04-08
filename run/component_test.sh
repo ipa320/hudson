@@ -74,4 +74,8 @@ echo " * RESULT:" "$result" >> component_test_result.txt
 sleep 15s
 cat component_test_result.txt
 
-echo "[$result]" >&2
+if [ $result == "SUCCESS" ]; then
+   return true
+else
+   return false
+fi
