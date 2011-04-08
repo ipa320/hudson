@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <hudson>
-  <version>1.384</version>
+  <version>1.395</version>
   <numExecutors>1</numExecutors>
   <mode>NORMAL</mode>
   <useSecurity>true</useSecurity>
@@ -27,6 +27,7 @@
   <securityRealm class="hudson.security.HudsonPrivateSecurityRealm">
     <disableSignup>true</disableSignup>
   </securityRealm>
+  <markupFormatter class="hudson.markup.RawHtmlMarkupFormatter"/>
   <jdks/>
   <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
   <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
@@ -37,16 +38,17 @@
       <description></description>
       <remoteFS>/home/hudson/</remoteFS>
       <numExecutors>1</numExecutors>
-      <mode>EXCLUSIVE</mode>
+      <mode>NORMAL</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
         <host>cob-sim1</host>
         <port>22</port>
         <username>hudson</username>
+        <password>qau7KLbgvj1YLN04R4uvzg==</password>
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
-      <label>gazebo</label>
+      <label></label>
       <nodeProperties/>
     </slave>
     <slave>
@@ -54,16 +56,17 @@
       <description></description>
       <remoteFS>/home/hudson/</remoteFS>
       <numExecutors>1</numExecutors>
-      <mode>EXCLUSIVE</mode>
+      <mode>NORMAL</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
         <host>cob-sim2</host>
         <port>22</port>
         <username>hudson</username>
+        <password>qau7KLbgvj1YLN04R4uvzg==</password>
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
-      <label>gazebo</label>
+      <label></label>
       <nodeProperties/>
     </slave>
     <slave>
@@ -77,6 +80,7 @@
         <host>cob-sim3</host>
         <port>22</port>
         <username>hudson</username>
+        <password>qau7KLbgvj1YLN04R4uvzg==</password>
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
@@ -89,28 +93,15 @@
       <remoteFS>/home/hudson/</remoteFS>
       <numExecutors>1</numExecutors>
       <mode>NORMAL</mode>
-      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Demand">
+        <inDemandDelay>15</inDemandDelay>
+        <idleDelay>10</idleDelay>
+      </retentionStrategy>
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
         <host>fmw-z600-1</host>
         <port>22</port>
         <username>hudson</username>
-        <privatekey></privatekey>
-        <jvmOptions></jvmOptions>
-      </launcher>
-      <label></label>
-      <nodeProperties/>
-    </slave>
-    <slave>
-      <name>fmw-z600-2</name>
-      <description></description>
-      <remoteFS>/home/hudson/</remoteFS>
-      <numExecutors>1</numExecutors>
-      <mode>NORMAL</mode>
-      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
-      <launcher class="hudson.plugins.sshslaves.SSHLauncher">
-        <host>fmw-z600-2</host>
-        <port>22</port>
-        <username>hudson</username>
+        <password>qau7KLbgvj1YLN04R4uvzg==</password>
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
@@ -122,12 +113,13 @@
       <description></description>
       <remoteFS>/home/hudson/</remoteFS>
       <numExecutors>1</numExecutors>
-      <mode>NORMAL</mode>
+      <mode>EXCLUSIVE</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
         <host>fmw-z600.ipa.fhg.de</host>
         <port>22</port>
         <username>hudson</username>
+        <password>qau7KLbgvj1YLN04R4uvzg==</password>
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
@@ -135,33 +127,20 @@
       <nodeProperties/>
     </slave>
     <slave>
-      <name>aeneas</name>
+      <name>fmw-z600-2</name>
       <description></description>
       <remoteFS>/home/hudson/</remoteFS>
       <numExecutors>1</numExecutors>
       <mode>NORMAL</mode>
-      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Demand">
+        <inDemandDelay>15</inDemandDelay>
+        <idleDelay>10</idleDelay>
+      </retentionStrategy>
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
-        <host>aeneas</host>
+        <host>fmw-z600-2</host>
         <port>22</port>
         <username>hudson</username>
-        <privatekey></privatekey>
-        <jvmOptions></jvmOptions>
-      </launcher>
-      <label></label>
-      <nodeProperties/>
-    </slave>
-    <slave>
-      <name>chaos</name>
-      <description></description>
-      <remoteFS>/home/hudson/</remoteFS>
-      <numExecutors>1</numExecutors>
-      <mode>NORMAL</mode>
-      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
-      <launcher class="hudson.plugins.sshslaves.SSHLauncher">
-        <host>chaos.ipa.fhg.de</host>
-        <port>22</port>
-        <username>hudson</username>
+        <password>qau7KLbgvj1YLN04R4uvzg==</password>
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
@@ -196,7 +175,7 @@
         <hudson.views.LastDurationColumn/>
         <hudson.views.BuildButtonColumn/>
       </columns>
-      <includeRegex>.*ipa-fmw.*</includeRegex>
+      <includeRegex>.*_ipa-fmw_.*</includeRegex>
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
@@ -264,7 +243,7 @@
         <hudson.views.LastDurationColumn/>
         <hudson.views.BuildButtonColumn/>
       </columns>
-      <includeRegex>.*--ipa-uhr--.*</includeRegex>
+      <includeRegex>.*__ipa-uhr__.*</includeRegex>
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
@@ -626,8 +605,88 @@
       </columns>
       <includeRegex>.*cob3_intern.*</includeRegex>
     </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>u_rmb</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*ipa-rmb.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>u_fmw-ws</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*ipa-fmw-ws.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>u_aub-nhg</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*nhg-ipa.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>u_b-it-bots</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[25]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*b-it-bots.*</includeRegex>
+    </listView>
   </views>
-  <primaryView>Alle</primaryView>
+  <primaryView>BROKEN</primaryView>
   <slaveAgentPort>0</slaveAgentPort>
   <label></label>
   <nodeProperties/>
