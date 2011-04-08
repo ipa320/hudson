@@ -11,7 +11,7 @@ Build on Slave: ${ENV,var=&quot;NODE_NAME&quot;}&#xd;
 &#xd;
 Check console output at $BUILD_URL to view the results.&#xd;
 &#xd;
-Last lines of console output:&#xd;
-${BUILD_LOG,maxLines=60}</defaultBody>
+Last 100 lines of console output:&#xd;
+${BUILD_LOG,maxLines=100}</defaultBody>
   <overrideGlobalSettings>false</overrideGlobalSettings>
 </hudson.plugins.emailext.ExtendedEmailPublisherDescriptor>
