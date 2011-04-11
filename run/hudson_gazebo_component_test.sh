@@ -107,7 +107,7 @@ export ROBOT_ENV=ipa-kitchen
 
 # rostest
 export ROBOT=cob3-1
-./component_test.sh
+$WORKSPACE/../component_test.sh
 
 #export ROBOT=cob3-2
 #rostest cob_gazebo arm.test
