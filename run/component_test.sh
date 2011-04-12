@@ -23,29 +23,29 @@ cd "$( rospack find cob_gazebo )"/ros/test
 # HOME POSITION
 rosparam load param_arm_test.yaml # load needed parameters for component_test 
 sleep 1s
-echo "TEST RESULTS" > component_test_result.txt
-echo "-------------------------------------------" >> component_test_result.txt
-echo "ARM TEST / HOME:" >> component_test_result.txt
-echo "-------------------------------------------" >> component_test_result.txt
-./component_test.py > component_test_result.txt # start component_test
+echo "TEST RESULTS" > $WORKSPACE/../component_test_result.txt
+echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
+echo "ARM TEST / HOME:" >> $WORKSPACE/../component_test_result.txt
+echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
+./component_test.py > $WORKSPACE/../component_test_result.txt # start component_test
 sleep 1s
 
 # PREGRASP POSITION
 rosparam set /component_test/target "pregrasp"
 sleep 1s
-echo "-------------------------------------------" >> component_test_result.txt
-echo "ARM TEST / PREGRASP:" >> component_test_result.txt
-echo "-------------------------------------------" >> component_test_result.txt
-./component_test.py >> component_test_result.txt # start component_test
+echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
+echo "ARM TEST / PREGRASP:" >> $WORKSPACE/../component_test_result.txt
+echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
+./component_test.py >> $WORKSPACE/../component_test_result.txt # start component_test
 sleep 1s
 
 # TRAY TEST
 rosparam load param_tray_test.yaml
 sleep 1s
-echo "--------------------------------------------" >> component_test_result.txt
-echo "TRAY TEST:" >> component_test_result.txt
-echo "--------------------------------------------" >> component_test_result.txt
-./component_test.py >> component_test_result.txt
+echo "--------------------------------------------" >> $WORKSPACE/../component_test_result.txt
+echo "TRAY TEST:" >> $WORKSPACE/../component_test_result.txt
+echo "--------------------------------------------" >> $WORKSPACE/../component_test_result.txt
+./component_test.py >> $WORKSPACE/../component_test_result.txt
 
 
 # kill cob_script_server and cob_bringup with before stored PIDs
@@ -53,7 +53,7 @@ kill "$pid_script_server"
 kill "$pid_bringup"
 
 # 
-echo "SUMMARY: " >> component_test_result.txt
+echo "SUMMARY: " >> $WORKSPACE/../component_test_result.txt
 tests_no="$( grep -c ' * TESTS: ' component_test_result.txt )"
 success_no="$( grep -c ' * RESULT: SUCCESS' component_test_result.txt )" 
 errors_no="$( grep -c ' * ERRORS: 1 ' component_test_result.txt )"
@@ -65,17 +65,17 @@ else
    result="FAIL"
 fi
 
-echo " * TESTS: [""$tests_no""]" >> component_test_result.txt
-echo " * SUCCESS: [""$success_no""]" >> component_test_result.txt
-echo " * ERRORS: [""$errors_no""]" >> component_test_result.txt
-echo " * FAILURES: [""$failures_no""]" >> component_test_result.txt
-echo " * RESULT:" "$result" >> component_test_result.txt
+echo " * TESTS: [""$tests_no""]" >> $WORKSPACE/../component_test_result.txt
+echo " * SUCCESS: [""$success_no""]" >> $WORKSPACE/../component_test_result.txt
+echo " * ERRORS: [""$errors_no""]" >> $WORKSPACE/../component_test_result.txt
+echo " * FAILURES: [""$failures_no""]" >> $WORKSPACE/../component_test_result.txt
+echo " * RESULT:" "$result" >> $WORKSPACE/../component_test_result.txt
 
 sleep 15s
-cat component_test_result.txt
+cat $WORKSPACE/../component_test_result.txt
 
 if [ $result == "SUCCESS" ]; then
-   return true
+   exit 0
 else
-   return false
+   exit 1
 fi
