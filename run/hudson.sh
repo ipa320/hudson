@@ -104,3 +104,6 @@ export ROBOT_ENV=ipa-kitchen
 # rostest
 export ROBOT=cob3-1
 rostest cob_script_server script_server.launch
+
+# copy test results
+cp -r ~/.ros/test_results $WORKSPACE/../
