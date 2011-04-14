@@ -105,7 +105,7 @@ rosmake cob_bringup --skip-blacklist --profile
 export SIMX=-r #no graphical output of gazebo
 export ROBOT_ENV=ipa-kitchen
 
-# create test directory
+# create test_results directory
 mkdir -p $WORKSPACE/test_results
 
 # rostest cob3-1
