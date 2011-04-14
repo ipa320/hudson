@@ -97,3 +97,10 @@ echo ""
 # installing dependencies and building
 rosdep install $REPOSITORY -y
 rosmake $REPOSITORY --skip-blacklist --profile
+
+# export parameters
+export ROBOT_ENV=ipa-kitchen
+
+# rostest
+export ROBOT=cob3-1
+rostest cob_script_server script_server.launch
