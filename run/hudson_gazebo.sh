@@ -112,3 +112,6 @@ export ROBOT=cob3-2
 rostest cob_bringup sim.launch
 #export ROBOT=desire
 #rostest cob_bringup sim.launch
+
+# copy test results
+cp -r ~/.ros/test_results $WORKSPACE/../
