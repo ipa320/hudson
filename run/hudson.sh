@@ -105,6 +105,9 @@ export ROBOT_ENV=ipa-kitchen
 export ROBOT=cob3-1
 rostest cob_script_server script_server.launch
 
+# beautify xml files
+rosrun rosunit clean_junit_xml.py
+
 # copy test results
 mkdir -p $WORKSPACE/../test_results
 mkdir -p $WORKSPACE/test_results
