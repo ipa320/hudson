@@ -107,4 +107,5 @@ rostest cob_script_server script_server.launch
 
 # copy test results
 mkdir -p $WORKSPACE/../test_results
+rm -rf $WORKSPACE/../test_results/*
 cp -r ~/.ros/test_results/cob_script_server $WORKSPACE/../test_results
