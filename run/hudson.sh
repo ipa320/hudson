@@ -106,4 +106,5 @@ export ROBOT=cob3-1
 rostest cob_script_server script_server.launch
 
 # copy test results
-cp -r ~/.ros/test_results $WORKSPACE/../
+mkdir -p $WORKSPACE/../test_results
+cp -r ~/.ros/test_results/cob_script_server $WORKSPACE/../test_results
