@@ -17,35 +17,35 @@ pid_script_server_raw=${pid_script_server_raw%% Running*}
 pid_script_server=${pid_script_server_raw##*]+ }
 
 
-cd "$( rospack find cob_gazebo )"/ros/test
+cd "$( rospack find cob_component_test )"/ros
 
 # ARM TEST
 # HOME POSITION
-rosparam load param_arm_test.yaml # load needed parameters for component_test 
+rosparam load launch/param_arm_test.yaml # load needed arm parameters for component_test 
 sleep 1s
-echo "TEST RESULTS" > $WORKSPACE/../component_test_result.txt
-echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-echo "ARM TEST / HOME:" >> $WORKSPACE/../component_test_result.txt
-echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-./component_test.py > $WORKSPACE/../component_test_result.txt # start component_test
+echo "TEST RESULTS
+-------------------------------------------
+ARM TEST / HOME:
+-------------------------------------------" > $WORKSPACE/../component_test_result.txt
+test/component_test.py > $WORKSPACE/../component_test_result.txt # start component_test
 sleep 1s
 
 # PREGRASP POSITION
-rosparam set /component_test/target "pregrasp"
+rosparam set /component_test/target "pregrasp" # change target parameter
 sleep 1s
 echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
 echo "ARM TEST / PREGRASP:" >> $WORKSPACE/../component_test_result.txt
 echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-./component_test.py >> $WORKSPACE/../component_test_result.txt # start component_test
+test/component_test.py >> $WORKSPACE/../component_test_result.txt # start component_test
 sleep 1s
 
 # TRAY TEST
-rosparam load param_tray_test.yaml
+rosparam load launch/param_tray_test.yaml #load parameters for tray
 sleep 1s
 echo "--------------------------------------------" >> $WORKSPACE/../component_test_result.txt
 echo "TRAY TEST:" >> $WORKSPACE/../component_test_result.txt
 echo "--------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-./component_test.py >> $WORKSPACE/../component_test_result.txt
+test/component_test.py >> $WORKSPACE/../component_test_result.txt
 
 
 # kill cob_script_server and cob_bringup with before stored PIDs
@@ -59,7 +59,7 @@ success_no="$( grep -c ' * RESULT: SUCCESS' component_test_result.txt )"
 errors_no="$( grep -c ' * ERRORS: 1 ' component_test_result.txt )"
 failures_no="$( grep -c ' * FAILURES: 1 ' component_test_result.txt )"
 
-if [ $success_no -eq $tests_no ]; then
+if [ $success_no -eq $tests_no -a $tests_no -ne '0']; then
    result="SUCCESS"
 else
    result="FAIL"

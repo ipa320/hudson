@@ -110,5 +110,5 @@ export ROBOT=cob3-1
 $WORKSPACE/../component_test.sh
 
 #export ROBOT=cob3-2
-#rostest cob_gazebo arm.test
+#$WORKSPACE/../component_test.sh
 
