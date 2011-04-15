@@ -5,12 +5,12 @@ export SIMX=-r
 
 # start cob_bringup in background 
 roslaunch cob_bringup sim.launch &
-sleep 20s
+sleep 60s
 pid_bringup="$(jobs -p)" # get the job PID
 
 # start cob_script_server in background
 roslaunch cob_script_server script_server.launch &
-sleep 120s
+sleep 150s
 # get the job PID
 pid_script_server_raw="$( jobs -l | grep ]+ )"
 pid_script_server_raw=${pid_script_server_raw%% Running*}
@@ -54,10 +54,10 @@ kill "$pid_bringup"
 
 # 
 echo "SUMMARY: " >> $WORKSPACE/../component_test_result.txt
-tests_no="$( grep -c ' * TESTS: ' component_test_result.txt )"
-success_no="$( grep -c ' * RESULT: SUCCESS' component_test_result.txt )" 
-errors_no="$( grep -c ' * ERRORS: 1 ' component_test_result.txt )"
-failures_no="$( grep -c ' * FAILURES: 1 ' component_test_result.txt )"
+tests_no="$( grep -c ' * TESTS: ' $WORKSPACE/../component_test_result.txt )"
+success_no="$( grep -c ' * RESULT: SUCCESS' $WORKSPACE/../component_test_result.txt )" 
+errors_no="$( grep -c ' * ERRORS: 1 ' $WORKSPACE/../component_test_result.txt )"
+failures_no="$( grep -c ' * FAILURES: 1 ' $WORKSPACE/../component_test_result.txt )"
 
 if [ $success_no -eq $tests_no -a $tests_no -ne '0']; then
    result="SUCCESS"
