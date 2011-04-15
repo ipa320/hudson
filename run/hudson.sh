@@ -99,18 +99,18 @@ rosdep install $REPOSITORY -y
 rosmake $REPOSITORY --skip-blacklist --profile
 
 # export parameters
-export ROBOT_ENV=ipa-kitchen
+#export ROBOT_ENV=ipa-kitchen
 
 # create test_results directory
-mkdir -p $WORKSPACE/test_results
+#mkdir -p $WORKSPACE/test_results
 
 # delete old rostest logs
-rm -rf ~/.ros/test_results
+#rm -rf ~/.ros/test_results
 
 # rostest
-export ROBOT=cob3-1
-rm -rf ~/.ros/test_results # delete old rostest logs
-rostest cob_script_server script_server.launch
-rosrun rosunit clean_junit_xml.py # beautify xml files
-mkdir -p $WORKSPACE/test_results/$ROBOT
-for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$i" ; done # copy test results
+#export ROBOT=cob3-1
+#rm -rf ~/.ros/test_results # delete old rostest logs
+#rostest cob_script_server script_server.launch
+#rosrun rosunit clean_junit_xml.py # beautify xml files
+#mkdir -p $WORKSPACE/test_results/$ROBOT
+#for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$i" ; done # copy test results
