@@ -113,16 +113,16 @@ export ROBOT=cob3-1
 rm -rf ~/.ros/test_results # delete old rostest logs
 rostest cob_bringup sim.launch # do the tests
 rosrun rosunit clean_junit_xml.py # beautify xml files
-mkdir -p $WORKSPACE/test_results/$ROBOT
-cp -r ~/.ros/test_results/_hudson/*.xml $WORKSPACE/test_results/$ROBOT # copy test results
+mkdir -p $WORKSPACE/test_results
+for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results
 
 # rostest cob3-2
 export ROBOT=cob3-2
 rm -rf ~/.ros/test_results # delete old rostest logs
 rostest cob_bringup sim.launch # do the tests
 rosrun rosunit clean_junit_xml.py # beautify xml files
-mkdir -p $WORKSPACE/test_results/$ROBOT
-cp -r ~/.ros/test_results/_hudson/*.xml $WORKSPACE/test_results/$ROBOT # copy test results
+mkdir -p $WORKSPACE/test_results
+for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results
 
 # rostest desire
 #export ROBOT=desire
