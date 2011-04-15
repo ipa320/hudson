@@ -99,7 +99,7 @@ rosdep install $REPOSITORY -y
 rosmake $REPOSITORY --skip-blacklist --profile
 
 # cleanup gazebo tmp dir
-rm -rf /tmp/gazebo*
+sudo rm -rf /tmp/gazebo*
 
 # export parameters
 export SIMX=-r #no graphical output of gazebo
