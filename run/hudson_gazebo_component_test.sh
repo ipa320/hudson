@@ -95,8 +95,8 @@ echo "-------------------------------------------------------"
 echo ""
 
 # installing dependencies and building
-rosdep install cob_bringup -y
-rosmake cob_bringup --skip-blacklist --profile
+rosdep install $REPOSITORY -y
+rosmake $REPOSITORY --skip-blacklist --profile
 
 # cleanup gazebo tmp dir
 rm -rf /tmp/gazebo*
