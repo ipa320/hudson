@@ -27,7 +27,7 @@ echo "TEST RESULTS
 -------------------------------------------
 ARM TEST / HOME:
 -------------------------------------------" > $WORKSPACE/../component_test_result.txt
-test/component_test.py > $WORKSPACE/../component_test_result.txt # start component_test
+test/trajectory_test.py > $WORKSPACE/../component_test_result.txt # start component_test
 sleep 1s
 
 # PREGRASP POSITION
@@ -36,7 +36,7 @@ sleep 1s
 echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
 echo "ARM TEST / PREGRASP:" >> $WORKSPACE/../component_test_result.txt
 echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-test/component_test.py >> $WORKSPACE/../component_test_result.txt # start component_test
+test/trajectory_test.py >> $WORKSPACE/../component_test_result.txt # start component_test
 sleep 1s
 
 # TRAY TEST
@@ -45,7 +45,7 @@ sleep 1s
 echo "--------------------------------------------" >> $WORKSPACE/../component_test_result.txt
 echo "TRAY TEST:" >> $WORKSPACE/../component_test_result.txt
 echo "--------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-test/component_test.py >> $WORKSPACE/../component_test_result.txt
+test/trajectory_test.py >> $WORKSPACE/../component_test_result.txt
 
 
 # kill cob_script_server and cob_bringup with before stored PIDs
