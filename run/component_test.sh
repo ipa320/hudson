@@ -23,10 +23,10 @@ cd "$( rospack find cob_component_test )"/ros
 # HOME POSITION
 rosparam load launch/param_arm_test.yaml # load needed arm parameters for component_test 
 sleep 1s
-echo "TEST RESULTS
--------------------------------------------
-ARM TEST / HOME:
--------------------------------------------" > $WORKSPACE/../component_test_result.txt
+echo "TEST RESULTS" > $WORKSPACE/../component_test_result.txt
+echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
+echo "ARM TEST / HOME:" >> $WORKSPACE/../component_test_result.txt
+echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
 test/trajectory_test.py > $WORKSPACE/../component_test_result.txt # start component_test
 sleep 1s
 
