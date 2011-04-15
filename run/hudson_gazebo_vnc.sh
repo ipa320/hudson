@@ -99,7 +99,7 @@ rosdep install cob_bringup -y
 rosmake cob_bringup --skip-blacklist --profile
 
 # cleanup gazebo tmp dir
-rm -rf /tmp/gazebo*
+sudo rm -rf /tmp/gazebo*
 
 # include TurboVNC and VirtualGL directories to $PATH
 export PATH=/opt/TurboVNC/bin:/opt/VirtualGL/bin:$PATH
