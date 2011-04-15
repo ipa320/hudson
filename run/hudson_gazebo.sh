@@ -99,16 +99,31 @@ rosdep install cob_bringup -y
 rosmake cob_bringup --skip-blacklist --profile
 
 # cleanup gazebo tmp dir
-rm -rf /tmp/gazebo*
+#rm -rf /tmp/gazebo*
 
 # export parameters
 export SIMX=-r #no graphical output of gazebo
 export ROBOT_ENV=ipa-kitchen
 
-# rostest
+# create test_results directory
+mkdir -p $WORKSPACE/test_results
+
+# rostest cob3-1
 export ROBOT=cob3-1
-rostest cob_bringup sim.launch
+rm -rf ~/.ros/test_results # delete old rostest logs
+rostest cob_bringup sim.launch # do the tests
+rosrun rosunit clean_junit_xml.py # beautify xml files
+mkdir -p $WORKSPACE/test_results
+for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results
+
+# rostest cob3-2
 export ROBOT=cob3-2
-rostest cob_bringup sim.launch
+rm -rf ~/.ros/test_results # delete old rostest logs
+rostest cob_bringup sim.launch # do the tests
+rosrun rosunit clean_junit_xml.py # beautify xml files
+mkdir -p $WORKSPACE/test_results
+for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results
+
+# rostest desire
 #export ROBOT=desire
 #rostest cob_bringup sim.launch

@@ -54,14 +54,15 @@
   </scm>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector">
-    <hudson.triggers.TimerTrigger>
-      <spec>@midnight</spec>
-    </hudson.triggers.TimerTrigger>
     <hudson.triggers.SCMTrigger>
       <spec>*/10 * * * *</spec>
     </hudson.triggers.SCMTrigger>
+    <hudson.triggers.TimerTrigger>
+      <spec>@midnight</spec>
+    </hudson.triggers.TimerTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
   <builders>
@@ -72,6 +73,11 @@ bash $WORKSPACE/../hudson.sh</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
+    <hudson.tasks.junit.JUnitResultArchiver>
+      <testResults>test_results/*/*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <testDataPublishers/>
+    </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.emailext.ExtendedEmailPublisher>
       <recipientList>fmw@ipa.fhg.de,---EMAIL---</recipientList>
       <configuredTriggers>

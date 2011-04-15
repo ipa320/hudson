@@ -55,6 +55,7 @@
   <assignedNode>gazebo</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector">
     <hudson.triggers.TimerTrigger>
@@ -70,6 +71,11 @@ sh $WORKSPACE/../hudson_gazebo.sh</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
+    <hudson.tasks.junit.JUnitResultArchiver>
+      <testResults>test_results/*/*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <testDataPublishers/>
+    </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.emailext.ExtendedEmailPublisher>
       <recipientList>fmw@ipa.fhg.de,---EMAIL---</recipientList>
       <configuredTriggers>
