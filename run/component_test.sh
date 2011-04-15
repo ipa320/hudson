@@ -10,7 +10,7 @@ pid_bringup="$(jobs -p)" # get the job PID
 
 # start cob_script_server in background
 roslaunch cob_script_server script_server.launch &
-sleep 20s
+sleep 120s
 # get the job PID
 pid_script_server_raw="$( jobs -l | grep ]+ )"
 pid_script_server_raw=${pid_script_server_raw%% Running*}
