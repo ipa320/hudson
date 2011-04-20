@@ -27,7 +27,7 @@ echo "TEST RESULTS" > $WORKSPACE/../component_test_result.txt
 echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
 echo "ARM TEST / HOME:" >> $WORKSPACE/../component_test_result.txt
 echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-test/trajectory_test.py > $WORKSPACE/../component_test_result.txt # start component_test
+test/trajectory_test.py >> $WORKSPACE/../component_test_result.txt # start component_test
 sleep 1s
 
 # PREGRASP POSITION
@@ -59,7 +59,7 @@ success_no="$( grep -c ' * RESULT: SUCCESS' $WORKSPACE/../component_test_result.
 errors_no="$( grep -c ' * ERRORS: 1 ' $WORKSPACE/../component_test_result.txt )"
 failures_no="$( grep -c ' * FAILURES: 1 ' $WORKSPACE/../component_test_result.txt )"
 
-if [ $success_no -eq $tests_no -a $tests_no -ne '0']; then
+if [ $success_no -eq $tests_no -a $tests_no -ne 0 ]; then
    result="SUCCESS"
 else
    result="FAIL"
@@ -74,7 +74,7 @@ echo " * RESULT:" "$result" >> $WORKSPACE/../component_test_result.txt
 sleep 15s
 cat $WORKSPACE/../component_test_result.txt
 
-if [ $result == "SUCCESS" ]; then
+if [ "$result" == "SUCCESS" ]; then
    exit 0
 else
    exit 1
