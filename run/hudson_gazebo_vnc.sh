@@ -115,8 +115,13 @@ export DISPLAY=:5
 export ROBOT_ENV=ipa-kitchen
 
 # rostest via VirtualGL
+sleep 10s
 export ROBOT=cob3-1
 vglrun rostest cob_bringup sim.launch
+
+sleep 10s
 #export ROBOT=cob3-2
-#vglrun -d :5 rostest cob_bringup sim.launch
+#vglrun rostest cob_bringup sim.launch
+
+
 
