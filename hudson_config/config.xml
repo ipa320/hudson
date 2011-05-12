@@ -48,7 +48,7 @@
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
-      <label></label>
+      <label>gazebo</label>
       <nodeProperties/>
     </slave>
     <slave>
@@ -66,7 +66,7 @@
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
-      <label></label>
+      <label>gazebo</label>
       <nodeProperties/>
     </slave>
     <slave>
@@ -84,7 +84,7 @@
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
-      <label></label>
+      <label>gazebo</label>
       <nodeProperties/>
     </slave>
     <slave>
@@ -105,7 +105,7 @@
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
-      <label></label>
+      <label>gazebo</label>
       <nodeProperties/>
     </slave>
     <slave>
@@ -144,7 +144,7 @@
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
-      <label></label>
+      <label>gazebo</label>
       <nodeProperties/>
     </slave>
   </slaves>
@@ -210,7 +210,7 @@
           <includeExcludeTypeString>includeMatched</includeExcludeTypeString>
           <unstable>false</unstable>
           <failed>true</failed>
-          <aborted>false</aborted>
+          <aborted>true</aborted>
           <disabled>false</disabled>
           <stable>false</stable>
         </hudson.views.JobStatusFilter>
@@ -367,46 +367,6 @@
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>r_cturtle</name>
-      <filterExecutors>false</filterExecutors>
-      <filterQueue>false</filterQueue>
-      <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator"/>
-      </jobNames>
-      <jobFilters/>
-      <columns>
-        <hudson.views.StatusColumn/>
-        <hudson.views.WeatherColumn/>
-        <hudson.views.JobColumn/>
-        <hudson.views.LastSuccessColumn/>
-        <hudson.views.LastFailureColumn/>
-        <hudson.views.LastDurationColumn/>
-        <hudson.views.BuildButtonColumn/>
-      </columns>
-      <includeRegex>.*cturtle.*</includeRegex>
-    </listView>
-    <listView>
-      <owner class="hudson" reference="../../.."/>
-      <name>r_unstable</name>
-      <filterExecutors>false</filterExecutors>
-      <filterQueue>false</filterQueue>
-      <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[11]/jobNames/comparator"/>
-      </jobNames>
-      <jobFilters/>
-      <columns>
-        <hudson.views.StatusColumn/>
-        <hudson.views.WeatherColumn/>
-        <hudson.views.JobColumn/>
-        <hudson.views.LastSuccessColumn/>
-        <hudson.views.LastFailureColumn/>
-        <hudson.views.LastDurationColumn/>
-        <hudson.views.BuildButtonColumn/>
-      </columns>
-      <includeRegex>.*unstable.*</includeRegex>
-    </listView>
-    <listView>
-      <owner class="hudson" reference="../../.."/>
       <name>u_fmw-jk</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
@@ -444,26 +404,6 @@
         <hudson.views.BuildButtonColumn/>
       </columns>
       <includeRegex>.*gazebo.*</includeRegex>
-    </listView>
-    <listView>
-      <owner class="hudson" reference="../../.."/>
-      <name>r_diamondback</name>
-      <filterExecutors>false</filterExecutors>
-      <filterQueue>false</filterQueue>
-      <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator"/>
-      </jobNames>
-      <jobFilters/>
-      <columns>
-        <hudson.views.StatusColumn/>
-        <hudson.views.WeatherColumn/>
-        <hudson.views.JobColumn/>
-        <hudson.views.LastSuccessColumn/>
-        <hudson.views.LastFailureColumn/>
-        <hudson.views.LastDurationColumn/>
-        <hudson.views.BuildButtonColumn/>
-      </columns>
-      <includeRegex>.*diamondback.*</includeRegex>
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
@@ -511,7 +451,7 @@
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[17]/jobNames/comparator"/>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[14]/jobNames/comparator"/>
       </jobNames>
       <jobFilters/>
       <columns>
@@ -531,7 +471,7 @@
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[17]/jobNames/comparator"/>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[14]/jobNames/comparator"/>
       </jobNames>
       <jobFilters/>
       <columns>
@@ -551,7 +491,7 @@
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[17]/jobNames/comparator"/>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[14]/jobNames/comparator"/>
       </jobNames>
       <jobFilters/>
       <columns>
@@ -571,7 +511,7 @@
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[17]/jobNames/comparator"/>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[14]/jobNames/comparator"/>
       </jobNames>
       <jobFilters/>
       <columns>
@@ -591,7 +531,7 @@
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[17]/jobNames/comparator"/>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[14]/jobNames/comparator"/>
       </jobNames>
       <jobFilters/>
       <columns>
@@ -671,7 +611,7 @@
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[25]/jobNames/comparator"/>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[22]/jobNames/comparator"/>
       </jobNames>
       <jobFilters/>
       <columns>
@@ -684,6 +624,69 @@
         <hudson.views.BuildButtonColumn/>
       </columns>
       <includeRegex>.*b-it-bots.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>BUNSTABLE</name>
+      <description>Unstable jobs regarding the last 5 builds.</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters>
+        <hudson.views.BuildTrendFilter>
+          <includeExcludeTypeString>includeMatched</includeExcludeTypeString>
+          <buildCountTypeString>AtLeastOne</buildCountTypeString>
+          <statusTypeString>Unstable</statusTypeString>
+          <amountTypeString>Builds</amountTypeString>
+          <amount>5.0</amount>
+        </hudson.views.BuildTrendFilter>
+        <hudson.views.BuildTrendFilter>
+          <includeExcludeTypeString>excludeMatched</includeExcludeTypeString>
+          <buildCountTypeString>All</buildCountTypeString>
+          <statusTypeString>Unstable</statusTypeString>
+          <amountTypeString>Builds</amountTypeString>
+          <amount>5.0</amount>
+        </hudson.views.BuildTrendFilter>
+      </jobFilters>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>BTESTFAILED</name>
+      <description>The last 5 tests all failed.</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[24]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters>
+        <hudson.views.BuildTrendFilter>
+          <includeExcludeTypeString>includeMatched</includeExcludeTypeString>
+          <buildCountTypeString>All</buildCountTypeString>
+          <statusTypeString>Unstable</statusTypeString>
+          <amountTypeString>Builds</amountTypeString>
+          <amount>5.0</amount>
+        </hudson.views.BuildTrendFilter>
+      </jobFilters>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
     </listView>
   </views>
   <primaryView>BROKEN</primaryView>
