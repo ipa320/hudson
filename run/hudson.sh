@@ -116,7 +116,7 @@ rm -rf ~/.ros/test_results # delete old rostest logs
 while read myline
 do
   rostest $myline
-done < $WORKSPACE/../$REPOSITORY.deps
+done < $WORKSPACE/all.tests
 echo "--------------------------------------------------------------------------------"
 echo ""
 rosrun rosunit clean_junit_xml.py # beautify xml files
