@@ -111,10 +111,10 @@ rm -rf ~/.ros/test_results
 echo ""
 echo "--------------------------------------------------------------------------------"
 echo "Rostest for $REPOSITORY"
-if [! -f $WORKSPACE/all.tests]; then
+if [ ! -f $WORKSPACE/all.tests ]; then
 	echo "no all.tests-file found"
 	# create dummy test result file
-elif [wc -l $WORKSPACE/all.tests = 0]
+elif [ "$WORKSPACE/all.tests | wc -l" = 0 ]; then
 	echo "no tests defined in all.tests"
 	# create dummy test result file
 else
