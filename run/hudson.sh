@@ -118,6 +118,7 @@ elif [ "$WORKSPACE/all.tests | wc -l" = 0 ]; then
 	echo "no tests defined in all.tests"
 	# create dummy test result file
 else
+	echo "start testing"
 	export ROBOT=cob3-1
 	rm -rf ~/.ros/test_results # delete old rostest logs
 	while read myline
