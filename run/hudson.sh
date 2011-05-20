@@ -110,7 +110,7 @@ rm -rf ~/.ros/test_results
 # rostest
 export ROBOT=cob3-1
 rm -rf ~/.ros/test_results # delete old rostest logs
-rostest cob_script_server script_server.launch
+rostest $WORKSPACE/alltests.launch
 rosrun rosunit clean_junit_xml.py # beautify xml files
 mkdir -p $WORKSPACE/test_results
 for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results
