@@ -111,19 +111,8 @@ rm -rf ~/.ros/test_results
 echo ""
 echo "--------------------------------------------------------------------------------"
 echo "Rostest for $REPOSITORY"
-if [ ! -f $WORKSPACE/all.tests ]; then
-	echo "no all.tests-file found, creating dummy test result file"
-	# create dummy test result file
-	mkdir -p $WORKSPACE/test_results
-	touch $WORKSPACE/test_results/dummy_test.xml
-	echo '<testsuite errors="0" failures="0" name="dummy_test" tests="1" time="0.01">
-	<testcase classname="__main__.DummyTest" name="test_dummy" time="0.01">
-	</testcase>
-	<system-out><![CDATA[]]></system-out>
-	<system-err><![CDATA[]]></system-err>
-</testsuite>' >> $WORKSPACE/test_results/dummy_test.xml
-elif [ "$WORKSPACE/all.tests | wc -l" = 0 ]; then
-	echo "no tests defined in all.tests, creating dummy test result file"
+if [ ! -s $WORKSPACE/all.tests ]; then
+	echo "all.tests-file not found or empty, creating dummy test result file"
 	# create dummy test result file
 	mkdir -p $WORKSPACE/test_results
 	touch $WORKSPACE/test_results/dummy_test.xml
