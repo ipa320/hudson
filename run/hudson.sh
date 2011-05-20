@@ -111,14 +111,20 @@ rm -rf ~/.ros/test_results
 echo ""
 echo "--------------------------------------------------------------------------------"
 echo "Rostest for $REPOSITORY"
-export ROBOT=cob3-1
-rm -rf ~/.ros/test_results # delete old rostest logs
-while read myline
-do
-  rostest $myline
-done < $WORKSPACE/all.tests
+if [! -f $WORKSPACE/all.tests]
+	echo "no all.tests-file found"
+elif [wc -l $WORKSPACE/all.tests == 0]
+	echo "no tests defined in all.tests"
+else
+	export ROBOT=cob3-1
+	rm -rf ~/.ros/test_results # delete old rostest logs
+	while read myline
+	do
+		rostest $myline
+	done < $WORKSPACE/all.tests
+	rosrun rosunit clean_junit_xml.py # beautify xml files
+	mkdir -p $WORKSPACE/test_results
+	for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results	
+fi
 echo "--------------------------------------------------------------------------------"
 echo ""
-rosrun rosunit clean_junit_xml.py # beautify xml files
-mkdir -p $WORKSPACE/test_results
-for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results
