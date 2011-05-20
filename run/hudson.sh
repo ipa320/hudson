@@ -114,12 +114,18 @@ echo "Rostest for $REPOSITORY"
 if [ ! -f $WORKSPACE/all.tests ]; then
 	echo "no all.tests-file found"
 	# create dummy test result file
+	touch $WORKSPACE/test_results/dummy_test.xml
+	$WORKSPACE/test_results/dummy_test.xml < "<testsuite errors="0" failures="0" name="dummy_test" tests="1" time="0.01">
+  <testcase classname="__main__.DummyTest" name="test_dummy" time="0.01"></testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>"
 elif [ "$WORKSPACE/all.tests | wc -l" = 0 ]; then
 	echo "no tests defined in all.tests"
 	# create dummy test result file
 else
-	echo "start testing"
 	export ROBOT=cob3-1
+	echo "start testing for $ROBOT"
 	rm -rf ~/.ros/test_results # delete old rostest logs
 	while read myline
 	do
