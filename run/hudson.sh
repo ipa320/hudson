@@ -108,9 +108,17 @@ mkdir -p $WORKSPACE/test_results
 rm -rf ~/.ros/test_results
 
 # rostest
+echo ""
+echo "--------------------------------------------------------------------------------"
+echo "Rostest for $REPOSITORY"
 export ROBOT=cob3-1
 rm -rf ~/.ros/test_results # delete old rostest logs
-rostest $WORKSPACE/alltests.launch
+while read myline
+do
+  rostest $myline
+done < $WORKSPACE/../$REPOSITORY.deps
+echo "--------------------------------------------------------------------------------"
+echo ""
 rosrun rosunit clean_junit_xml.py # beautify xml files
 mkdir -p $WORKSPACE/test_results
 for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results
