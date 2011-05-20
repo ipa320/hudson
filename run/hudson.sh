@@ -114,7 +114,7 @@ echo "Rostest for $REPOSITORY"
 if [! -f $WORKSPACE/all.tests]; then
 	echo "no all.tests-file found"
 	# create dummy test result file
-elif [wc -l $WORKSPACE/all.tests == 0]
+elif [wc -l $WORKSPACE/all.tests = 0]
 	echo "no tests defined in all.tests"
 	# create dummy test result file
 else
