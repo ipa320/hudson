@@ -117,7 +117,7 @@ if [ ! -s $WORKSPACE/all.tests ]; then
 	mkdir -p $WORKSPACE/test_results
 	touch $WORKSPACE/test_results/dummy_test.xml
 	echo '<testsuite errors="0" failures="0" name="dummy_test" tests="1" time="0.01">
-	<testcase classname="__main__.DummyTest" name="test_dummy" time="0.01">
+	<testcase classname="DummyTest.DummyTest" name="dummy_test" time="0.01">
 	</testcase>
 	<system-out><![CDATA[]]></system-out>
 	<system-err><![CDATA[]]></system-err>
