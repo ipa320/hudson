@@ -115,6 +115,7 @@ rostest cob_bringup sim.launch # do the tests
 rosrun rosunit clean_junit_xml.py # beautify xml files
 mkdir -p $WORKSPACE/test_results
 for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results
+sed -i "s/cob_bringup.TEST/$ROBOT-cob_bringup.TEST/g" $WORKSPACE/test_results/$ROBOT* #change test names to include ROBOT
 
 # rostest cob3-2
 export ROBOT=cob3-2
@@ -123,6 +124,7 @@ rostest cob_bringup sim.launch # do the tests
 rosrun rosunit clean_junit_xml.py # beautify xml files
 mkdir -p $WORKSPACE/test_results
 for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results
+sed -i "s/cob_bringup.TEST/$ROBOT-cob_bringup.TEST/g" $WORKSPACE/test_results/$ROBOT* #change test names to include ROBOT
 
 # rostest desire
 #export ROBOT=desire
