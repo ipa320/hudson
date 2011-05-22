@@ -23,6 +23,23 @@ check_stack(){
 	return $(grep -c "200 OK" $WORKSPACE/../wget_response.txt)
 }
 
+do_testing(){
+	# export parameters
+	export ROBOT_ENV="$1"
+	export ROBOT="$2"
+	echo ""
+	echo "start testing for $ROBOT in $ROBOT_ENV..."
+	rm -rf ~/.ros/test_results # delete old rostest logs
+	while read myline
+	do
+		rostest $myline
+	done < $WORKSPACE/all.tests
+	rosrun rosunit clean_junit_xml.py # beautify xml files
+	mkdir -p $WORKSPACE/test_results
+	for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results and rename with ROBOT
+	echo "...finished testing for $ROBOT in $ROBOT_ENV."
+}
+
 # installing ROS release
 sudo apt-get autoclean
 sudo apt-get update
@@ -98,9 +115,6 @@ echo ""
 rosdep install $REPOSITORY -y
 rosmake $REPOSITORY --skip-blacklist --profile
 
-# export parameters
-export ROBOT_ENV=ipa-kitchen
-
 # create test_results directory
 mkdir -p $WORKSPACE/test_results
 
@@ -123,16 +137,8 @@ if [ ! -s $WORKSPACE/all.tests ]; then
 	<system-err><![CDATA[]]></system-err>
 </testsuite>' >> $WORKSPACE/test_results/dummy_test.xml
 else
-	export ROBOT=cob3-1
-	echo "start testing for $ROBOT"
-	rm -rf ~/.ros/test_results # delete old rostest logs
-	while read myline
-	do
-		rostest $myline
-	done < $WORKSPACE/all.tests
-	rosrun rosunit clean_junit_xml.py # beautify xml files
-	mkdir -p $WORKSPACE/test_results
-	for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results	
+	do_testing ipa-kitchen cob3-1
+	do_testing ipa-kitchen cob3-2
 fi
 echo "--------------------------------------------------------------------------------"
 echo ""
