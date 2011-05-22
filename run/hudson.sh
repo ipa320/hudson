@@ -36,8 +36,7 @@ do_testing(){
 	done < $WORKSPACE/all.tests
 	rosrun rosunit clean_junit_xml.py # beautify xml files
 	mkdir -p $WORKSPACE/test_results
-	echo "renaming test files for $ROBOT: $WORKSPACE/test_results/$ROBOT"
-	for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results and rename with ROBOT
+	for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-`basename $i`" ; done # copy test results and rename with ROBOT
 	echo "...finished testing for $ROBOT in $ROBOT_ENV."
 }
 
@@ -116,20 +115,19 @@ echo ""
 rosdep install $REPOSITORY -y
 rosmake $REPOSITORY --skip-blacklist --profile
 
-# create test_results directory
-mkdir -p $WORKSPACE/test_results
-
-# delete old rostest logs
-rm -rf ~/.ros/test_results
+# TODO check if building is succesfull, otherwise don't perform test
 
 # rostest
 echo ""
 echo "--------------------------------------------------------------------------------"
 echo "Rostest for $REPOSITORY"
+
+mkdir -p $WORKSPACE/test_results # create test_results directory
+rm -rf ~/.ros/test_results # delete old rostest logs
+
 if [ ! -s $WORKSPACE/all.tests ]; then
 	echo "all.tests-file not found or empty, creating dummy test result file"
 	# create dummy test result file
-	mkdir -p $WORKSPACE/test_results
 	touch $WORKSPACE/test_results/dummy_test.xml
 	echo '<testsuite errors="0" failures="0" name="dummy_test" tests="1" time="0.01">
 	<testcase classname="DummyTest.DummyTest" name="dummy_test" time="0.01">
