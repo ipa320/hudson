@@ -36,6 +36,7 @@ do_testing(){
 	done < $WORKSPACE/all.tests
 	rosrun rosunit clean_junit_xml.py # beautify xml files
 	mkdir -p $WORKSPACE/test_results
+	echo "renaming test files for $ROBOT: $WORKSPACE/test_results/$ROBOT"
 	for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results and rename with ROBOT
 	echo "...finished testing for $ROBOT in $ROBOT_ENV."
 }
