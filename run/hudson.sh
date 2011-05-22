@@ -113,7 +113,7 @@ echo ""
 
 # installing dependencies and building
 rosdep install $REPOSITORY -y
-res=rosmake $REPOSITORY --skip-blacklist --profile
+res=`rosmake $REPOSITORY --skip-blacklist --profile`
 
 # check if building is succesfull, otherwise don't perform test and exit
 if [ ! res ]; then
