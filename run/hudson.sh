@@ -113,9 +113,13 @@ echo ""
 
 # installing dependencies and building
 rosdep install $REPOSITORY -y
-rosmake $REPOSITORY --skip-blacklist --profile
+res=rosmake $REPOSITORY --skip-blacklist --profile
 
-# TODO check if building is succesfull, otherwise don't perform test
+# check if building is succesfull, otherwise don't perform test and exit
+if [ ! res ]; then
+	echo "rosmake failed, skipping tests"
+	exit 1
+fi
 
 # rostest
 echo ""
@@ -138,6 +142,7 @@ if [ ! -s $WORKSPACE/all.tests ]; then
 else
 	do_testing ipa-kitchen cob3-1
 	do_testing ipa-kitchen cob3-2
+	do_testing ipa-kitchen cob3-3
 fi
 echo "--------------------------------------------------------------------------------"
 echo ""
