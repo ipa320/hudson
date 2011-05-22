@@ -116,9 +116,12 @@ rosdep install $REPOSITORY -y
 rosmake $REPOSITORY --skip-blacklist --profile
 
 # check if building is succesfull, otherwise don't perform test and exit
+
 if [ ! $? ]; then
 	echo "rosmake failed, skipping tests"
 	exit 1
+else
+	echo "rosmake succeeded"
 fi
 
 # rostest
