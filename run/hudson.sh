@@ -120,8 +120,6 @@ rosmake $REPOSITORY --skip-blacklist --profile
 if [ $? != "0" ]; then
 	echo "rosmake failed, skipping tests"
 	exit 1
-else
-	echo "rosmake succeeded"
 fi
 
 # rostest
