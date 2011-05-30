@@ -24,9 +24,13 @@ check_stack(){
 }
 
 do_testing(){
+	# sleep to finish running tests
+	sleep 10
+
 	# export parameters
 	export ROBOT_ENV="$1"
 	export ROBOT="$2"
+
 	echo ""
 	echo "start testing for $ROBOT in $ROBOT_ENV..."
 	rm -rf ~/.ros/test_results # delete old rostest logs
@@ -37,6 +41,10 @@ do_testing(){
 	rosrun rosunit clean_junit_xml.py # beautify xml files
 	mkdir -p $WORKSPACE/test_results
 	for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-`basename $i`" ; done # copy test results and rename with ROBOT
+
+	# sleep to finish running tests
+	sleep 10
+
 	echo "...finished testing for $ROBOT in $ROBOT_ENV."
 }
 
