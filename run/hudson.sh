@@ -1,11 +1,14 @@
 #!/bin/bash
 
 # get the name of ROSRELEASE, GITHUBUSER and REPOSITORY from JOB_NAME
-REPOSITORY="${JOB_NAME##*__}"
-INTERSTAGE="${JOB_NAME%__*}"
-GITHUBUSER="${INTERSTAGE#*__}"
-RELEASE="${INTERSTAGE%__*}"
+#REPOSITORY="${JOB_NAME##*__}"
+#INTERSTAGE="${JOB_NAME%__*}"
+#GITHUBUSER="${INTERSTAGE#*__}"
+#RELEASE="${INTERSTAGE%__*}"
 
+RELEASE=$1
+GITHUBUSER=$2
+REPOSITORY=$3
 
 write_rosinstall(){
 	STACK="$1"
@@ -124,13 +127,12 @@ rosdep install $REPOSITORY -y
 rosmake $REPOSITORY --skip-blacklist --profile
 
 # check if building is succesfull, otherwise don't perform test and exit
-
 if [ $? != "0" ]; then
 	echo "rosmake failed, skipping tests"
 	exit 1
 fi
 
-# rostest
+# do rostests
 echo ""
 echo "--------------------------------------------------------------------------------"
 echo "Rostest for $REPOSITORY"
