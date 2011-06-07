@@ -10,6 +10,14 @@ RELEASE=$1
 GITHUBUSER=$2
 REPOSITORY=$3
 
+echo ""
+echo "-------------------------------------------------------"
+echo "==> RELEASE =" $RELEASE
+echo "==> GITHUBUSER =" $GITHUBUSER
+echo "==> REPOSITORY =" $REPOSITORY
+echo "-------------------------------------------------------"
+echo ""
+
 write_rosinstall(){
 	STACK="$1"
 	echo "- git: 
