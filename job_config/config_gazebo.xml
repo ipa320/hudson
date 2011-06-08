@@ -72,7 +72,7 @@ sh $WORKSPACE/../hudson_gazebo.sh ---ROSRELEASE--- ---GITHUBUSER---</command>
   </builders>
   <publishers>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>test_results/*/*.xml</testResults>
+      <testResults>test_results/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>

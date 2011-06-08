@@ -74,7 +74,7 @@ bash $WORKSPACE/../hudson.sh ---ROSRELEASE--- ---GITHUBUSER--- ---REPOSITORY---<
   </builders>
   <publishers>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>test_results/*/*.xml</testResults>
+      <testResults>test_results/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
