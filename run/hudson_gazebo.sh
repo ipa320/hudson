@@ -1,10 +1,9 @@
 #!/bin/bash
 
 # get the name of ROSRELEASE and GITHUBUSER from JOB_NAME
+RELEASE=$1
+GITHUBUSER=$2
 REPOSITORY=cob_apps
-INTERSTAGE="${JOB_NAME%__*}"
-GITHUBUSER="${INTERSTAGE#*__}"
-RELEASE="${INTERSTAGE%__*}"
 
 
 write_rosinstall(){

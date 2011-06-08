@@ -1,10 +1,9 @@
 #!/bin/bash
 
 # get the name of ROSRELEASE, GITHUBUSER and REPOSITORY from JOB_NAME
-REPOSITORY="${JOB_NAME##*__}"
-INTERSTAGE="${JOB_NAME%__*}"
-GITHUBUSER="${INTERSTAGE#*__}"
-RELEASE="${INTERSTAGE%__*}"
+RELEASE=$1
+GITHUBUSER=$2
+REPOSITORY=cob3_intern
 
 
 write_rosinstall(){

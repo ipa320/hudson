@@ -67,7 +67,7 @@
     <hudson.tasks.Shell>
       <command>wget https://github.com/ipa320/hudson/raw/master/run/hudson_gazebo.sh -O $WORKSPACE/../hudson_gazebo.sh --no-check-certificate 
 chmod 755 $WORKSPACE/../hudson_gazebo.sh
-sh $WORKSPACE/../hudson_gazebo.sh</command>
+sh $WORKSPACE/../hudson_gazebo.sh ---ROSRELEASE--- ---GITHUBUSER---</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
