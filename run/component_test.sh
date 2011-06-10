@@ -16,43 +16,51 @@ pid_script_server_raw="$( jobs -l | grep ]+ )"
 pid_script_server_raw=${pid_script_server_raw%% Running*}
 pid_script_server=${pid_script_server_raw##*]+ }
 
-
+#change to cob_component_test package
 cd "$( rospack find cob_component_test )"/ros
 
-# ARM TEST
-# HOME POSITION
-rosparam load launch/param_arm_test.yaml # load needed arm parameters for component_test 
-sleep 1s
+#create/overwrite text file for test results
 echo "TEST RESULTS" > $WORKSPACE/../component_test_result.txt
-echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-echo "ARM TEST / HOME:" >> $WORKSPACE/../component_test_result.txt
-echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-test/trajectory_test.py >> $WORKSPACE/../component_test_result.txt # start component_test
-sleep 1s
 
-# PREGRASP POSITION
-rosparam set /component_test/target "pregrasp" # change target parameter
-sleep 1s
-echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-echo "ARM TEST / PREGRASP:" >> $WORKSPACE/../component_test_result.txt
-echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-test/trajectory_test.py >> $WORKSPACE/../component_test_result.txt # start component_test
-sleep 1s
+#set static test parameters
+rosparam set /component_test/wait_time 10.0
+rosparam set /component_test/error_range 1.0
 
-# TRAY TEST
-rosparam load launch/param_tray_test.yaml #load parameters for tray
-sleep 1s
-echo "--------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-echo "TRAY TEST:" >> $WORKSPACE/../component_test_result.txt
-echo "--------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-test/trajectory_test.py >> $WORKSPACE/../component_test_result.txt
+do_test(){
+    #set test parameter for current component and target
+    rosparam set /component_test/component "$1"
+    rosparam set /component_test/command_topic /"$1"_controller/command
+    rosparam set /component_test/state_topic /"$1"_controller/state
+    rosparam set /component_test/target "$2"
+    sleep 1s
+    #write introduction for current test to test file
+    cat >>$WORKSPACE/../component_test_result.txt <<EOF 
+    -------------------------------------------
+    Component: $1 / Target: $2
+    -------------------------------------------
+    EOF
+    #start test and write results to text file
+    test/trajectory_test.py >> $WORKSPACE/../component_test_result.txt
+    sleep 1s
+}
 
+#tests for each component
+do_test arm home
+do_test arm pregrasp
+do_test tray down
+do_test tray up
+do_test torso front
+do_test torso right
+do_test sdh cylclosed
+do_test sdh spheropen
+do_test head front
+do_test head back
 
 # kill cob_script_server and cob_bringup with before stored PIDs
 kill "$pid_script_server"
 kill "$pid_bringup"
 
-# 
+#evaluate test results
 echo "SUMMARY: " >> $WORKSPACE/../component_test_result.txt
 tests_no="$( grep -c ' * TESTS: ' $WORKSPACE/../component_test_result.txt )"
 success_no="$( grep -c ' * RESULT: SUCCESS' $WORKSPACE/../component_test_result.txt )" 
