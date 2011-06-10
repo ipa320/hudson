@@ -123,5 +123,8 @@ vglrun rostest cob_bringup sim.launch
 #export ROBOT=cob3-2
 #vglrun rostest cob_bringup sim.launch
 
+#kill VNCserver
+vncserver -kill :5
+
 
 
