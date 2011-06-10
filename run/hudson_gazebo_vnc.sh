@@ -98,6 +98,12 @@ echo ""
 rosdep install cob_bringup -y
 rosmake cob_bringup --skip-blacklist --profile
 
+# check if building is succesfull, otherwise don't perform test and exit
+if [ $? != "0" ]; then
+	echo "rosmake failed, skipping tests"
+	exit 1
+fi
+
 # cleanup gazebo tmp dir
 sudo rm -rf /tmp/gazebo*
 
@@ -106,6 +112,7 @@ export PATH=/opt/TurboVNC/bin:/opt/VirtualGL/bin:$PATH
 
 #kill old VNCserver
 vncserver -kill :5
+sleep 5s
 
 #start VNCserver
 vncserver :5
@@ -122,9 +129,4 @@ vglrun rostest cob_bringup sim.launch
 #sleep 10s
 #export ROBOT=cob3-2
 #vglrun rostest cob_bringup sim.launch
-
-#kill VNCserver
-vncserver -kill :5
-
-
 
