@@ -36,7 +36,7 @@ do_test(){
     sleep 1s
     echo "Component: " $1 " / Target: " $2
     #write introduction for current test to test file
-    cat >>$WORKSPACE/../component_test_result.txt <<EOF 
+    cat >>$WORKSPACE/../component_test_result.txt << "EOF" 
     -------------------------------------------
     Component: $1 / Target: $2
     -------------------------------------------
