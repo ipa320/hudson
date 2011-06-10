@@ -165,6 +165,5 @@ else
     #do_testing ipa-kitchen cob3-2
     #do_testing ipa-kitchen cob3-3
 fi
-fi
 echo "--------------------------------------------------------------------------------"
 echo ""

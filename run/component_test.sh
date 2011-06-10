@@ -23,7 +23,7 @@ do_test(){
     rosparam set /component_test/state_topic /"$1"_controller/state
     rosparam set /component_test/target "$2"
     sleep 1s
-    echo "Component: " $1 " / Target: " $2
+    echo "Component: " $1 " / Target: " $2                       # to be deleted
     #write introduction for current test to test file
     echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
     echo "Component: " $1 " / Target: " $2 >> $WORKSPACE/../component_test_result.txt
