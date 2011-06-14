@@ -14,9 +14,11 @@ roslaunch cob_script_server script_server.launch &
 sleep 150s
 # get the job PID
 pid_script_server_raw="$( jobs -l | grep ]+ )"
+sleep 1s
 pid_script_server_raw=${pid_script_server_raw%% Running*}
+sleep 1s
 pid_script_server=${pid_script_server_raw##*]+ }
-
+sleep 1s
 echo "cob_script_server PID: " $pid_script_server                 # to be deleted
 
 do_test(){
