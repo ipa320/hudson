@@ -163,7 +163,7 @@ if [ ! -s $WORKSPACE/all.tests ]; then
 </testsuite>' >> $WORKSPACE/test_results/dummy_test.xml
 else
     do_testing ipa-kitchen cob3-1
-    #do_testing ipa-kitchen cob3-2
+    do_testing ipa-kitchen cob3-2
     #do_testing ipa-kitchen cob3-3
 fi
 echo "--------------------------------------------------------------------------------"
