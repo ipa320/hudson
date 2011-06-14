@@ -7,6 +7,7 @@ export SIMX=-r
 roslaunch cob_bringup sim.launch &
 sleep 60s
 pid_bringup="$(jobs -p)" # get the job PID
+echo "cob_bringup PID: " $pid_bringup                           # to be deleted
 
 # start cob_script_server in background
 roslaunch cob_script_server script_server.launch &
@@ -15,6 +16,8 @@ sleep 150s
 pid_script_server_raw="$( jobs -l | grep ]+ )"
 pid_script_server_raw=${pid_script_server_raw%% Running*}
 pid_script_server=${pid_script_server_raw##*]+ }
+
+echo "cob_script_server PID: " $pid_script_server                 # to be deleted
 
 do_test(){
     #set test parameter for current component and target
@@ -31,7 +34,7 @@ do_test(){
     #start test and write results to text file
     test/trajectory_test.py >> $WORKSPACE/../component_test_result.txt
     sleep 1s
-    cat $WORKSPACE/../component_test_result.txt                  # to be deleted
+    # cat $WORKSPACE/../component_test_result.txt                  # to be deleted
 }
 
 #change to cob_component_test package
@@ -56,6 +59,8 @@ do_test sdh cylclosed
 do_test sdh spheropen
 do_test head front
 do_test head back
+
+sleep 10s
 
 # kill cob_script_server and cob_bringup with before stored PIDs
 kill "$pid_script_server"
