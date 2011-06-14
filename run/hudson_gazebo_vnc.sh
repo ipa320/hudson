@@ -28,7 +28,7 @@ do_testing(){
 	
 	#kill old VNCserver
     vncserver -kill :5
-    sleep 5s
+    sleep 5
 
     #start VNCserver
     vncserver :5
@@ -41,6 +41,7 @@ do_testing(){
 	echo ""
 	echo "start testing for $ROBOT in $ROBOT_ENV..."
 	rm -rf ~/.ros/test_results # delete old rostest logs
+	sleep 5
 	while read myline
 	do
 		vglrun rostest $myline
