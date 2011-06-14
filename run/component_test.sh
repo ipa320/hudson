@@ -5,21 +5,18 @@ export SIMX=-r
 
 # start cob_bringup in background 
 roslaunch cob_bringup sim.launch &
-sleep 60s
+sleep 30s
 pid_bringup="$(jobs -p)" # get the job PID
-echo "cob_bringup PID: " $pid_bringup                           # to be deleted
 
 # start cob_script_server in background
 roslaunch cob_script_server script_server.launch &
-sleep 150s
+sleep 60s
 # get the job PID
 pid_script_server_raw="$( jobs -l | grep ]+ )"
 sleep 1s
 pid_script_server_raw=${pid_script_server_raw%% Running*}
 sleep 1s
 pid_script_server=${pid_script_server_raw##*]+ }
-sleep 1s
-echo "cob_script_server PID: " $pid_script_server                 # to be deleted
 
 do_test(){
     #set test parameter for current component and target
@@ -28,7 +25,6 @@ do_test(){
     rosparam set /component_test/state_topic /"$1"_controller/state
     rosparam set /component_test/target "$2"
     sleep 1s
-    echo "Component: " $1 " / Target: " $2                       # to be deleted
     #write introduction for current test to test file
     echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
     echo "Component: " $1 " / Target: " $2 >> $WORKSPACE/../component_test_result.txt
@@ -36,7 +32,6 @@ do_test(){
     #start test and write results to text file
     test/trajectory_test.py >> $WORKSPACE/../component_test_result.txt
     sleep 1s
-    # cat $WORKSPACE/../component_test_result.txt                  # to be deleted
 }
 
 #change to cob_component_test package
@@ -44,7 +39,6 @@ cd "$( rospack find cob_component_test )"/ros
 
 #create/overwrite text file for test results
 echo "TEST RESULTS" > $WORKSPACE/../component_test_result.txt
-cat $WORKSPACE/../component_test_result.txt                      # to be deleted
 
 #set static test parameters
 rosparam set /component_test/wait_time 10.0
@@ -57,12 +51,13 @@ do_test tray down
 do_test tray up
 do_test torso front
 do_test torso right
-do_test sdh cylclosed
-do_test sdh spheropen
+do_test sdh spherclosed
+do_test sdh cylopen
+do_test sdh home
 do_test head front
 do_test head back
 
-sleep 10s
+sleep 5s
 
 # kill cob_script_server and cob_bringup with before stored PIDs
 kill "$pid_script_server"
