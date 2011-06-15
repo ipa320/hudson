@@ -5,12 +5,12 @@ export SIMX=-r
 
 # start cob_bringup in background 
 roslaunch cob_bringup sim.launch &
-sleep 30s
+sleep 120s
 pid_bringup="$(jobs -p)" # get the job PID
 
 # start cob_script_server in background
 roslaunch cob_script_server script_server.launch &
-sleep 60s
+sleep 120s
 # get the job PID
 pid_script_server_raw="$( jobs -l | grep ]+ )"
 sleep 1s
