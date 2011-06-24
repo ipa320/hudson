@@ -45,7 +45,7 @@ do_testing(){
 	while read myline
 	do
 		vglrun rostest $myline
-	done < $WORKSPACE/all.tests
+	done < $WORKSPACE/all_gazebo.tests
 	rosrun rosunit clean_junit_xml.py # beautify xml files
 	mkdir -p $WORKSPACE/test_results
 	for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-`basename $i`" ; done # copy test results and rename with ROBOT
@@ -151,8 +151,8 @@ echo "Rostest for GAZEBO via VNC"
 mkdir -p $WORKSPACE/test_results # create test_results directory
 rm -rf ~/.ros/test_results # delete old rostest logs
 
-if [ ! -s $WORKSPACE/all.tests ]; then
-	echo "all.tests-file not found or empty, creating dummy test result file"
+if [ ! -s $WORKSPACE/all_gazebo.tests ]; then
+	echo "all_gazebo.tests-file not found or empty, creating dummy test result file"
 	# create dummy test result file
 	touch $WORKSPACE/test_results/dummy_test.xml
 	echo '<testsuite errors="0" failures="0" name="dummy_test" tests="1" time="0.01">
