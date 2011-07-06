@@ -3,8 +3,10 @@
 # get the name of ROSRELEASE, GITHUBUSER and REPOSITORY  !!!will be insert automatically!!!
 
 
-cd /tmp/workspace                                                               ##############
-WORKSPACE=/tmp/workspace/$REPOSITORY                                               ##############
+cd /tmp/workspace
+WORKSPACE=/tmp/workspace/$REPOSITORY 
+cp $WORKSPACE/../.gitconfig ~/.gitconfig
+
 #ssh-keygen -t rsa -f /home/rosbuild/.ssh/id_rsa
 
 write_rosinstall(){
@@ -12,16 +14,16 @@ write_rosinstall(){
 	echo "- git: 
     local-name: $STACK
     uri: git://github.com/$GITHUBUSER/$STACK.git
-    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall                ############# read-only adress
+    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
 }
 
 check_stack(){
 	STACK="$1"
-	#user=`git config --global github.user`
-	#echo $user                                                                  #############
-	#token=`git config --global github.token`    
-	#echo $token                                                                 #############
-	wget  --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/Makefile --no-check-certificate 2> $WORKSPACE/../wget_response.txt #--post-data "login=$user&token=$token"
+	user=`git config --global github.user`
+	echo $user                                                                  #############
+	token=`git config --global github.token`    
+	echo $token                                                                 #############
+	wget --post-data "login=$user&token=$token" --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/Makefile --no-check-certificate 2> $WORKSPACE/../wget_response.txt
 	cat $WORKSPACE/../wget_response.txt                                         #############
 	return $(grep -c "200 OK" $WORKSPACE/../wget_response.txt)
 }
@@ -52,15 +54,12 @@ do_testing(){
 }
 
 # installing ROS release
-#sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu maverick main" > /etc/apt/sources.list.d/ros-latest.list'   ######################
-#git clone git://github.com/"$GITHUBUSER"/"$REPOSITORY".git      ###################### read-only
 sudo apt-get autoclean
 sudo apt-get update
-#udo apt-get upgrade -y                                                         ################
 sudo apt-get install python-setuptools -y
 sudo easy_install -U rosinstall
 sudo apt-get install ros-$RELEASE-care-o-bot -y
-sudo apt-get install ros-$RELEASE-openni-kinect -y                           ################
+sudo apt-get install ros-$RELEASE-openni-kinect -y
 sudo apt-get install bc -y                                                      ######################
 
 
