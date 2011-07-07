@@ -44,6 +44,7 @@ do_testing(){
 	sleep 5
 	while read myline
 	do
+	    sleep 5
 		vglrun rostest $myline
 	done < $WORKSPACE/all_gazebo.tests
 	rosrun rosunit clean_junit_xml.py # beautify xml files
@@ -164,7 +165,7 @@ if [ ! -s $WORKSPACE/all_gazebo.tests ]; then
 else
     do_testing ipa-kitchen cob3-1
     do_testing ipa-kitchen cob3-2
-    #do_testing ipa-kitchen cob3-3
+    do_testing ipa-kitchen cob3-3
 fi
 echo "--------------------------------------------------------------------------------"
 echo ""
