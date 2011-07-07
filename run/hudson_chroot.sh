@@ -7,14 +7,14 @@ cd /tmp/workspace
 WORKSPACE=/tmp/workspace/$REPOSITORY 
 cp $WORKSPACE/../.gitconfig ~/.gitconfig
 mkdir -p $WORKSPACE/test_results # create test_results directory
-# create dummy test result file in case script aborts before actual tests start
-touch $WORKSPACE/test_results/no_test.xml
-echo '<testsuite errors="1" failures="1" name="no_test" tests="1" time="0.01">
-<testcase classname="NoTest.NoTest" name="no_test" time="0.01">
-</testcase>
-<system-out><![CDATA[]]></system-out>
-<system-err><![CDATA[]]></system-err>
-</testsuite>' >> $WORKSPACE/test_results/no_test.xml
+## create dummy test result file in case script aborts before actual tests start
+#touch $WORKSPACE/test_results/no_test.xml
+#echo '<testsuite errors="1" failures="1" name="no_test" tests="1" time="0.01">
+#<testcase classname="NoTest.NoTest" name="no_test" time="0.01">
+#</testcase>
+#<system-out><![CDATA[]]></system-out>
+#<system-err><![CDATA[]]></system-err>
+#</testsuite>' >> $WORKSPACE/test_results/no_test.xml
 
 #ssh-keygen -t rsa -f ~/.ssh/id_rsa
 
