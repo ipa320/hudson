@@ -8,13 +8,13 @@ WORKSPACE=/tmp/workspace/$REPOSITORY
 cp $WORKSPACE/../.gitconfig ~/.gitconfig
 mkdir -p $WORKSPACE/test_results # create test_results directory
 ## create dummy test result file in case script aborts before actual tests start
-#touch $WORKSPACE/test_results/no_test.xml
-#echo '<testsuite errors="1" failures="1" name="no_test" tests="1" time="0.01">
-#<testcase classname="NoTest.NoTest" name="no_test" time="0.01">
-#</testcase>
-#<system-out><![CDATA[]]></system-out>
-#<system-err><![CDATA[]]></system-err>
-#</testsuite>' >> $WORKSPACE/test_results/no_test.xml
+touch $WORKSPACE/test_results/no_test.xml
+echo '<testsuite errors="1" failures="0" name="no_test" tests="0" time="0.01">
+<testcase classname="NoTest.NoTest" name="no_test" time="0.01">
+</testcase>
+<system-out><![CDATA[]]></system-out>
+<system-err><![CDATA[]]></system-err>
+</testsuite>' >> $WORKSPACE/test_results/no_test.xml
 
 #ssh-keygen -t rsa -f ~/.ssh/id_rsa
 
@@ -141,7 +141,6 @@ rosdep install $REPOSITORY -y
 rosmake $REPOSITORY --skip-blacklist --profile
 
 # check if building is succesfull, otherwise don't perform test and exit
-
 if [ $? != "0" ]; then
 	echo "rosmake failed, skipping tests"
 	exit 1
