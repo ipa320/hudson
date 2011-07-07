@@ -6,8 +6,17 @@
 cd /tmp/workspace
 WORKSPACE=/tmp/workspace/$REPOSITORY 
 cp $WORKSPACE/../.gitconfig ~/.gitconfig
+mkdir -p $WORKSPACE/test_results # create test_results directory
+# create dummy test result file in case script aborts before actual tests start
+touch $WORKSPACE/test_results/no_test.xml
+echo '<testsuite errors="1" failures="1" name="no_test" tests="1" time="0.01">
+<testcase classname="NoTest.NoTest" name="no_test" time="0.01">
+</testcase>
+<system-out><![CDATA[]]></system-out>
+<system-err><![CDATA[]]></system-err>
+</testsuite>' >> $WORKSPACE/test_results/no_test.xml
 
-#ssh-keygen -t rsa -f /home/rosbuild/.ssh/id_rsa
+#ssh-keygen -t rsa -f ~/.ssh/id_rsa
 
 write_rosinstall(){
 	STACK="$1"
@@ -20,11 +29,9 @@ write_rosinstall(){
 check_stack(){
 	STACK="$1"
 	user=`git config --global github.user`
-	echo $user                                                                  #############
-	token=`git config --global github.token`    
-	echo $token                                                                 #############
+	token=`git config --global github.token`
 	wget --post-data "login=$user&token=$token" --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/Makefile --no-check-certificate 2> $WORKSPACE/../wget_response.txt
-	cat $WORKSPACE/../wget_response.txt                                         #############
+	cat $WORKSPACE/../wget_response.txt
 	return $(grep -c "200 OK" $WORKSPACE/../wget_response.txt)
 }
 
@@ -145,8 +152,8 @@ echo ""
 echo "--------------------------------------------------------------------------------"
 echo "Rostest for $REPOSITORY"
 
-mkdir -p $WORKSPACE/test_results # create test_results directory
 rm -rf ~/.ros/test_results # delete old rostest logs
+rm -f $WORKSPACE/test_results/no_test.xml # delete dummy test file
 
 if [ ! -s $WORKSPACE/all.tests ]; then
 	echo "all.tests-file not found or empty, creating dummy test result file"
