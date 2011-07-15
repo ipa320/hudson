@@ -69,7 +69,7 @@
     <hudson.tasks.Shell>
       <command>wget https://github.com/ipa320/hudson/raw/master/run/hudson.sh -O $WORKSPACE/../hudson.sh --no-check-certificate 
 chmod 755 $WORKSPACE/../hudson.sh
-bash $WORKSPACE/../hudson.sh</command>
+bash $WORKSPACE/../hudson.sh ---ROSRELEASE--- ---GITHUBUSER--- ---REPOSITORY---</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
@@ -98,5 +98,5 @@ bash $WORKSPACE/../hudson.sh</command>
     </hudson.plugins.emailext.ExtendedEmailPublisher>
   </publishers>
   <buildWrappers/>
-  <customWorkspace>/home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/---REPOSITORY---</customWorkspace>
+  <customWorkspace>/home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/</customWorkspace>
 </project>

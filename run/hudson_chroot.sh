@@ -1,16 +1,27 @@
 #!/bin/bash
 
-# get the name of ROSRELEASE and GITHUBUSER from JOB_NAME
-RELEASE=$1
-GITHUBUSER=$2
-REPOSITORY=cob_apps
+# ROSRELEASE, GITHUBUSER and REPOSITORY  !!!will be inserted automatically!!!
+
+
+cd /tmp/workspace
+WORKSPACE=/tmp/workspace/$REPOSITORY 
+cp $WORKSPACE/../.gitconfig ~/.gitconfig
+mkdir -p $WORKSPACE/test_results # create test_results directory
+## create dummy test result file in case the script aborts before actual tests start
+touch $WORKSPACE/test_results/no_test.xml
+echo '<testsuite errors="0" failures="1" name="no_test" tests="0" time="0.01">
+<testcase classname="NoTest.NoTest" name="no_test" time="0.01">
+</testcase>
+<system-out><![CDATA[]]></system-out>
+<system-err><![CDATA[]]></system-err>
+</testsuite>' >> $WORKSPACE/test_results/no_test.xml
 
 
 write_rosinstall(){
 	STACK="$1"
 	echo "- git: 
     local-name: $STACK
-    uri: git@github.com:---GITHUBUSER---/$STACK.git
+    uri: git://github.com/$GITHUBUSER/$STACK.git
     branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
 }
 
@@ -19,20 +30,13 @@ check_stack(){
 	user=`git config --global github.user`
 	token=`git config --global github.token`
 	wget --post-data "login=$user&token=$token" --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/Makefile --no-check-certificate 2> $WORKSPACE/../wget_response.txt
+	cat $WORKSPACE/../wget_response.txt
 	return $(grep -c "200 OK" $WORKSPACE/../wget_response.txt)
 }
 
 do_testing(){
 	# sleep to finish running tests
 	sleep 10
-	
-	#kill old VNCserver
-    vncserver -kill :5
-    sleep 5
-
-    #start VNCserver
-    vncserver :5
-    export DISPLAY=:5
 
 	# export parameters
 	export ROBOT_ENV="$1"
@@ -41,12 +45,10 @@ do_testing(){
 	echo ""
 	echo "start testing for $ROBOT in $ROBOT_ENV..."
 	rm -rf ~/.ros/test_results # delete old rostest logs
-	sleep 5
 	while read myline
 	do
-	    sleep 5
-		vglrun rostest $myline
-	done < $WORKSPACE/all_gazebo.tests
+		rostest $myline
+	done < $WORKSPACE/all.tests
 	rosrun rosunit clean_junit_xml.py # beautify xml files
 	mkdir -p $WORKSPACE/test_results
 	for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-`basename $i`" ; done # copy test results and rename with ROBOT
@@ -63,6 +65,9 @@ sudo apt-get update
 sudo apt-get install python-setuptools -y
 sudo easy_install -U rosinstall
 sudo apt-get install ros-$RELEASE-care-o-bot -y
+sudo apt-get install ros-$RELEASE-openni-kinect -y
+sudo apt-get install bc -y                                                      ######################
+
 
 # create .rosinstall file
 echo "- other: {local-name: /opt/ros/---ROSRELEASE---/ros}
@@ -128,9 +133,11 @@ echo "==> ROS_PACKAGE_PATH =" $ROS_PACKAGE_PATH
 echo "-------------------------------------------------------"
 echo ""
 
+sleep 5
+
 # installing dependencies and building
-rosdep install cob_bringup -y
-rosmake cob_bringup --skip-blacklist --profile
+rosdep install $REPOSITORY -y
+rosmake $REPOSITORY --skip-blacklist --profile
 
 # check if building is succesfull, otherwise don't perform test and exit
 if [ $? != "0" ]; then
@@ -138,22 +145,16 @@ if [ $? != "0" ]; then
 	exit 1
 fi
 
-# cleanup gazebo tmp dir
-sudo rm -rf /tmp/gazebo*
-
-# include TurboVNC and VirtualGL directories to $PATH
-export PATH=/opt/TurboVNC/bin:/opt/VirtualGL/bin:$PATH
-
-#rostest
+# rostest
 echo ""
 echo "--------------------------------------------------------------------------------"
-echo "Rostest for GAZEBO via VNC"
+echo "Rostest for $REPOSITORY"
 
-mkdir -p $WORKSPACE/test_results # create test_results directory
 rm -rf ~/.ros/test_results # delete old rostest logs
+rm -f $WORKSPACE/test_results/no_test.xml # delete dummy test file
 
-if [ ! -s $WORKSPACE/all_gazebo.tests ]; then
-	echo "all_gazebo.tests-file not found or empty, creating dummy test result file"
+if [ ! -s $WORKSPACE/all.tests ]; then
+	echo "all.tests-file not found or empty, creating dummy test result file"
 	# create dummy test result file
 	touch $WORKSPACE/test_results/dummy_test.xml
 	echo '<testsuite errors="0" failures="0" name="dummy_test" tests="1" time="0.01">
@@ -163,9 +164,9 @@ if [ ! -s $WORKSPACE/all_gazebo.tests ]; then
 	<system-err><![CDATA[]]></system-err>
 </testsuite>' >> $WORKSPACE/test_results/dummy_test.xml
 else
-    do_testing ipa-kitchen cob3-1
-    do_testing ipa-kitchen cob3-2
-    do_testing ipa-kitchen cob3-3
+	do_testing ipa-kitchen cob3-1
+	do_testing ipa-kitchen cob3-2
+	do_testing ipa-kitchen cob3-3
 fi
 echo "--------------------------------------------------------------------------------"
 echo ""

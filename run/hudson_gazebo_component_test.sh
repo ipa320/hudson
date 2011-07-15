@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # get the name of ROSRELEASE and GITHUBUSER from JOB_NAME
-RELEASE=$1
-GITHUBUSER=$2
 REPOSITORY=cob_apps
+INTERSTAGE="${JOB_NAME%__*}"
+GITHUBUSER="${INTERSTAGE#*__}"
+RELEASE="${INTERSTAGE%__*}"
 
 
 write_rosinstall(){
@@ -20,41 +21,6 @@ check_stack(){
 	token=`git config --global github.token`
 	wget --post-data "login=$user&token=$token" --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/Makefile --no-check-certificate 2> $WORKSPACE/../wget_response.txt
 	return $(grep -c "200 OK" $WORKSPACE/../wget_response.txt)
-}
-
-do_testing(){
-	# sleep to finish running tests
-	sleep 10
-	
-	#kill old VNCserver
-    vncserver -kill :5
-    sleep 5
-
-    #start VNCserver
-    vncserver :5
-    export DISPLAY=:5
-
-	# export parameters
-	export ROBOT_ENV="$1"
-	export ROBOT="$2"
-
-	echo ""
-	echo "start testing for $ROBOT in $ROBOT_ENV..."
-	rm -rf ~/.ros/test_results # delete old rostest logs
-	sleep 5
-	while read myline
-	do
-	    sleep 5
-		vglrun rostest $myline
-	done < $WORKSPACE/all_gazebo.tests
-	rosrun rosunit clean_junit_xml.py # beautify xml files
-	mkdir -p $WORKSPACE/test_results
-	for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-`basename $i`" ; done # copy test results and rename with ROBOT
-
-	# sleep to finish running tests
-	sleep 10
-
-	echo "...finished testing for $ROBOT in $ROBOT_ENV."
 }
 
 # installing ROS release
@@ -129,43 +95,20 @@ echo "-------------------------------------------------------"
 echo ""
 
 # installing dependencies and building
-rosdep install cob_bringup -y
-rosmake cob_bringup --skip-blacklist --profile
-
-# check if building is succesfull, otherwise don't perform test and exit
-if [ $? != "0" ]; then
-	echo "rosmake failed, skipping tests"
-	exit 1
-fi
+rosdep install $REPOSITORY -y
+rosmake $REPOSITORY --skip-blacklist --profile
 
 # cleanup gazebo tmp dir
 sudo rm -rf /tmp/gazebo*
 
-# include TurboVNC and VirtualGL directories to $PATH
-export PATH=/opt/TurboVNC/bin:/opt/VirtualGL/bin:$PATH
+# export parameters
+export SIMX=-r #no graphical output of gazebo
+export ROBOT_ENV=ipa-kitchen
 
-#rostest
-echo ""
-echo "--------------------------------------------------------------------------------"
-echo "Rostest for GAZEBO via VNC"
+# rostest
+export ROBOT=cob3-1
+$WORKSPACE/../component_test.sh
 
-mkdir -p $WORKSPACE/test_results # create test_results directory
-rm -rf ~/.ros/test_results # delete old rostest logs
+#export ROBOT=cob3-2
+#$WORKSPACE/../component_test.sh
 
-if [ ! -s $WORKSPACE/all_gazebo.tests ]; then
-	echo "all_gazebo.tests-file not found or empty, creating dummy test result file"
-	# create dummy test result file
-	touch $WORKSPACE/test_results/dummy_test.xml
-	echo '<testsuite errors="0" failures="0" name="dummy_test" tests="1" time="0.01">
-	<testcase classname="DummyTest.DummyTest" name="dummy_test" time="0.01">
-	</testcase>
-	<system-out><![CDATA[]]></system-out>
-	<system-err><![CDATA[]]></system-err>
-</testsuite>' >> $WORKSPACE/test_results/dummy_test.xml
-else
-    do_testing ipa-kitchen cob3-1
-    do_testing ipa-kitchen cob3-2
-    do_testing ipa-kitchen cob3-3
-fi
-echo "--------------------------------------------------------------------------------"
-echo ""
