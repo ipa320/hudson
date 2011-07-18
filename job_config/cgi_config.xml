@@ -73,7 +73,7 @@
 
 wget https://code.ros.org/svn/ros/stacks/ros_release/trunk/hudson/scripts/run_chroot.py -O $WORKSPACE/../run_chroot.py
 chmod +x $WORKSPACE/../run_chroot.py
-wget https://github.com/fmw-jk/hudson/raw/master/run/hudson_chroot.sh -O $WORKSPACE/../hudson_chroot.sh --no-check-certificate
+wget https://github.com/ipa320/hudson/raw/master/run/hudson_chroot.sh -O $WORKSPACE/../hudson_chroot.sh --no-check-certificate
 
 sed -i '3aRELEASE=---ROSRELEASE---' $WORKSPACE/../hudson_chroot.sh
 sed -i '4aGITHUBUSER=---GITHUBUSER---' $WORKSPACE/../hudson_chroot.sh
@@ -104,7 +104,7 @@ $WORKSPACE/../run_chroot.py --chroot-dir /home/hudson/chroot --distro ---DISTRIB
       </tasks>
     </hudson.plugins.postbuildtask.PostbuildTask>
     <hudson.plugins.emailext.ExtendedEmailPublisher>
-      <recipientList>---EMAIL---</recipientList>
+      <recipientList>fmw@ipa.fhg.de,---EMAIL---</recipientList>
       <configuredTriggers>
         <hudson.plugins.emailext.plugins.trigger.FailureTrigger>
           <email>

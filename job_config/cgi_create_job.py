@@ -48,14 +48,14 @@ def main():
         if stacks != []:
             for stack in stacks:
                 find_stack(stack)
-				
+                
         
         print "<p>Creating jobs to test:<br><ul>"    
         for stack in repositories:
             print "- ", stack, "<br>"
         print "</ul>"
         print "<hr>"
-		
+        
         print create_config(form["username"].value, form["email"].value, repositories)
 
     print '<p><input type=button value="Back" onClick="history.back()">'    
@@ -83,7 +83,7 @@ def create_config(name, email, REPOSITORY):
             for distro in UBUNTUDISTRO:
                 for arch in ARCHITECTURE:
                     
-                    UNIVERSAL_CONFIG = open("config.xml", "r+w")
+                    UNIVERSAL_CONFIG = open("cgi_config.xml", "r+w")
                     
                     # replacing placeholder
                     hudson_config = UNIVERSAL_CONFIG.read()
@@ -103,7 +103,7 @@ def create_config(name, email, REPOSITORY):
                         results = results + post_xml(job_name, hudson_config)
                         
                     else:
-						# update existing job
+                        # update existing job
                         results = results + job_name + ": exists already and will be updated<br>\n"
                         results = results + update_job(job_name, hudson_config)
     
@@ -111,18 +111,18 @@ def create_config(name, email, REPOSITORY):
 
 
 def find_stack(stack):
-	# function to check if inserted stack is available
-	
-	global repositories
-	available_stacks = ['cob_apps', 'cob_common', 'cob_driver', 'cob_extern', 'cob_simulation', 'cob3_intern', 'cob_commercial', 'srs']
-	# correct common mistakes
-	stack = stack.lower()
-	stack = stack.replace('-', '_')
-	if stack in available_stacks:
-		repositories = repositories[:] + [stack]
-	else:
-		print "<p><font color='#FF0000'>ERROR:"
-		print "Stack <b>" + stack + " </b>could not be found. Please check spelling!</font>"
+    # function to check if inserted stack is available
+    
+    global repositories
+    available_stacks = ['cob_apps', 'cob_common', 'cob_driver', 'cob_extern', 'cob_simulation', 'cob3_intern', 'cob_commercial', 'srs']
+    # correct common mistakes
+    stack = stack.lower()
+    stack = stack.replace('-', '_')
+    if stack in available_stacks:
+        repositories = repositories[:] + [stack]
+    else:
+        print "<p><font color='#FF0000'>ERROR:"
+        print "Stack <b>" + stack + " </b>could not be found. Please check spelling!</font>"
 
 
 def stack_forked(githubuser, stack):
@@ -135,7 +135,7 @@ def stack_forked(githubuser, stack):
     if response.status == 200:
         return True
     else:
-		return False
+        return False
 
 
 def stack_exists(job_name):
@@ -152,7 +152,7 @@ def stack_exists(job_name):
 
 
 def update_job(job_name, config_xml):
-	# function to update a existing job
+    # function to update a existing job
 
     username = 'fmw-jk'
     password = 'fmw-k3ttj'
