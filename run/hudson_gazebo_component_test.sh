@@ -105,6 +105,9 @@ sudo rm -rf /tmp/gazebo*
 export SIMX=-r #no graphical output of gazebo
 export ROBOT_ENV=ipa-kitchen
 
+mkdir -p $WORKSPACE/test_results # create test_results directory
+rm -rf ~/.ros/test_results # delete old rostest logs
+
 # rostest
 export ROBOT=cob3-1
 $WORKSPACE/../component_test.sh

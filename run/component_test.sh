@@ -25,12 +25,15 @@ do_test(){
     rosparam set /component_test/state_topic /"$1"_controller/state
     rosparam set /component_test/target "$2"
     sleep 1s
-    #write introduction for current test to test file
-    echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-    echo "Component: " $1 " / Target: " $2 >> $WORKSPACE/../component_test_result.txt
-    echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
+#    #write introduction for current test to test file
+#    echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
+#    echo "Component: " $1 " / Target: " $2 >> $WORKSPACE/../component_test_result.txt
+#    echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
     #start test and write results to text file
-    test/trajectory_test.py >> $WORKSPACE/../component_test_result.txt
+    rm -rf ~/.ros/test_results # delete old rostest logs
+    test/trajectory_test.py #>> $WORKSPACE/../component_test_result.txt
+    rosrun rosunit clean_junit_xml.py # beautify xml files
+    for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-`basename $i`" ; done # copy test results and rename with ROBOT
     sleep 1s
 }
 
@@ -46,16 +49,16 @@ rosparam set /component_test/error_range 1.0
 
 #tests for each component
 do_test arm home
-do_test arm pregrasp
-do_test tray down
-do_test tray up
-do_test torso front
-do_test torso right
-do_test sdh spherclosed
-do_test sdh cylopen
-do_test sdh home
-do_test head front
-do_test head back
+#do_test arm pregrasp
+#do_test tray down
+#do_test tray up
+#do_test torso front
+#do_test torso right
+#do_test sdh spherclosed
+#do_test sdh cylopen
+#do_test sdh home
+#do_test head front
+#do_test head back
 
 sleep 5s
 
