@@ -33,7 +33,7 @@ do_test(){
     rm -rf ~/.ros/test_results # delete old rostest logs
     test/trajectory_test.py #>> $WORKSPACE/../component_test_result.txt
     rosrun rosunit clean_junit_xml.py # beautify xml files
-    for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-`basename $i`" ; done # copy test results and rename with ROBOT
+    for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-`basename $i`-$1-$2" ; done # copy test results and rename with ROBOT
     sleep 1s
 }
 
@@ -49,7 +49,7 @@ rosparam set /component_test/error_range 1.0
 
 #tests for each component
 do_test arm home
-#do_test arm pregrasp
+do_test arm pregrasp
 #do_test tray down
 #do_test tray up
 #do_test torso front
@@ -67,29 +67,29 @@ kill "$pid_script_server"
 kill "$pid_bringup"
 
 #evaluate test results
-echo "SUMMARY: " >> $WORKSPACE/../component_test_result.txt
-tests_no="$( grep -c ' * TESTS: ' $WORKSPACE/../component_test_result.txt )"
-success_no="$( grep -c ' * RESULT: SUCCESS' $WORKSPACE/../component_test_result.txt )" 
-errors_no="$( grep -c ' * ERRORS: 1 ' $WORKSPACE/../component_test_result.txt )"
-failures_no="$( grep -c ' * FAILURES: 1 ' $WORKSPACE/../component_test_result.txt )"
+#echo "SUMMARY: " >> $WORKSPACE/../component_test_result.txt
+#tests_no="$( grep -c ' * TESTS: ' $WORKSPACE/../component_test_result.txt )"
+#success_no="$( grep -c ' * RESULT: SUCCESS' $WORKSPACE/../component_test_result.txt )" 
+#errors_no="$( grep -c ' * ERRORS: 1 ' $WORKSPACE/../component_test_result.txt )"
+#failures_no="$( grep -c ' * FAILURES: 1 ' $WORKSPACE/../component_test_result.txt )"
 
-if [ $success_no -eq $tests_no -a $tests_no -ne 0 ]; then
-   result="SUCCESS"
-else
-   result="FAIL"
-fi
+#if [ $success_no -eq $tests_no -a $tests_no -ne 0 ]; then
+#   result="SUCCESS"
+#else
+#   result="FAIL"
+#fi
 
-echo " * TESTS: [""$tests_no""]" >> $WORKSPACE/../component_test_result.txt
-echo " * SUCCESS: [""$success_no""]" >> $WORKSPACE/../component_test_result.txt
-echo " * ERRORS: [""$errors_no""]" >> $WORKSPACE/../component_test_result.txt
-echo " * FAILURES: [""$failures_no""]" >> $WORKSPACE/../component_test_result.txt
-echo " * RESULT:" "$result" >> $WORKSPACE/../component_test_result.txt
+#echo " * TESTS: [""$tests_no""]" >> $WORKSPACE/../component_test_result.txt
+#echo " * SUCCESS: [""$success_no""]" >> $WORKSPACE/../component_test_result.txt
+#echo " * ERRORS: [""$errors_no""]" >> $WORKSPACE/../component_test_result.txt
+#echo " * FAILURES: [""$failures_no""]" >> $WORKSPACE/../component_test_result.txt
+#echo " * RESULT:" "$result" >> $WORKSPACE/../component_test_result.txt
 
 sleep 15s
-cat $WORKSPACE/../component_test_result.txt
+#cat $WORKSPACE/../component_test_result.txt
 
-if [ "$result" == "SUCCESS" ]; then
-   exit 0
-else
-   exit 1
-fi
+#if [ "$result" == "SUCCESS" ]; then
+#   exit 0
+#else
+#   exit 1
+#fi

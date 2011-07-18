@@ -112,6 +112,6 @@ rm -rf ~/.ros/test_results # delete old rostest logs
 export ROBOT=cob3-1
 $WORKSPACE/../component_test.sh
 
-#export ROBOT=cob3-2
-#$WORKSPACE/../component_test.sh
+export ROBOT=cob3-2
+$WORKSPACE/../component_test.sh
 
