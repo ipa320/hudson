@@ -33,7 +33,7 @@ do_test(){
     rm -rf ~/.ros/test_results # delete old rostest logs
     test/trajectory_test.py #>> $WORKSPACE/../component_test_result.txt
     rosrun rosunit clean_junit_xml.py # beautify xml files
-    for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-`basename $i`-$1-$2" ; done # copy test results and rename with ROBOT
+    for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-$1-$2-`basename $i`" ; done # copy test results and rename with ROBOT
     sleep 1s
 }
 
