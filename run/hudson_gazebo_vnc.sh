@@ -50,6 +50,7 @@ do_testing(){
 	rosrun rosunit clean_junit_xml.py # beautify xml files
 	mkdir -p $WORKSPACE/test_results
 	for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-`basename $i`" ; done # copy test results and rename with ROBOT
+	sed -i "s/cob_bringup.TEST/$ROBOT-cob_bringup.TEST/g" $WORKSPACE/test_results/$ROBOT* #change test names to include ROBOT
 
 	# sleep to finish running tests
 	sleep 10
