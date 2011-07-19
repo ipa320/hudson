@@ -108,7 +108,7 @@ export ROBOT_ENV=ipa-kitchen
 mkdir -p $WORKSPACE/test_results
 
 # rostest
-robots=( "cob3-1" "cob3-2" "cob3-3" )
+robots=(cob3-1 cob3-2 cob3-3)
 
 for robot in $robots
     do
