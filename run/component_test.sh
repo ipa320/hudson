@@ -25,10 +25,14 @@ do_test(){
     rosparam set /component_test/state_topic /"$1"_controller/state
     rosparam set /component_test/target "$2"
     sleep 1s
-    rm -rf ~/.ros/test_results # delete old rostest logs
-    test/trajectory_test.py #>> $WORKSPACE/../component_test_result.txt
-    rosrun rosunit clean_junit_xml.py # beautify xml files
-    for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-$1-$2-`basename $i`" ; done # copy test results and rename with ROBOT
+    rm -rf ~/.ros/test_results          # delete old rostest logs
+    test/trajectory_test.py             # start test
+    rosrun rosunit clean_junit_xml.py   # beautify xml files
+    for i in ~/.ros/test_results/_hudson/*.xml # copy test results and rename with ROBOT
+        do
+            sed -i "s/rostest.TEST-component_test/$ROBOT-rostest.TEST-$1-$2-component_test/g" "$i"
+            mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-$1-$2-`basename $i`"
+    done 
     sleep 1s
 }
 
