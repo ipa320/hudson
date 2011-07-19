@@ -109,7 +109,7 @@ mkdir -p $WORKSPACE/test_results # create test_results directory
 rm -rf ~/.ros/test_results # delete old rostest logs
 
 # rostest
-robots=(cob3-1 cob3-2 cob3-3)
+robots=( "cob3-1" "cob3-2" "cob3-3" )
 
 for robot in $robots
     do
