@@ -7,11 +7,13 @@ Hudson can be installed as a Debian package, which enables:
 * Automatic upgrade of Hudson via apt
 * /etc/init.d hook up to start Hudson on boot 
 
-	sudo sh -c "echo 'deb http://hudson-ci.org/debian binary/' > /etc/apt/sources.list.d/hudson.list"
+	wget -q -O - http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key | sudo apt-key add -
+	sudo sh -c 'echo deb http://pkg.jenkins-ci.org/debian binary/ > /etc/apt/sources.list.d/jenkins.list'
 	sudo apt-get update
-	sudo apt-get install hudson
+	sudo apt-get install jenkins
 
-Once the package is installed, apt-get update; apt-get install hudson will update Hudson. See Wiki for more information.
+
+Once the package is installed, apt-get update; apt-get install jenkins will update Hudson. See Wiki for more information.
 
 -----------------------------
 2 Install Hudson plugins
@@ -24,6 +26,8 @@ Loginto hudson at http://localhost:8080 and add the following plugins
 * Github plugin
 * View Job Filters
 * Post build task
+
+restart jenkins afterwards if no jobs are running.
 
 -----------------------------
 3 Configure Hudson and slave nodes
