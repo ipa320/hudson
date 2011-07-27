@@ -74,15 +74,21 @@ function disableBox() {
 <p>With this form you can create multiple Hudson jobs in an easy way. Hudson will build your forks of the selected stacks every night and after each modification.<br>
 In the unlikely case of any problems while building your code, Hudson will inform you via an email. Thus you will always know whether your code is working or not.
 
-<h3>Github username:</h3> <input type="text" name="username" />
+<h3>GITHUB USERNAME:</h3> <input type="text" name="username" />
 <br><br>
 
-<h3>Email address:</h3> <input type="text" name="email" /> (e.g., <tt>you@example.com</tt>)
+<h3>EMAIL ADDRESS:</h3> <input type="text" name="email" /> (e.g., <tt>you@example.com</tt>)
 <br><br>
 
-<h3>Stacks:</h3> 
-<font size="3">Select the stacks you want to test</font><br> 
-<p><input type="radio" name="stacks" value="All" checked onclick="disableBox()" > All <tt>(cob_apps,  cob_common, cob_driver, cob_extern and cob_simulation)</tt><br>
+<h3>ROSRELEASES</h3>
+<font size="3"><b>Choose additional releases</b></font><br> 
+<input type="checkbox" name="release" value="unstable" disabled > unstable<br>
+<input type="checkbox" name="release" value="diamondback" checked disabled> diamondback<br>
+<input type="checkbox" name="release" value="electric" > electric<br>
+
+<h3>STACKS:</h3> 
+<font size="3"><b>Select the stacks you want to test</b></font><br> 
+<input type="radio" name="stacks" value="All" checked onclick="disableBox()" > All <tt>(cob_apps,  cob_common, cob_driver, cob_extern and cob_simulation)</tt><br>
 <input type="radio" name="stacks" value="Selection" onclick="enableBox()" > Choose one or more stacks<br>
 <ul><input id="boxApps" type="checkbox" name="stack" value="cob_apps" disabled > cob_apps<br>
 <input id="boxCommon" type="checkbox" name="stack" value="cob_common" disabled > cob_common<br>

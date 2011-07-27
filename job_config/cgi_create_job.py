@@ -17,22 +17,29 @@ def main():
 
     form = cgi.FieldStorage() # keys from HTML form
         
-    # check if keys are available
-    if "username" not in form or "email" not in form:
+    # check if necessary keys (username & email) are available
+    if "username" not in form or "email" not in form: # raise error if not
         print "<H1>ERROR<H1>"
         print "Please fill in your Github username and email address."
         print '<p><input type=button value="Back" onClick="history.back()">'
         return
     
+    # if available check other parameters
     else:
         print "<p>Creating jobs for:<br>"
         print "<ul><p>Username: ", form["username"].value  
         print "<p>Email: ", form["email"].value, "</ul>"
         
+        rosrelease = ['diamondback'] # diamondback is allways chose
+        # check if other releases were chosen
+        if "release" in form:
+            releases = form.getlist('release')
+            for release in releases:
+                rosrelease = rosrelease[:] + [release]
         
+        # check chosen stacks
         if form['stacks'].value == 'All':
             repositories = ['cob_apps', 'cob_common', 'cob_driver', 'cob_extern', 'cob_simulation']
-              
         else:
             stacks = form.getlist('stack')
             if stacks == []:
@@ -49,28 +56,27 @@ def main():
             for stack in stacks:
                 find_stack(stack)
                 
-        
+        # printing planed job creations
         print "<p>Creating jobs to test:<br><ul>"    
         for stack in repositories:
             print "- ", stack, "<br>"
         print "</ul>"
         print "<hr>"
         
-        print create_config(form["username"].value, form["email"].value, repositories)
+        print create_config(form["username"].value, form["email"].value, repositories, rosrelease)
 
     print '<p><input type=button value="Back" onClick="history.back()">'    
 
-def create_config(name, email, REPOSITORY):
+def create_config(name, email, REPOSITORY, ROSRELEASE):
     # function to create config files for all jobs
     
     results = """<p>JOB CREATION RESULTS<br>
 ====================<br>\n"""
     
     # all available options
-    ARCHITECTURE = ['i386'] #, 'amd64'] # i686
-    UBUNTUDISTRO = ['lucid'] #, 'maverick', 'natty'] # karmic
-    ROSRELEASE = ['diamondback'] # unstable
-
+    ARCHITECTURE = ['i386', 'amd64'] # i686
+    UBUNTUDISTRO = ['lucid', 'maverick', 'natty'] # karmic
+    
     for release in ROSRELEASE:
         for repo in REPOSITORY:
             results = results + "<br>"
