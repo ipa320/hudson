@@ -1,16 +1,27 @@
 #!/bin/bash
 
-# get the name of ROSRELEASE, GITHUBUSER and REPOSITORY from JOB_NAME
-RELEASE=$1
-GITHUBUSER=$2
-REPOSITORY=$3
+# ROSRELEASE, GITHUBUSER and REPOSITORY  !!!will be inserted automatically!!!
+
+
+cd /tmp/workspace
+WORKSPACE=/tmp/workspace/$REPOSITORY 
+cp $WORKSPACE/../.gitconfig ~/.gitconfig
+mkdir -p $WORKSPACE/test_results # create test_results directory
+## create dummy test result file in case the script aborts before actual tests start
+touch $WORKSPACE/test_results/no_test.xml
+echo '<testsuite errors="0" failures="1" name="no_test" tests="0" time="0.01">
+<testcase classname="NoTest.NoTest" name="no_test" time="0.01">
+</testcase>
+<system-out><![CDATA[]]></system-out>
+<system-err><![CDATA[]]></system-err>
+</testsuite>' >> $WORKSPACE/test_results/no_test.xml
 
 
 write_rosinstall(){
 	STACK="$1"
 	echo "- git: 
     local-name: $STACK
-    uri: git@github.com:---GITHUBUSER---/$STACK.git
+    uri: git://github.com/$GITHUBUSER/$STACK.git
     branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
 }
 
@@ -19,6 +30,7 @@ check_stack(){
 	user=`git config --global github.user`
 	token=`git config --global github.token`
 	wget --post-data "login=$user&token=$token" --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/Makefile --no-check-certificate 2> $WORKSPACE/../wget_response.txt
+	cat $WORKSPACE/../wget_response.txt
 	return $(grep -c "200 OK" $WORKSPACE/../wget_response.txt)
 }
 
@@ -53,6 +65,9 @@ sudo apt-get update
 sudo apt-get install python-setuptools -y
 sudo easy_install -U rosinstall
 sudo apt-get install ros-$RELEASE-care-o-bot -y
+sudo apt-get install ros-$RELEASE-openni-kinect -y
+sudo apt-get install bc -y                                                      ######################
+
 
 # create .rosinstall file
 echo "- other: {local-name: /opt/ros/---ROSRELEASE---/ros}
@@ -118,12 +133,13 @@ echo "==> ROS_PACKAGE_PATH =" $ROS_PACKAGE_PATH
 echo "-------------------------------------------------------"
 echo ""
 
+sleep 5
+
 # installing dependencies and building
 rosdep install $REPOSITORY -y
 rosmake $REPOSITORY --skip-blacklist --profile
 
 # check if building is succesfull, otherwise don't perform test and exit
-
 if [ $? != "0" ]; then
 	echo "rosmake failed, skipping tests"
 	exit 1
@@ -134,8 +150,8 @@ echo ""
 echo "--------------------------------------------------------------------------------"
 echo "Rostest for $REPOSITORY"
 
-mkdir -p $WORKSPACE/test_results # create test_results directory
 rm -rf ~/.ros/test_results # delete old rostest logs
+rm -f $WORKSPACE/test_results/no_test.xml # delete dummy test file
 
 if [ ! -s $WORKSPACE/all.tests ]; then
 	echo "all.tests-file not found or empty, creating dummy test result file"

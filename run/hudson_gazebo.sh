@@ -1,10 +1,9 @@
 #!/bin/bash
 
 # get the name of ROSRELEASE and GITHUBUSER from JOB_NAME
+RELEASE=$1
+GITHUBUSER=$2
 REPOSITORY=cob_apps
-INTERSTAGE="${JOB_NAME%__*}"
-GITHUBUSER="${INTERSTAGE#*__}"
-RELEASE="${INTERSTAGE%__*}"
 
 
 write_rosinstall(){
@@ -108,24 +107,16 @@ export ROBOT_ENV=ipa-kitchen
 # create test_results directory
 mkdir -p $WORKSPACE/test_results
 
-# rostest cob3-1
-export ROBOT=cob3-1
-rm -rf ~/.ros/test_results # delete old rostest logs
-rostest cob_bringup sim.launch # do the tests
-rosrun rosunit clean_junit_xml.py # beautify xml files
-mkdir -p $WORKSPACE/test_results
-for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results
-sed -i "s/cob_bringup.TEST/$ROBOT-cob_bringup.TEST/g" $WORKSPACE/test_results/$ROBOT* #change test names to include ROBOT
+# rostest
+robots=(cob3-1 cob3-2 cob3-3)
 
-# rostest cob3-2
-export ROBOT=cob3-2
-rm -rf ~/.ros/test_results # delete old rostest logs
-rostest cob_bringup sim.launch # do the tests
-rosrun rosunit clean_junit_xml.py # beautify xml files
-mkdir -p $WORKSPACE/test_results
-for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results
-sed -i "s/cob_bringup.TEST/$ROBOT-cob_bringup.TEST/g" $WORKSPACE/test_results/$ROBOT* #change test names to include ROBOT
-
-# rostest desire
-#export ROBOT=desire
-#rostest cob_bringup sim.launch
+for robot in $robots
+    do
+        export ROBOT=${robot[*]}
+        rm -rf ~/.ros/test_results # delete old rostest logs
+        rostest cob_bringup sim.launch # do the tests
+        rosrun rosunit clean_junit_xml.py # beautify xml files
+        mkdir -p $WORKSPACE/test_results
+        for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-`basename $i`" ; done # copy test results
+        sed -i "s/cob_bringup.TEST/$ROBOT-cob_bringup.TEST/g" $WORKSPACE/test_results/$ROBOT* #change test names to include ROBOT
+done

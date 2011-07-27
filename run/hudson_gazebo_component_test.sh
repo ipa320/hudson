@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# get the name of ROSRELEASE, GITHUBUSER and REPOSITORY from JOB_NAME
-RELEASE=$1
-GITHUBUSER=$2
-REPOSITORY=$3
+# get the name of ROSRELEASE and GITHUBUSER from JOB_NAME
+REPOSITORY=cob_apps
+INTERSTAGE="${JOB_NAME%__*}"
+GITHUBUSER="${INTERSTAGE#*__}"
+RELEASE="${INTERSTAGE%__*}"
 
 
 write_rosinstall(){
@@ -20,31 +21,6 @@ check_stack(){
 	token=`git config --global github.token`
 	wget --post-data "login=$user&token=$token" --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/Makefile --no-check-certificate 2> $WORKSPACE/../wget_response.txt
 	return $(grep -c "200 OK" $WORKSPACE/../wget_response.txt)
-}
-
-do_testing(){
-	# sleep to finish running tests
-	sleep 10
-
-	# export parameters
-	export ROBOT_ENV="$1"
-	export ROBOT="$2"
-
-	echo ""
-	echo "start testing for $ROBOT in $ROBOT_ENV..."
-	rm -rf ~/.ros/test_results # delete old rostest logs
-	while read myline
-	do
-		rostest $myline
-	done < $WORKSPACE/all.tests
-	rosrun rosunit clean_junit_xml.py # beautify xml files
-	mkdir -p $WORKSPACE/test_results
-	for i in ~/.ros/test_results/_hudson/*.xml ; do mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-`basename $i`" ; done # copy test results and rename with ROBOT
-
-	# sleep to finish running tests
-	sleep 10
-
-	echo "...finished testing for $ROBOT in $ROBOT_ENV."
 }
 
 # installing ROS release
@@ -122,35 +98,21 @@ echo ""
 rosdep install $REPOSITORY -y
 rosmake $REPOSITORY --skip-blacklist --profile
 
-# check if building is succesfull, otherwise don't perform test and exit
+# cleanup gazebo tmp dir
+sudo rm -rf /tmp/gazebo*
 
-if [ $? != "0" ]; then
-	echo "rosmake failed, skipping tests"
-	exit 1
-fi
-
-# rostest
-echo ""
-echo "--------------------------------------------------------------------------------"
-echo "Rostest for $REPOSITORY"
+# export parameters
+export SIMX=-r #no graphical output of gazebo
+export ROBOT_ENV=ipa-kitchen
 
 mkdir -p $WORKSPACE/test_results # create test_results directory
 rm -rf ~/.ros/test_results # delete old rostest logs
 
-if [ ! -s $WORKSPACE/all.tests ]; then
-	echo "all.tests-file not found or empty, creating dummy test result file"
-	# create dummy test result file
-	touch $WORKSPACE/test_results/dummy_test.xml
-	echo '<testsuite errors="0" failures="0" name="dummy_test" tests="1" time="0.01">
-	<testcase classname="DummyTest.DummyTest" name="dummy_test" time="0.01">
-	</testcase>
-	<system-out><![CDATA[]]></system-out>
-	<system-err><![CDATA[]]></system-err>
-</testsuite>' >> $WORKSPACE/test_results/dummy_test.xml
-else
-	do_testing ipa-kitchen cob3-1
-	do_testing ipa-kitchen cob3-2
-	do_testing ipa-kitchen cob3-3
-fi
-echo "--------------------------------------------------------------------------------"
-echo ""
+# rostest
+robots=(cob3-1 cob3-2 cob3-3)
+
+for robot in $robots
+    do
+        export ROBOT=${robot[*]}
+        $WORKSPACE/../component_test.sh
+done

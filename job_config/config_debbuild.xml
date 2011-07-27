@@ -11,7 +11,7 @@
   <keepDependencies>false</keepDependencies>
   <properties>
     <com.coravy.hudson.plugins.github.GithubProjectProperty>
-      <projectUrl>https://github.com/---GITHUBUSER---/cob_apps/</projectUrl>
+      <projectUrl>https://github.com/---GITHUBUSER---/---REPOSITORY---/</projectUrl>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
   </properties>
   <scm class="hudson.plugins.git.GitSCM">
@@ -27,7 +27,7 @@
         <string>uploadpack</string>
         <string>git-upload-pack</string>
         <string>url</string>
-        <string>git@github.com:---GITHUBUSER---/cob_apps.git</string>
+        <string>git@github.com:---GITHUBUSER---/---REPOSITORY---.git</string>
         <string>tagopt</string>
         <string></string>
       </org.spearce.jgit.transport.RemoteConfig>
@@ -52,12 +52,14 @@
     <excludedRegions></excludedRegions>
     <excludedUsers></excludedUsers>
   </scm>
-  <assignedNode>gazebo</assignedNode>
-  <canRoam>false</canRoam>
+  <canRoam>true</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector">
+    <hudson.triggers.SCMTrigger>
+      <spec>*/10 * * * *</spec>
+    </hudson.triggers.SCMTrigger>
     <hudson.triggers.TimerTrigger>
       <spec>@midnight</spec>
     </hudson.triggers.TimerTrigger>
@@ -65,14 +67,14 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>wget https://github.com/ipa320/hudson/raw/master/run/hudson_gazebo.sh -O $WORKSPACE/../hudson_gazebo.sh --no-check-certificate 
-chmod 755 $WORKSPACE/../hudson_gazebo.sh
-sh $WORKSPACE/../hudson_gazebo.sh ---ROSRELEASE--- ---GITHUBUSER---</command>
+      <command>wget https://github.com/ipa320/hudson/raw/master/run/hudson.sh -O $WORKSPACE/../hudson.sh --no-check-certificate 
+chmod 755 $WORKSPACE/../hudson.sh
+bash $WORKSPACE/../hudson.sh</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>test_results/*.xml</testResults>
+      <testResults>test_results/*/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
@@ -96,5 +98,5 @@ sh $WORKSPACE/../hudson_gazebo.sh ---ROSRELEASE--- ---GITHUBUSER---</command>
     </hudson.plugins.emailext.ExtendedEmailPublisher>
   </publishers>
   <buildWrappers/>
-  <customWorkspace>/home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/cob_apps</customWorkspace>
+  <customWorkspace>/home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/---REPOSITORY---</customWorkspace>
 </project>

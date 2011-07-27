@@ -68,7 +68,7 @@
     <hudson.tasks.Shell>
       <command>wget https://github.com/ipa320/hudson/raw/master/run/hudson_intern.sh -O $WORKSPACE/../hudson_intern.sh --no-check-certificate 
 chmod 755 $WORKSPACE/../hudson_intern.sh
-bash $WORKSPACE/../hudson_intern.sh</command>
+bash $WORKSPACE/../hudson_intern.sh ---ROSRELEASE--- ---GITHUBUSER---</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

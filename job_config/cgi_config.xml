@@ -11,7 +11,7 @@
   <keepDependencies>false</keepDependencies>
   <properties>
     <com.coravy.hudson.plugins.github.GithubProjectProperty>
-      <projectUrl>https://github.com/---GITHUBUSER---/cob_apps/</projectUrl>
+      <projectUrl>https://github.com/---GITHUBUSER---/---REPOSITORY---/</projectUrl>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
   </properties>
   <scm class="hudson.plugins.git.GitSCM">
@@ -27,7 +27,7 @@
         <string>uploadpack</string>
         <string>git-upload-pack</string>
         <string>url</string>
-        <string>git@github.com:---GITHUBUSER---/cob_apps.git</string>
+        <string>git@github.com:---GITHUBUSER---/---REPOSITORY---.git</string>
         <string>tagopt</string>
         <string></string>
       </org.spearce.jgit.transport.RemoteConfig>
@@ -37,7 +37,6 @@
         <name>master</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
-    <localBranch></localBranch>
     <mergeOptions/>
     <recursiveSubmodules>false</recursiveSubmodules>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
@@ -51,23 +50,36 @@
     <relativeTargetDir></relativeTargetDir>
     <excludedRegions></excludedRegions>
     <excludedUsers></excludedUsers>
+    <skipTag>false</skipTag>
   </scm>
-  <assignedNode>gazebo</assignedNode>
+  <assignedNode>chroot</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector">
+    <hudson.triggers.SCMTrigger>
+      <spec>*/10 * * * *</spec>
+    </hudson.triggers.SCMTrigger>
     <hudson.triggers.TimerTrigger>
       <spec>@midnight</spec>
     </hudson.triggers.TimerTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
+  <cleanWorkspaceRequired>false</cleanWorkspaceRequired>
   <builders>
     <hudson.tasks.Shell>
-      <command>wget https://github.com/ipa320/hudson/raw/master/run/hudson_gazebo.sh -O $WORKSPACE/../hudson_gazebo.sh --no-check-certificate 
-chmod 755 $WORKSPACE/../hudson_gazebo.sh
-sh $WORKSPACE/../hudson_gazebo.sh ---ROSRELEASE--- ---GITHUBUSER---</command>
+      <command>cp /home/hudson/.gitconfig $WORKSPACE/../.gitconfig
+
+wget https://code.ros.org/svn/ros/stacks/ros_release/trunk/hudson/scripts/run_chroot.py -O $WORKSPACE/../run_chroot.py
+chmod +x $WORKSPACE/../run_chroot.py
+wget https://github.com/ipa320/hudson/raw/master/run/hudson_chroot.sh -O $WORKSPACE/../hudson_chroot.sh --no-check-certificate
+
+sed -i '3aRELEASE=---ROSRELEASE---' $WORKSPACE/../hudson_chroot.sh
+sed -i '4aGITHUBUSER=---GITHUBUSER---' $WORKSPACE/../hudson_chroot.sh
+sed -i '5aREPOSITORY=---REPOSITORY---' $WORKSPACE/../hudson_chroot.sh
+
+$WORKSPACE/../run_chroot.py --chroot-dir /home/hudson/chroot --distro ---DISTRIBUTION--- --arch ---ARCHITECTURE--- --script=$WORKSPACE/../hudson_chroot.sh --debug-chroot --workspace $WORKSPACE/../</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
@@ -76,6 +88,21 @@ sh $WORKSPACE/../hudson_gazebo.sh ---ROSRELEASE--- ---GITHUBUSER---</command>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
+    <hudson.plugins.postbuildtask.PostbuildTask>
+      <tasks>
+        <hudson.plugins.postbuildtask.TaskProperties>
+          <logTexts>
+            <hudson.plugins.postbuildtask.LogProperties>
+              <logText></logText>
+              <operator>AND</operator>
+            </hudson.plugins.postbuildtask.LogProperties>
+          </logTexts>
+          <EscalateStatus>false</EscalateStatus>
+          <RunIfJobSuccessful>false</RunIfJobSuccessful>
+          <script>sudo rm -rf /home/hudson/chroot/$JOB_NAME</script>
+        </hudson.plugins.postbuildtask.TaskProperties>
+      </tasks>
+    </hudson.plugins.postbuildtask.PostbuildTask>
     <hudson.plugins.emailext.ExtendedEmailPublisher>
       <recipientList>fmw@ipa.fhg.de,---EMAIL---</recipientList>
       <configuredTriggers>
@@ -96,5 +123,5 @@ sh $WORKSPACE/../hudson_gazebo.sh ---ROSRELEASE--- ---GITHUBUSER---</command>
     </hudson.plugins.emailext.ExtendedEmailPublisher>
   </publishers>
   <buildWrappers/>
-  <customWorkspace>/home/hudson/---ROSRELEASE---/---GITHUBUSER---/---JOBNAME---/cob_apps</customWorkspace>
+  <customWorkspace>/home/hudson/---ROSRELEASE---/---GITHUBUSER---/---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__---DISTRIBUTION---__---ARCHITECTURE---/---REPOSITORY---</customWorkspace>
 </project>
