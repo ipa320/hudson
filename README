@@ -36,14 +36,14 @@ create ssh-key and upload it to github
 
 	ssh-keygen
 	
-tell github who hudson is
+tell github who jenkins is
 
 	git config --global user.email florian.weisshardt@ipa.fhg.de
 	git config --global user.name ipa320
 	
-allow hudson user to permanently use sudo rights by adding this line at the end of /etc/sudoers with sudo visudo
+allow jenkins user to permanently use sudo rights by adding this line at the end of /etc/sudoers with sudo visudo
 
-hudson ALL=(ALL) NOPASSWD: ALL
+jenkins ALL=(ALL) NOPASSWD: ALL
 
 -----------------------------
 4 Generate hudson jobs
