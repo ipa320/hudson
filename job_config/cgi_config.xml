@@ -62,14 +62,14 @@
       <spec>*/10 * * * *</spec>
     </hudson.triggers.SCMTrigger>
     <hudson.triggers.TimerTrigger>
-      <spec>@midnight</spec>
+      <spec>@weekly</spec>
     </hudson.triggers.TimerTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
   <cleanWorkspaceRequired>false</cleanWorkspaceRequired>
   <builders>
     <hudson.tasks.Shell>
-      <command>cp /home/hudson/.gitconfig $WORKSPACE/../.gitconfig
+      <command>cp /home/jenkins/.gitconfig $WORKSPACE/../.gitconfig
 
 wget https://code.ros.org/svn/ros/stacks/ros_release/trunk/hudson/scripts/run_chroot.py -O $WORKSPACE/../run_chroot.py
 chmod +x $WORKSPACE/../run_chroot.py
@@ -79,7 +79,7 @@ sed -i '3aRELEASE=---ROSRELEASE---' $WORKSPACE/../hudson_chroot.sh
 sed -i '4aGITHUBUSER=---GITHUBUSER---' $WORKSPACE/../hudson_chroot.sh
 sed -i '5aREPOSITORY=---REPOSITORY---' $WORKSPACE/../hudson_chroot.sh
 
-$WORKSPACE/../run_chroot.py --chroot-dir /home/hudson/chroot --distro ---DISTRIBUTION--- --arch ---ARCHITECTURE--- --script=$WORKSPACE/../hudson_chroot.sh --debug-chroot --workspace $WORKSPACE/../</command>
+$WORKSPACE/../run_chroot.py --chroot-dir /home/jenkins/chroot --distro ---DISTRIBUTION--- --arch ---ARCHITECTURE--- --script=$WORKSPACE/../hudson_chroot.sh --debug-chroot --workspace $WORKSPACE/../</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
@@ -99,7 +99,7 @@ $WORKSPACE/../run_chroot.py --chroot-dir /home/hudson/chroot --distro ---DISTRIB
           </logTexts>
           <EscalateStatus>false</EscalateStatus>
           <RunIfJobSuccessful>false</RunIfJobSuccessful>
-          <script>sudo rm -rf /home/hudson/chroot/$JOB_NAME</script>
+          <script>sudo rm -rf /home/jenkins/chroot/$JOB_NAME</script>
         </hudson.plugins.postbuildtask.TaskProperties>
       </tasks>
     </hudson.plugins.postbuildtask.PostbuildTask>
@@ -123,5 +123,5 @@ $WORKSPACE/../run_chroot.py --chroot-dir /home/hudson/chroot --distro ---DISTRIB
     </hudson.plugins.emailext.ExtendedEmailPublisher>
   </publishers>
   <buildWrappers/>
-  <customWorkspace>/home/hudson/---ROSRELEASE---/---GITHUBUSER---/---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__---DISTRIBUTION---__---ARCHITECTURE---/---REPOSITORY---</customWorkspace>
+  <customWorkspace>/home/jenkins/---ROSRELEASE---/---GITHUBUSER---/---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__---DISTRIBUTION---__---ARCHITECTURE---/---REPOSITORY---</customWorkspace>
 </project>
