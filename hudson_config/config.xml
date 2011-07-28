@@ -1,32 +1,17 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <hudson>
-  <version>1.395</version>
+  <disabledAdministrativeMonitors/>
+  <version>1.423</version>
   <numExecutors>1</numExecutors>
   <mode>NORMAL</mode>
   <useSecurity>true</useSecurity>
-  <authorizationStrategy class="hudson.security.GlobalMatrixAuthorizationStrategy">
-    <permission>hudson.model.Computer.Configure:authenticated</permission>
-    <permission>hudson.model.Computer.Delete:authenticated</permission>
-    <permission>hudson.model.Hudson.Administer:authenticated</permission>
-    <permission>hudson.model.Hudson.Read:anonymous</permission>
-    <permission>hudson.model.Hudson.Read:authenticated</permission>
-    <permission>hudson.model.Item.Build:authenticated</permission>
-    <permission>hudson.model.Item.Configure:authenticated</permission>
-    <permission>hudson.model.Item.Create:authenticated</permission>
-    <permission>hudson.model.Item.Delete:authenticated</permission>
-    <permission>hudson.model.Item.Read:anonymous</permission>
-    <permission>hudson.model.Item.Read:authenticated</permission>
-    <permission>hudson.model.Item.Workspace:authenticated</permission>
-    <permission>hudson.model.Run.Delete:authenticated</permission>
-    <permission>hudson.model.Run.Update:authenticated</permission>
-    <permission>hudson.model.View.Configure:authenticated</permission>
-    <permission>hudson.model.View.Create:authenticated</permission>
-    <permission>hudson.model.View.Delete:authenticated</permission>
-    <permission>hudson.scm.SCM.Tag:authenticated</permission>
-  </authorizationStrategy>
+  <authorizationStrategy class="hudson.security.FullControlOnceLoggedInAuthorizationStrategy"/>
   <securityRealm class="hudson.security.HudsonPrivateSecurityRealm">
     <disableSignup>true</disableSignup>
+    <enableCaptcha>false</enableCaptcha>
   </securityRealm>
+  <workspaceDir>${JENKINS_HOME}/workspace/${ITEM_FULLNAME}</workspaceDir>
+  <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
   <markupFormatter class="hudson.markup.RawHtmlMarkupFormatter"/>
   <jdks/>
   <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
@@ -44,7 +29,7 @@
         <host>cob-sim1</host>
         <port>22</port>
         <username>hudson</username>
-        <password>qau7KLbgvj1YLN04R4uvzg==</password>
+        <password>PVyhuTIggd+pU3yKW22oMD2vEPNfB5HJmpV8TjnI5VfjR17ONrBJLOK8Z6qM6yrZ</password>
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
@@ -54,19 +39,17 @@
     <slave>
       <name>cob-sim2</name>
       <description></description>
-      <remoteFS>/home/hudson/</remoteFS>
+      <remoteFS>/home/jenkins/</remoteFS>
       <numExecutors>1</numExecutors>
       <mode>NORMAL</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
         <host>cob-sim2</host>
         <port>22</port>
-        <username>hudson</username>
-        <password>qau7KLbgvj1YLN04R4uvzg==</password>
-        <privatekey></privatekey>
-        <jvmOptions></jvmOptions>
+        <username>jenkins</username>
+        <password>tNKu0VXCjLknOzYZQd8Iig==</password>
       </launcher>
-      <label>gazebo</label>
+      <label>gazebo chroot</label>
       <nodeProperties/>
     </slave>
     <slave>
@@ -80,7 +63,7 @@
         <host>cob-sim3</host>
         <port>22</port>
         <username>hudson</username>
-        <password>qau7KLbgvj1YLN04R4uvzg==</password>
+        <password>PVyhuTIggd+pU3yKW22oMD2vEPNfB5HJmpV8TjnI5VfjR17ONrBJLOK8Z6qM6yrZ</password>
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
@@ -101,7 +84,7 @@
         <host>fmw-z600-1</host>
         <port>22</port>
         <username>hudson</username>
-        <password>qau7KLbgvj1YLN04R4uvzg==</password>
+        <password>PVyhuTIggd+pU3yKW22oMD2vEPNfB5HJmpV8TjnI5VfjR17ONrBJLOK8Z6qM6yrZ</password>
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
@@ -111,19 +94,17 @@
     <slave>
       <name>fmw-z600</name>
       <description></description>
-      <remoteFS>/home/hudson/</remoteFS>
+      <remoteFS>/home/jenkins/</remoteFS>
       <numExecutors>1</numExecutors>
       <mode>EXCLUSIVE</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
         <host>fmw-z600.ipa.fhg.de</host>
         <port>22</port>
-        <username>hudson</username>
-        <password>qau7KLbgvj1YLN04R4uvzg==</password>
-        <privatekey></privatekey>
-        <jvmOptions></jvmOptions>
+        <username>jenkins</username>
+        <password>tNKu0VXCjLknOzYZQd8Iig==</password>
       </launcher>
-      <label>gazebo</label>
+      <label>gazebo chroot</label>
       <nodeProperties/>
     </slave>
     <slave>
@@ -140,7 +121,7 @@
         <host>fmw-z600-2</host>
         <port>22</port>
         <username>hudson</username>
-        <password>qau7KLbgvj1YLN04R4uvzg==</password>
+        <password>PVyhuTIggd+pU3yKW22oMD2vEPNfB5HJmpV8TjnI5VfjR17ONrBJLOK8Z6qM6yrZ</password>
         <privatekey></privatekey>
         <jvmOptions></jvmOptions>
       </launcher>
@@ -153,9 +134,10 @@
   <views>
     <hudson.model.AllView>
       <owner class="hudson" reference="../../.."/>
-      <name>Alle</name>
+      <name>All</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
     </hudson.model.AllView>
     <listView>
       <owner class="hudson" reference="../../.."/>
@@ -691,11 +673,7 @@
   </views>
   <primaryView>BROKEN</primaryView>
   <slaveAgentPort>0</slaveAgentPort>
-  <label></label>
+  <label>chroot</label>
   <nodeProperties/>
   <globalNodeProperties/>
-  <disabledAdministrativeMonitors>
-    <string>OldData</string>
-    <string>hudson.node_monitors.MonitorMarkedNodeOffline</string>
-  </disabledAdministrativeMonitors>
 </hudson>
