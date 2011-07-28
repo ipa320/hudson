@@ -70,6 +70,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>cp /home/jenkins/.gitconfig $WORKSPACE/../.gitconfig
+cp -r /home/jenkins/.ssh $WORKSPACE/../
 
 wget https://code.ros.org/svn/ros/stacks/ros_release/trunk/hudson/scripts/run_chroot.py -O $WORKSPACE/../run_chroot.py
 chmod +x $WORKSPACE/../run_chroot.py
