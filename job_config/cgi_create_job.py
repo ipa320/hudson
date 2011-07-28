@@ -17,22 +17,29 @@ def main():
 
     form = cgi.FieldStorage() # keys from HTML form
         
-    # check if keys are available
-    if "username" not in form or "email" not in form:
+    # check if necessary keys (username & email) are available
+    if "username" not in form or "email" not in form: # raise error if not
         print "<H1>ERROR<H1>"
         print "Please fill in your Github username and email address."
         print '<p><input type=button value="Back" onClick="history.back()">'
         return
     
+    # if available check other parameters
     else:
         print "<p>Creating jobs for:<br>"
         print "<ul><p>Username: ", form["username"].value  
         print "<p>Email: ", form["email"].value, "</ul>"
         
+        rosrelease = ['diamondback'] # diamondback is allways chose
+        # check if other releases were chosen
+        if "release" in form:
+            releases = form.getlist('release')
+            for release in releases:
+                rosrelease = rosrelease[:] + [release]
         
+        # check chosen stacks
         if form['stacks'].value == 'All':
             repositories = ['cob_apps', 'cob_common', 'cob_driver', 'cob_extern', 'cob_simulation']
-              
         else:
             stacks = form.getlist('stack')
             if stacks == []:
@@ -49,28 +56,27 @@ def main():
             for stack in stacks:
                 find_stack(stack)
                 
-        
+        # printing planed job creations
         print "<p>Creating jobs to test:<br><ul>"    
         for stack in repositories:
             print "- ", stack, "<br>"
         print "</ul>"
         print "<hr>"
         
-        print create_config(form["username"].value, form["email"].value, repositories)
+        print create_config(form["username"].value, form["email"].value, repositories, rosrelease)
 
     print '<p><input type=button value="Back" onClick="history.back()">'    
 
-def create_config(name, email, REPOSITORY):
+def create_config(name, email, REPOSITORY, ROSRELEASE):
     # function to create config files for all jobs
     
     results = """<p>JOB CREATION RESULTS<br>
 ====================<br>\n"""
     
     # all available options
-    ARCHITECTURE = ['i386'] #, 'amd64'] # i686
-    UBUNTUDISTRO = ['lucid'] #, 'maverick', 'natty'] # karmic
-    ROSRELEASE = ['diamondback'] # unstable
-
+    ARCHITECTURE = ['i386', 'amd64'] # i686
+    UBUNTUDISTRO = ['lucid', 'maverick', 'natty'] # karmic
+    
     for release in ROSRELEASE:
         for repo in REPOSITORY:
             results = results + "<br>"
@@ -86,13 +92,13 @@ def create_config(name, email, REPOSITORY):
                     UNIVERSAL_CONFIG = open("cgi_config.xml", "r+w")
                     
                     # replacing placeholder
-                    hudson_config = UNIVERSAL_CONFIG.read()
-                    hudson_config = hudson_config.replace('---GITHUBUSER---', name)
-                    hudson_config = hudson_config.replace('---EMAIL---', email)
-                    hudson_config = hudson_config.replace('---ROSRELEASE---', release)
-                    hudson_config = hudson_config.replace('---REPOSITORY---', repo)
-                    hudson_config = hudson_config.replace('---DISTRIBUTION---', distro)
-                    hudson_config = hudson_config.replace('---ARCHITECTURE---', arch)
+                    jenkins_config = UNIVERSAL_CONFIG.read()
+                    jenkins_config = jenkins_config.replace('---GITHUBUSER---', name)
+                    jenkins_config = jenkins_config.replace('---EMAIL---', email)
+                    jenkins_config = jenkins_config.replace('---ROSRELEASE---', release)
+                    jenkins_config = jenkins_config.replace('---REPOSITORY---', repo)
+                    jenkins_config = jenkins_config.replace('---DISTRIBUTION---', distro)
+                    jenkins_config = jenkins_config.replace('---ARCHITECTURE---', arch)
                     
                     # job name
                     job_name = release + "__" + name + "__" + repo + "__" + distro + "__" + arch
@@ -100,12 +106,12 @@ def create_config(name, email, REPOSITORY):
                     # check if job already exists
                     if not stack_exists(job_name):
                         # create new job
-                        results = results + post_xml(job_name, hudson_config)
+                        results = results + post_xml(job_name, jenkins_config)
                         
                     else:
                         # update existing job
                         results = results + job_name + ": exists already and will be updated<br>\n"
-                        results = results + update_job(job_name, hudson_config)
+                        results = results + update_job(job_name, jenkins_config)
     
     return results
 
@@ -139,7 +145,7 @@ def stack_forked(githubuser, stack):
 
 
 def stack_exists(job_name):
-    # function to check if job already exists on hudson
+    # function to check if job already exists on jenkins
     
     path = '/job/' + job_name
     conn = httplib.HTTPConnection("10.0.1.1", 8080)
@@ -170,7 +176,7 @@ def update_job(job_name, config_xml):
 
 
 def post_xml(job_name, config_xml):
-    # function to create job by posting xml to Hudson API
+    # function to create job by posting xml to jenkins API
     
     username = 'fmw-jk'
     password = 'fmw-k3ttj'
