@@ -105,10 +105,14 @@ sudo rm -rf /tmp/gazebo*
 export SIMX=-r #no graphical output of gazebo
 export ROBOT_ENV=ipa-kitchen
 
+mkdir -p $WORKSPACE/test_results # create test_results directory
+rm -rf ~/.ros/test_results # delete old rostest logs
+
 # rostest
-export ROBOT=cob3-1
-$WORKSPACE/../component_test.sh
+robots=(cob3-1 cob3-2 cob3-3)
 
-#export ROBOT=cob3-2
-#$WORKSPACE/../component_test.sh
-
+for robot in $robots
+    do
+        export ROBOT=${robot[*]}
+        $WORKSPACE/../component_test.sh
+done

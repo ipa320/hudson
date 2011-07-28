@@ -5,12 +5,12 @@ export SIMX=-r
 
 # start cob_bringup in background 
 roslaunch cob_bringup sim.launch &
-sleep 120s
+sleep 100s
 pid_bringup="$(jobs -p)" # get the job PID
 
 # start cob_script_server in background
 roslaunch cob_script_server script_server.launch &
-sleep 120s
+sleep 100s
 # get the job PID
 pid_script_server_raw="$( jobs -l | grep ]+ )"
 sleep 1s
@@ -25,20 +25,19 @@ do_test(){
     rosparam set /component_test/state_topic /"$1"_controller/state
     rosparam set /component_test/target "$2"
     sleep 1s
-    #write introduction for current test to test file
-    echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-    echo "Component: " $1 " / Target: " $2 >> $WORKSPACE/../component_test_result.txt
-    echo "-------------------------------------------" >> $WORKSPACE/../component_test_result.txt
-    #start test and write results to text file
-    test/trajectory_test.py >> $WORKSPACE/../component_test_result.txt
+    rm -rf ~/.ros/test_results          # delete old rostest logs
+    test/trajectory_test.py             # start test
+    rosrun rosunit clean_junit_xml.py   # beautify xml files
+    for i in ~/.ros/test_results/_hudson/*.xml # copy test results and rename with ROBOT
+        do
+            sed -i "s/rostest.TEST-component_test/$ROBOT-rostest.TEST-$1-$2-component_test/g" "$i"
+            mv "$i" "$WORKSPACE/test_results/$ROBOT-$ROBOT_ENV-$1-$2-`basename $i`"
+    done 
     sleep 1s
 }
 
 #change to cob_component_test package
 cd "$( rospack find cob_component_test )"/ros
-
-#create/overwrite text file for test results
-echo "TEST RESULTS" > $WORKSPACE/../component_test_result.txt
 
 #set static test parameters
 rosparam set /component_test/wait_time 10.0
@@ -63,30 +62,4 @@ sleep 5s
 kill "$pid_script_server"
 kill "$pid_bringup"
 
-#evaluate test results
-echo "SUMMARY: " >> $WORKSPACE/../component_test_result.txt
-tests_no="$( grep -c ' * TESTS: ' $WORKSPACE/../component_test_result.txt )"
-success_no="$( grep -c ' * RESULT: SUCCESS' $WORKSPACE/../component_test_result.txt )" 
-errors_no="$( grep -c ' * ERRORS: 1 ' $WORKSPACE/../component_test_result.txt )"
-failures_no="$( grep -c ' * FAILURES: 1 ' $WORKSPACE/../component_test_result.txt )"
-
-if [ $success_no -eq $tests_no -a $tests_no -ne 0 ]; then
-   result="SUCCESS"
-else
-   result="FAIL"
-fi
-
-echo " * TESTS: [""$tests_no""]" >> $WORKSPACE/../component_test_result.txt
-echo " * SUCCESS: [""$success_no""]" >> $WORKSPACE/../component_test_result.txt
-echo " * ERRORS: [""$errors_no""]" >> $WORKSPACE/../component_test_result.txt
-echo " * FAILURES: [""$failures_no""]" >> $WORKSPACE/../component_test_result.txt
-echo " * RESULT:" "$result" >> $WORKSPACE/../component_test_result.txt
-
 sleep 15s
-cat $WORKSPACE/../component_test_result.txt
-
-if [ "$result" == "SUCCESS" ]; then
-   exit 0
-else
-   exit 1
-fi
