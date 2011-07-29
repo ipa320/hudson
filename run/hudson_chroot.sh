@@ -137,8 +137,13 @@ echo ""
 sleep 5
 
 # installing dependencies and building
-rosdep install $REPOSITORY -y
-rosmake $REPOSITORY --skip-blacklist --profile
+if [ $REPOSITORY == "cob3_intern" ]; then
+    make ros-install
+    make ros-skip-blacklist
+else
+    rosdep install $REPOSITORY -y
+    rosmake $REPOSITORY --skip-blacklist --profile
+fi
 
 # check if building is succesfull, otherwise don't perform test and exit
 if [ $? != "0" ]; then
