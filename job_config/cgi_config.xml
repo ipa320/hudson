@@ -62,7 +62,7 @@
       <spec>*/10 * * * *</spec>
     </hudson.triggers.SCMTrigger>
     <hudson.triggers.TimerTrigger>
-      <spec>@weekly</spec>
+      <spec></spec>
     </hudson.triggers.TimerTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
