@@ -142,7 +142,7 @@ if [ $REPOSITORY == "cob3_intern" ]; then
     make ros-skip-blacklist
 else
     rosdep install $REPOSITORY -y
-    rosmake $REPOSITORY --skip-blacklist --profile
+    rosmake $REPOSITORY --skip-blacklist --profile --status-rate=0
 fi
 
 # check if building is succesfull, otherwise don't perform test and exit
