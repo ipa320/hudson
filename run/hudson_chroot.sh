@@ -138,7 +138,7 @@ sleep 5
 
 # installing dependencies and building
 rosdep install $REPOSITORY -y
-rosmake $REPOSITORY --skip-blacklist --profile
+rosmake $REPOSITORY --skip-blacklist --profile --status-rate=0
 
 # check if building is succesfull, otherwise don't perform test and exit
 if [ $? != "0" ]; then
