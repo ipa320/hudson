@@ -5,7 +5,10 @@ import cgitb; cgitb.enable()
 import httplib, urllib
 import sys
 import base64
+import socket
 import StringIO
+import pycurl
+import subprocess
 
 repositories = []
 
@@ -18,7 +21,13 @@ def main():
     form = cgi.FieldStorage() # keys from HTML form
         
     # check if necessary keys (username & email) are available
-    if "username" not in form or "email" not in form: # raise error if not
+    if "username" not in form: # raise error if not
+        print "<H1>ERROR<H1>"
+        print "Please fill in your Github username and email address."
+        print '<p><input type=button value="Back" onClick="history.back()">'
+        return
+    
+    if "email" not in form and ( form["username"].value != "ipa-fmw" or form["username"].value != "ipa320" ):
         print "<H1>ERROR<H1>"
         print "Please fill in your Github username and email address."
         print '<p><input type=button value="Back" onClick="history.back()">'
@@ -38,22 +47,22 @@ def main():
                 rosrelease = rosrelease[:] + [release]
         
         # check chosen stacks
+        otherstacks = form.getlist('otherstack')
         if form['stacks'].value == 'All':
             repositories = ['cob_apps', 'cob_common', 'cob_driver', 'cob_extern', 'cob_simulation']
         else:
             stacks = form.getlist('stack')
-            if stacks == []:
+            if stacks == [] and otherstacks == []:
                 print "<H1>ERROR<H1>"
-                print "Your have to select at least one stack!"
+                print "Your have to select at least one stack! <br>"
                 print '<input type=button value="Back" onClick="history.back()">'
                 return
             else:
                 for stack in stacks:
                     repositories = repositories[:] + [stack]
         
-        stacks = form.getlist('otherstack')
-        if stacks != []:
-            for stack in stacks:
+        if otherstacks != []:
+            for stack in otherstacks:
                 find_stack(stack)
                 
         # printing planed job creations
@@ -134,13 +143,24 @@ def find_stack(stack):
 def stack_forked(githubuser, stack):
     # function to check if stack is forked on Github.com
     
-    path = '/' + githubuser + '/' + stack + '/blob/master/Makefile'
-    conn = httplib.HTTPSConnection("github.com")
-    conn.request('GET', path)
-    response = conn.getresponse()
-    if response.status == 200:
+    username = subprocess.check_output(['git', 'config', '--global', 'github.user'])
+    token = subprocess.check_output(['git', 'config', '--global', 'github.token'])
+    post = {'login' : username[:-1], 'token' : token[:-1]}
+    fields = urllib.urlencode(post)
+    
+    path = "https://github.com/" + githubuser + "/" + stack + "/blob/master/Makefile"
+    file1 = StringIO.StringIO()
+    
+    c = pycurl.Curl()
+    c.setopt(pycurl.URL, path)
+    c.setopt(pycurl.POSTFIELDS, fields)
+    c.setopt(pycurl.WRITEFUNCTION, file1.write) # to avoid to show the called page
+    c.perform()
+    c.close
+    if c.getinfo(pycurl.HTTP_CODE) == 200:
         return True
     else:
+        print "ERRORCODE: " + c.getinfo(pycurl.HTTP_CODE)
         return False
 
 
