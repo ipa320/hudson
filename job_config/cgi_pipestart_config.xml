@@ -64,7 +64,7 @@
   </builders>
   <publishers>
     <hudson.tasks.BuildTrigger>
-      <childProjects>---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__lucid__i386</childProjects>
+      <childProjects>---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__natty__i386</childProjects>
       <threshold>
         <name>SUCCESS</name>
         <ordinal>0</ordinal>

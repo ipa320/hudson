@@ -89,7 +89,7 @@ def spawn_jobs(githubuser, email, REPOSITORY, ROSRELEASES):
     
     # all available options
     ARCHITECTURE = ['i386', 'amd64'] # i686
-    UBUNTUDISTRO = ['lucid', 'maverick', 'natty'] # karmic
+    UBUNTUDISTRO = ['natty', 'maverick','lucid'] # karmic
     
     for release in ROSRELEASES:
         for repo in REPOSITORY:
