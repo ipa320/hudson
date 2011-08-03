@@ -5,6 +5,13 @@ RELEASE=$1
 GITHUBUSER=$2
 REPOSITORY=$3
 
+echo ""
+echo "-------------------------------------------------------"
+echo "==> RELEASE =" $RELEASE
+echo "==> GITHUBUSER =" $GITHUBUSER
+echo "==> REPOSITORY =" $REPOSITORY
+echo "-------------------------------------------------------"
+echo ""
 
 write_rosinstall(){
 	STACK="$1"
@@ -123,13 +130,12 @@ rosdep install $REPOSITORY -y
 rosmake $REPOSITORY --skip-blacklist --profile
 
 # check if building is succesfull, otherwise don't perform test and exit
-
 if [ $? != "0" ]; then
 	echo "rosmake failed, skipping tests"
 	exit 1
 fi
 
-# rostest
+# do rostests
 echo ""
 echo "--------------------------------------------------------------------------------"
 echo "Rostest for $REPOSITORY"
