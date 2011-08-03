@@ -77,12 +77,12 @@ def main():
         print "</ul>"
         print "<hr>"
         
-        print create_config(form["username"].value, form["email"].value, repositories, rosrelease)
+        print spawn_jobs(form["username"].value, form["email"].value, repositories, rosrelease)
 
     print '<p><input type=button value="Back" onClick="history.back()">'    
 
-def create_config(githubuser, email, REPOSITORY, ROSRELEASES):
-    # function to create config files for all jobs
+def spawn_jobs(githubuser, email, REPOSITORY, ROSRELEASES):
+    # function to spawn jobs
     
     results = """<p>JOB CREATION RESULTS<br>
 ====================<br>\n"""
@@ -100,52 +100,33 @@ def create_config(githubuser, email, REPOSITORY, ROSRELEASES):
                 results = results + "<b>" + repo + "</b>" + ": stack is not forked\n"
                 continue
                 
-            results = results + create_pipe_job(githubuser, release, repo)
+            results = results + create_job("pipe", githubuser, release, repo)
             
             for distro in UBUNTUDISTRO:
+
+                child_distro = distro
+
                 for arch in ARCHITECTURE:
                     
                     # name of job to be triggered after successful build
                     if ARCHITECTURE.index(arch) == len(ARCHITECTURE)-1:
                        child_arch = ARCHITECTURE[0]
-                    child_arch = ARCHITECTURE[ARCHITECTURE.index(arch)+1]
-                    
-                    if UBUNTUDISTRO.index(distro) == len(ARCHITECTURE)-1:
-                       child_distro = UBUNTUDISTRO[0]
-                    child_distro = UBUNTUDISTRO[UBUNTUDISTRO.index(distro)+1]
-                    
-                    child_name = release + "__" + githubuser + "__" + repo + "__" + child_distro + "__" + child_arch
-                    if UBUNTUDISTRO.index(distro) == len(ARCHITECTURE)-1 and ARCHITECTURE.index(arch) == len(ARCHITECTURE)-1:
-                        STACKLIST = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps', '']
-                        next_repo = STACKLIST[STACKLIST.index(repo) + 1]
-                        child_name = release + "__" + githubuser + "__" + next_repo + "__pipe"
-                    
-                                        
-                    UNIVERSAL_CONFIG = open("cgi_config.xml", "r+w")
-                                        
-                    # replacing placeholder
-                    jenkins_config = UNIVERSAL_CONFIG.read()
-                    jenkins_config = jenkins_config.replace('---GITHUBUSER---', githubuser)
-                    jenkins_config = jenkins_config.replace('---EMAIL---', email)
-                    jenkins_config = jenkins_config.replace('---ROSRELEASE---', release)
-                    jenkins_config = jenkins_config.replace('---REPOSITORY---', repo)
-                    jenkins_config = jenkins_config.replace('---DISTRIBUTION---', distro)
-                    jenkins_config = jenkins_config.replace('---ARCHITECTURE---', arch)
-                    jenkins_config = jenkins_config.replace('---CHILDPROJECT---', child_name)
-                    
-                    # job name
-                    job_name = release + "__" + githubuser + "__" + repo + "__" + distro + "__" + arch
-                    
-                    # check if job already exists
-                    if not stack_exists(job_name):
-                        # create new job
-                        results = results + create_job(job_name, jenkins_config)
-                        
+                       child_name = release + "__" + githubuser + "__" + repo + "__" + child_distro + "__" + child_arch
+                       if UBUNTUDISTRO.index(distro) == len(UBUNTUDISTRO)-1:
+                           STACKLIST = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps', '']
+                           next_repo = STACKLIST[STACKLIST.index(repo) + 1]
+                           if next_repo == '':
+                               child_name = ''
+                           child_name = release + "__" + githubuser + "__" + next_repo + "__pipe"
+                       else:
+                           child_distro = UBUNTUDISTRO[UBUNTUDISTRO.index(distro)+1]
+                           child_name = release + "__" + githubuser + "__" + repo + "__" + child_distro + "__" + child_arch
                     else:
-                        # update existing job
-                        results = results + job_name + ": exists already and will be updated<br>\n"
-                        results = results + update_job(job_name, jenkins_config)
-    
+                       child_arch = ARCHITECTURE[ARCHITECTURE.index(arch)+1]
+                       child_name = release + "__" + githubuser + "__" + repo + "__" + child_distro + "__" + child_arch
+                           
+                    results = results + create_job("build", githubuser, release, repo, email, distro, arch, child_name)
+
     return results
 
 
@@ -192,76 +173,73 @@ def stack_forked(githubuser, stack):
         return False
 
 
-def stack_exists(job_name):
+def job_exists(job_name):
     # function to check if job already exists on jenkins
     
     path = '/job/' + job_name
-    conn = httplib.HTTPConnection("10.0.1.1", 8080)
+    conn = httplib.HTTPConnection("cob-kitchen-server", 8080)
     conn.request('GET', path)
     response = conn.getresponse()
     if response.status == 302:
         return True
     else:
         return False
-
-
-def update_job(job_name, config_xml):
-    # function to update a existing job
-    
-    # get auth keys from jenkins' .gitconfig file
-    gitconfig = open("/home/jenkins/.gitconfig", "r") 
-    gitconfig = gitconfig.read()
-    # extract necessary data
-    regex = ".*\[jenkins]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
-    gitinfo = re.match(regex, gitconfig, re.DOTALL)
-    base64string = base64.encodestring('%s:%s' % (gitinfo.group(1), gitinfo.group(2))).strip()
-    headers = {"Content-Type": "text/xml", "charset": "UTF-8", "Authorization": "Basic %s" % base64string }
-    path = '/job/' + job_name + '/config.xml'
-    conn = httplib.HTTPConnection("10.0.1.1", 8080)
-    conn.request('POST', path, config_xml, headers)
-    response = conn.getresponse()
-    conn.close
-    if response.status != 200:
-        return job_name + ": failed to update: %d %s<br>" %(response.status, response.reason)
-    else:
-        return job_name + ": updated successfully<br>"
-
-
-def create_job(job_name, config_xml):
-    # function to create job by posting xml to jenkins API
-    
-    gitconfig = open("/home/jenkins/.gitconfig", "r") 
-    gitconfig = gitconfig.read()
-    # extract necessary data
-    regex = ".*\[jenkins]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
-    gitinfo = re.match(regex, gitconfig, re.DOTALL)
-    base64string = base64.encodestring('%s:%s' % (gitinfo.group(1), gitinfo.group(2))).strip()
-    headers = {"Content-Type": "text/xml", "charset": "UTF-8", "Authorization": "Basic %s" % base64string }
-    path = '/createItem?name=' + job_name
-    conn = httplib.HTTPConnection("10.0.1.1", 8080)
-    conn.request('POST', path, config_xml, headers)
-    response = conn.getresponse()
-    conn.close
-    if response.status != 200:
-        return job_name + ": failed to create: %d %s<br>" %(response.status, response.reason)
-    else:
-        return job_name + ": created successfully<br>"
+      
         
-        
-def create_pipe_job(githubuser, release, repo):
-    # function to create pipeline job (first job of pipeline)
+def create_job(job_type, githubuser, release, repo, email="", distro="", arch="", child_name=""):
+    # function to create pipeline config (config for first job of pipeline)
     
-    UNIVERSAL_PIPE_CONFIG = open("cgi_pipe_config.xml", "r+w")
-                    
+    if job_type == "pipe": 
+        UNIVERSAL_CONFIG = open("cgi_pipestart_config.xml", "r+w")
+        job_name = release + "__" + githubuser + "__" + repo + "__pipe"
+    elif job_type == "build":    
+        UNIVERSAL_CONFIG = open("cgi_config.xml", "r+w")
+        job_name = release + "__" + githubuser + "__" + repo + "__" + distro + "__" + arch
+    else:    
+        return "wrong job_type specified (this should never happen)"
+
     # replacing placeholder
-    jenkins_pipe_config = UNIVERSAL_PIPE_CONFIG.read()
-    jenkins_pipe_config = jenkins_pipe_config.replace('---GITHUBUSER---', githubuser)
-    jenkins_pipe_config = jenkins_pipe_config.replace('---ROSRELEASE---', release)
-    jenkins_pipe_config = jenkins_pipe_config.replace('---REPOSITORY---', repo)
-    
-    job_name = release + "__" + githubuser + "__" + repo + "__pipe"
-    
-    return create_job(job_name, jenkins_pipe_config)
-    
+    jenkins_config = UNIVERSAL_CONFIG.read()
+    jenkins_config = jenkins_config.replace('---GITHUBUSER---', githubuser)
+    jenkins_config = jenkins_config.replace('---EMAIL---', email)
+    jenkins_config = jenkins_config.replace('---ROSRELEASE---', release)
+    jenkins_config = jenkins_config.replace('---REPOSITORY---', repo)
+    jenkins_config = jenkins_config.replace('---DISTRIBUTION---', distro)
+    jenkins_config = jenkins_config.replace('---ARCHITECTURE---', arch)
+    jenkins_config = jenkins_config.replace('---CHILDPROJECT---', child_name) 
+
+    # check if job already exists
+    exists = job_exists(job_name)
+    if not exists:
+        # create new job
+        path = '/createItem?name=' + job_name
+    else:
+        # update existing job
+        path = '/job/' + job_name + '/config.xml'
+
+    # send job config to jenkins API
+    gitconfig = open("/home/jenkins/.gitconfig", "r") 
+    gitconfig = gitconfig.read()
+    # extract necessary data
+    regex = ".*\[jenkins]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
+    gitinfo = re.match(regex, gitconfig, re.DOTALL)
+    base64string = base64.encodestring('%s:%s' % (gitinfo.group(1), gitinfo.group(2))).strip()
+    headers = {"Content-Type": "text/xml", "charset": "UTF-8", "Authorization": "Basic %s" % base64string }
+    conn = httplib.HTTPConnection("cob-kitchen-server", 8080)
+    conn.request('POST', path, jenkins_config, headers)
+    response = conn.getresponse()
+    conn.close
+    if response.status != 200:
+        if exists:
+            return job_name + ": failed to update: %d %s<br>" %(response.status, response.reason)
+        else:
+            return job_name + ": failed to create: %d %s<br>" %(response.status, response.reason)
+    else:
+        if exists:
+            return job_name + ": updated successfully<br>"
+        else:
+            return job_name + ": created successfully<br>"
+
+
 
 main()    

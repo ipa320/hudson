@@ -56,7 +56,7 @@
     </hudson.triggers.SCMTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
-  <customWorkspace>/home/jenkins/---ROSRELEASE---/---GITHUBUSER---/---ROSRELEASE__---GITHUBUSER---__---REPOSITORY---__pipe</customWorkspace>
+  <customWorkspace>/home/jenkins/---ROSRELEASE---/---GITHUBUSER---/---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__pipe</customWorkspace>
   <builders>
     <hudson.tasks.Shell>
       <command></command>
@@ -64,7 +64,7 @@
   </builders>
   <publishers>
     <hudson.tasks.BuildTrigger>
-      <childProjects>---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__lucid__amd64</childProjects>
+      <childProjects>---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__lucid__i386</childProjects>
       <threshold>
         <name>SUCCESS</name>
         <ordinal>0</ordinal>
