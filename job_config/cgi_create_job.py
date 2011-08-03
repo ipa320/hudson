@@ -113,7 +113,7 @@ def spawn_jobs(githubuser, email, REPOSITORY, ROSRELEASES):
                        child_arch = ARCHITECTURE[0]
                        child_name = release + "__" + githubuser + "__" + repo + "__" + child_distro + "__" + child_arch
                        if UBUNTUDISTRO.index(distro) == len(UBUNTUDISTRO)-1:
-                           STACKLIST = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps', '']
+                           STACKLIST = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps', 'cob3_intern', '']
                            next_repo = STACKLIST[STACKLIST.index(repo) + 1]
                            if next_repo == '':
                                child_name = ''
@@ -134,7 +134,7 @@ def find_stack(stack):
     # function to check if inserted stack is available
     
     global repositories
-    available_stacks = ['cob_apps', 'cob_common', 'cob_driver', 'cob_extern', 'cob_simulation', 'cob3_intern', 'cob_commercial', 'srs']
+    available_stacks = ['cob_apps', 'cob_common', 'cob_driver', 'cob_extern', 'cob_simulation', 'cob3_intern', 'srs', 'interaid']
     # correct common mistakes
     stack = stack.lower()
     stack = stack.replace('-', '_')
