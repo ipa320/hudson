@@ -81,7 +81,7 @@ def main():
 
     print '<p><input type=button value="Back" onClick="history.back()">'    
 
-def create_config(name, email, REPOSITORY, ROSRELEASES):
+def create_config(githubuser, email, REPOSITORY, ROSRELEASES):
     # function to create config files for all jobs
     
     results = """<p>JOB CREATION RESULTS<br>
@@ -96,31 +96,50 @@ def create_config(name, email, REPOSITORY, ROSRELEASES):
             results = results + "<br>"
                         
             # check if stack is forked
-            if not stack_forked(name, repo):
+            if not stack_forked(githubuser, repo):
                 results = results + "<b>" + repo + "</b>" + ": stack is not forked\n"
                 continue
+                
+            results = results + create_pipe_job(githubuser, release, repo)
             
             for distro in UBUNTUDISTRO:
                 for arch in ARCHITECTURE:
                     
-                    UNIVERSAL_CONFIG = open("cgi_config.xml", "r+w")
+                    # name of job to be triggered after successful build
+                    if ARCHITECTURE.index(arch) == len(ARCHITECTURE)-1:
+                       child_arch = ARCHITECTURE[0]
+                    child_arch = ARCHITECTURE[ARCHITECTURE.index(arch)+1]
                     
+                    if UBUNTUDISTRO.index(distro) == len(ARCHITECTURE)-1:
+                       child_distro = UBUNTUDISTRO[0]
+                    child_distro = UBUNTUDISTRO[UBUNTUDISTRO.index(distro)+1]
+                    
+                    child_name = release + "__" + githubuser + "__" + repo + "__" + child_distro + "__" + child_arch
+                    if UBUNTUDISTRO.index(distro) == len(ARCHITECTURE)-1 and ARCHITECTURE.index(arch) == len(ARCHITECTURE)-1:
+                        STACKLIST = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps', '']
+                        next_repo = STACKLIST[STACKLIST.index(repo) + 1]
+                        child_name = release + "__" + githubuser + "__" + next_repo + "__pipe"
+                    
+                                        
+                    UNIVERSAL_CONFIG = open("cgi_config.xml", "r+w")
+                                        
                     # replacing placeholder
                     jenkins_config = UNIVERSAL_CONFIG.read()
-                    jenkins_config = jenkins_config.replace('---GITHUBUSER---', name)
+                    jenkins_config = jenkins_config.replace('---GITHUBUSER---', githubuser)
                     jenkins_config = jenkins_config.replace('---EMAIL---', email)
                     jenkins_config = jenkins_config.replace('---ROSRELEASE---', release)
                     jenkins_config = jenkins_config.replace('---REPOSITORY---', repo)
                     jenkins_config = jenkins_config.replace('---DISTRIBUTION---', distro)
                     jenkins_config = jenkins_config.replace('---ARCHITECTURE---', arch)
+                    jenkins_config = jenkins_config.replace('---CHILDPROJECT---', child_name)
                     
                     # job name
-                    job_name = release + "__" + name + "__" + repo + "__" + distro + "__" + arch
+                    job_name = release + "__" + githubuser + "__" + repo + "__" + distro + "__" + arch
                     
                     # check if job already exists
                     if not stack_exists(job_name):
                         # create new job
-                        results = results + post_xml(job_name, jenkins_config)
+                        results = results + create_job(job_name, jenkins_config)
                         
                     else:
                         # update existing job
@@ -208,7 +227,7 @@ def update_job(job_name, config_xml):
         return job_name + ": updated successfully<br>"
 
 
-def post_xml(job_name, config_xml):
+def create_job(job_name, config_xml):
     # function to create job by posting xml to jenkins API
     
     gitconfig = open("/home/jenkins/.gitconfig", "r") 
@@ -227,6 +246,22 @@ def post_xml(job_name, config_xml):
         return job_name + ": failed to create: %d %s<br>" %(response.status, response.reason)
     else:
         return job_name + ": created successfully<br>"
+        
+        
+def create_pipe_job(githubuser, release, repo):
+    # function to create pipeline job (first job of pipeline)
+    
+    UNIVERSAL_PIPE_CONFIG = open("cgi_pipe_config.xml", "r+w")
+                    
+    # replacing placeholder
+    jenkins_pipe_config = UNIVERSAL_PIPE_CONFIG.read()
+    jenkins_pipe_config = jenkins_pipe_config.replace('---GITHUBUSER---', githubuser)
+    jenkins_pipe_config = jenkins_pipe_config.replace('---ROSRELEASE---', release)
+    jenkins_pipe_config = jenkins_pipe_config.replace('---REPOSITORY---', repo)
+    
+    job_name = release + "__" + githubuser + "__" + repo + "__pipe"
+    
+    return create_job(job_name, jenkins_pipe_config)
     
 
 main()    
