@@ -138,6 +138,7 @@ sleep 5
 
 # installing dependencies and building
 if [ $REPOSITORY == "cob3_intern" ]; then
+    cd cob3_intern
     make ros-install
     make ros-skip-blacklist
 else
