@@ -8,7 +8,7 @@ Created by: Jeroen Haan | http://www.haan.net */
 
 function addStackInput(i) {
   var div = document.createElement("div");
-  div.innerHTML='&rarr; Stack name ' + i + ': <input type="text" name="otherstack"/> (e.g., <tt>cob3_intern</tt>)';
+  div.innerHTML='&rarr; Stack name : <input type="text" name="otherstack"/> (e.g., <tt>cob3_intern</tt>)';
 
   div.setAttribute("id", 'otherstack_');
   var otherstack = document.getElementById('otherstack');
@@ -80,26 +80,34 @@ In the unlikely case of any problems while building your code, Jenkins will info
 <h3>EMAIL ADDRESS:</h3> <input type="text" name="email" /> (e.g., <tt>you@example.com</tt>)
 <br><br>
 
-<h3>ROSRELEASES:</h3>
-<font size="3"><b>Choose additional releases</b></font><br> 
-<input type="checkbox" name="release" value="unstable" disabled > unstable<br>
-<input type="checkbox" name="release" value="diamondback" checked disabled> diamondback<br>
+<h3>ROSRELEASE:</h3>
+
+<input type="checkbox" name="release" value="unstable" > unstable<br>
+<input type="checkbox" name="release" value="diamondback" > diamondback<br>
 <input type="checkbox" name="release" value="electric" > electric<br>
 
 <h3>STACKS:</h3> 
-<font size="3"><b>Select the stacks you want to test</b></font><br> 
-<input type="radio" name="stacks" value="All" checked onclick="disableBox()" > All <tt>(cob_apps,  cob_common, cob_driver, cob_extern and cob_simulation)</tt><br>
-<input type="radio" name="stacks" value="Selection" onclick="enableBox()" > Choose one or more stacks<br>
-<ul><input id="boxApps" type="checkbox" name="stack" value="cob_apps" disabled > cob_apps<br>
-<input id="boxCommon" type="checkbox" name="stack" value="cob_common" disabled > cob_common<br>
-<input id="boxDriver" type="checkbox" name="stack" value="cob_driver" disabled > cob_driver<br>
-<input id="boxExtern" type="checkbox" name="stack" value="cob_extern" disabled > cob_extern<br>
-<input id="boxSimulation" type="checkbox" name="stack" value="cob_simulation" disabled > cob_simulation</ul>
-
-<p>If you want to create a job for another stack, you can fill in below
-<div id="otherstack"></div>
-<a href="#" id="add_stack"><input type="button" value="Add another stack"/></a>
-<br>
+<table border="1" cellpadding="10" rules="cols">
+    <colgroup width=50% span="2"></colgroup>
+    <tr>
+        <th><font size="3"><b>Select the stacks you want to test</b></font><br> </th>
+        <th><p>If you want to create a job for another stack, you can fill in below</th>
+    </tr>
+    <tr></tr>
+    <tr>
+        <td align="left"   valign="top"><input type="radio" name="stacks" value="All" checked onclick="disableBox()" > All <tt>(cob_apps,  cob_common, cob_driver, cob_extern and cob_simulation)</tt><br>
+        <input type="radio" name="stacks" value="Selection" onclick="enableBox()" > Choose one or more stacks<br>
+        <ul><input id="boxApps" type="checkbox" name="stack" value="cob_apps" disabled > cob_apps<br>
+        <input id="boxCommon" type="checkbox" name="stack" value="cob_common" disabled > cob_common<br>
+        <input id="boxDriver" type="checkbox" name="stack" value="cob_driver" disabled > cob_driver<br>
+        <input id="boxExtern" type="checkbox" name="stack" value="cob_extern" disabled > cob_extern<br>
+        <input id="boxSimulation" type="checkbox" name="stack" value="cob_simulation" disabled > cob_simulation</ul>
+        <input type="radio" name="stacks" value="Additional" onclick="disableBox()" > Only other stacks<br></td>
+        <td align="left"   valign="top"><div id="otherstack"></div>
+        <a href="#" id="add_stack"><input type="button" value="Add another stack"></a>
+        <br></td>
+    </tr>
+</table>
 
 <hr>
 <input type="submit" value="Submit" />

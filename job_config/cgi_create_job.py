@@ -5,20 +5,30 @@ import cgitb; cgitb.enable()
 import httplib, urllib
 import sys
 import base64
+import socket
 import StringIO
+import pycurl
+import re
 
 repositories = []
 
 def main():
     
     global repositories
+    rosrelease = []
     
     print "Content-Type: text/html\n\n"     # HTML is following
 
     form = cgi.FieldStorage() # keys from HTML form
         
     # check if necessary keys (username & email) are available
-    if "username" not in form or "email" not in form: # raise error if not
+    if "username" not in form: # raise error if not
+        print "<H1>ERROR<H1>"
+        print "Please fill in your Github username and email address."
+        print '<p><input type=button value="Back" onClick="history.back()">'
+        return
+    
+    if "email" not in form and ( form["username"].value != "ipa-fmw" or form["username"].value != "ipa320" ):
         print "<H1>ERROR<H1>"
         print "Please fill in your Github username and email address."
         print '<p><input type=button value="Back" onClick="history.back()">'
@@ -30,30 +40,34 @@ def main():
         print "<ul><p>Username: ", form["username"].value  
         print "<p>Email: ", form["email"].value, "</ul>"
         
-        rosrelease = ['diamondback'] # diamondback is allways chose
-        # check if other releases were chosen
-        if "release" in form:
-            releases = form.getlist('release')
+        # get chosen releases
+        releases = form.getlist('release')
+        if releases == []:
+            print "<H1>ERROR<H1>"
+            print "You have to select at least one release! <br>"
+            print '<input type=button value="Back" onClick="history.back()">'
+            return
+        else:
             for release in releases:
                 rosrelease = rosrelease[:] + [release]
         
         # check chosen stacks
+        otherstacks = form.getlist('otherstack')
         if form['stacks'].value == 'All':
             repositories = ['cob_apps', 'cob_common', 'cob_driver', 'cob_extern', 'cob_simulation']
         else:
             stacks = form.getlist('stack')
-            if stacks == []:
+            if stacks == [] and otherstacks == []:
                 print "<H1>ERROR<H1>"
-                print "Your have to select at least one stack!"
+                print "You have to select at least one stack! <br>"
                 print '<input type=button value="Back" onClick="history.back()">'
                 return
             else:
                 for stack in stacks:
                     repositories = repositories[:] + [stack]
         
-        stacks = form.getlist('otherstack')
-        if stacks != []:
-            for stack in stacks:
+        if otherstacks != []:
+            for stack in otherstacks:
                 find_stack(stack)
                 
         # printing planed job creations
@@ -67,7 +81,7 @@ def main():
 
     print '<p><input type=button value="Back" onClick="history.back()">'    
 
-def create_config(name, email, REPOSITORY, ROSRELEASE):
+def create_config(name, email, REPOSITORY, ROSRELEASES):
     # function to create config files for all jobs
     
     results = """<p>JOB CREATION RESULTS<br>
@@ -77,7 +91,7 @@ def create_config(name, email, REPOSITORY, ROSRELEASE):
     ARCHITECTURE = ['i386', 'amd64'] # i686
     UBUNTUDISTRO = ['lucid', 'maverick', 'natty'] # karmic
     
-    for release in ROSRELEASE:
+    for release in ROSRELEASES:
         for repo in REPOSITORY:
             results = results + "<br>"
                         
@@ -134,13 +148,28 @@ def find_stack(stack):
 def stack_forked(githubuser, stack):
     # function to check if stack is forked on Github.com
     
-    path = '/' + githubuser + '/' + stack + '/blob/master/Makefile'
-    conn = httplib.HTTPSConnection("github.com")
-    conn.request('GET', path)
-    response = conn.getresponse()
-    if response.status == 200:
+    # get token from jenkins' .gitconfig file for private github forks
+    gitconfig = open("/home/jenkins/.gitconfig", "r") 
+    gitconfig = gitconfig.read()
+    # extract necessary data
+    regex = ".*\[github]\s*user\s*=\s*([^\s]*)\s*token\s*=\s*([^\s]*).*"
+    gitinfo = re.match(regex, gitconfig, re.DOTALL)
+    post = {'login' : gitinfo.group(1), 'token' : gitinfo.group(2)}
+    fields = urllib.urlencode(post)
+    
+    path = "https://github.com/" + githubuser + "/" + stack + "/blob/master/Makefile"
+    file1 = StringIO.StringIO()
+    
+    c = pycurl.Curl()
+    c.setopt(pycurl.URL, path)
+    c.setopt(pycurl.POSTFIELDS, fields)
+    c.setopt(pycurl.WRITEFUNCTION, file1.write) # to avoid to show the called page
+    c.perform()
+    c.close
+    if c.getinfo(pycurl.HTTP_CODE) == 200:
         return True
     else:
+        print "ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE)
         return False
 
 
@@ -159,10 +188,14 @@ def stack_exists(job_name):
 
 def update_job(job_name, config_xml):
     # function to update a existing job
-
-    username = 'fmw-jk'
-    password = 'fmw-k3ttj'
-    base64string = base64.encodestring('%s:%s' % (username, password)).strip()
+    
+    # get auth keys from jenkins' .gitconfig file
+    gitconfig = open("/home/jenkins/.gitconfig", "r") 
+    gitconfig = gitconfig.read()
+    # extract necessary data
+    regex = ".*\[jenkins]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
+    gitinfo = re.match(regex, gitconfig, re.DOTALL)
+    base64string = base64.encodestring('%s:%s' % (gitinfo.group(1), gitinfo.group(2))).strip()
     headers = {"Content-Type": "text/xml", "charset": "UTF-8", "Authorization": "Basic %s" % base64string }
     path = '/job/' + job_name + '/config.xml'
     conn = httplib.HTTPConnection("10.0.1.1", 8080)
@@ -178,9 +211,12 @@ def update_job(job_name, config_xml):
 def post_xml(job_name, config_xml):
     # function to create job by posting xml to jenkins API
     
-    username = 'fmw-jk'
-    password = 'fmw-k3ttj'
-    base64string = base64.encodestring('%s:%s' % (username, password)).strip()
+    gitconfig = open("/home/jenkins/.gitconfig", "r") 
+    gitconfig = gitconfig.read()
+    # extract necessary data
+    regex = ".*\[jenkins]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
+    gitinfo = re.match(regex, gitconfig, re.DOTALL)
+    base64string = base64.encodestring('%s:%s' % (gitinfo.group(1), gitinfo.group(2))).strip()
     headers = {"Content-Type": "text/xml", "charset": "UTF-8", "Authorization": "Basic %s" % base64string }
     path = '/createItem?name=' + job_name
     conn = httplib.HTTPConnection("10.0.1.1", 8080)

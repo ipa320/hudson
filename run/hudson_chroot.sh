@@ -10,10 +10,10 @@ cp -r $WORKSPACE/../.ssh ~/
 mkdir -p $WORKSPACE/test_results # create test_results directory
 ## create dummy test result file in case the script aborts before actual tests start
 touch $WORKSPACE/test_results/no_test.xml
-echo '<testsuite errors="0" failures="1" name="no_test" tests="0" time="0.01">
+echo '<testsuite errors="1" failures="0" name="no_test" tests="1" time="0.01">
 <testcase classname="NoTest.NoTest" name="no_test" time="0.01">
 </testcase>
-<system-out><![CDATA[]]></system-out>
+<system-out><![CDATA[Script aborted before actual tests could be started]]></system-out>
 <system-err><![CDATA[]]></system-err>
 </testsuite>' >> $WORKSPACE/test_results/no_test.xml
 
@@ -138,8 +138,14 @@ echo ""
 sleep 5
 
 # installing dependencies and building
-rosdep install $REPOSITORY -y
-rosmake $REPOSITORY --skip-blacklist --profile --status-rate=0
+if [ $REPOSITORY == "cob3_intern" ]; then
+    cd cob3_intern
+    make ros-install
+    make ros-skip-blacklist
+else
+    rosdep install $REPOSITORY -y
+    rosmake $REPOSITORY --skip-blacklist --profile --status-rate=0
+fi
 
 # check if building is succesfull, otherwise don't perform test and exit
 if [ $? != "0" ]; then
