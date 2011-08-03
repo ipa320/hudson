@@ -57,14 +57,7 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers class="vector">
-    <hudson.triggers.SCMTrigger>
-      <spec>*/10 * * * *</spec>
-    </hudson.triggers.SCMTrigger>
-    <hudson.triggers.TimerTrigger>
-      <spec>@weekly</spec>
-    </hudson.triggers.TimerTrigger>
-  </triggers>
+  <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <cleanWorkspaceRequired>false</cleanWorkspaceRequired>
   <builders>
