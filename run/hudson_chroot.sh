@@ -63,12 +63,13 @@ do_testing(){
 
 # installing ROS release
 #sudo apt-get autoclean
-#sudo apt-get update
+sudo apt-get update
 sudo apt-get install python-setuptools -y
 sudo easy_install -U rosinstall
+sudo apt-get install ros-$RELEASE-ros -y
 #sudo apt-get install ros-$RELEASE-care-o-bot -y
 #sudo apt-get install ros-$RELEASE-openni-kinect -y
-#sudo apt-get install bc -y                                                      ######################
+sudo apt-get install bc -y                                                      ######################
 
 
 # create .rosinstall file
