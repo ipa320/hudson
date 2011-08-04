@@ -32,11 +32,11 @@ def main():
                     
             if not stack == init_stack:
                 job_name = release + "__" + githubuser + "__" + repo + "__pipe"
-                send_stop(job_name, gitinfo.group(1), gitinfo.group(2)))
+                send_stop(job_name, gitinfo.group(1), gitinfo.group(2))
             
             for arch in ARCHITECTURE:
                 job_name = release + "__" + githubuser + "__" + repo + "__" + distro + "__" + arch
-                send_stop(job_name, gitinfo.group(1), gitinfo.group(2)))
+                send_stop(job_name, gitinfo.group(1), gitinfo.group(2))
 
         
 def send_stop(job_name, username, password):
