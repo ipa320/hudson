@@ -375,7 +375,7 @@ grub-pc grub-pc/install_devices_empty boolean true
         self.execute(['chmod', '4755', '-R', '/usr/bin/sudo'])
 
 
-        self.setup_rosbuild()
+        self.debian_setup_rosbuild()
 
     def debian_setup_rosbuild(self):
         cmd = "useradd rosbuild -m --groups sudo".split()
