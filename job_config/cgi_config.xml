@@ -58,15 +58,15 @@
       <command>cp /home/jenkins/.gitconfig $WORKSPACE/../.gitconfig
 cp -r /home/jenkins/.ssh $WORKSPACE/../
 
-wget https://code.ros.org/svn/ros/stacks/ros_release/trunk/hudson/scripts/run_chroot.py -O $WORKSPACE/../run_chroot.py
-chmod +x $WORKSPACE/../run_chroot.py
+wget https://github.com/ipa320/hudson/raw/master/run/devel_run_chroot.py -O $WORKSPACE/../devel_run_chroot.py
+chmod +x $WORKSPACE/../devel_run_chroot.py
 wget https://github.com/ipa320/hudson/raw/master/run/hudson_chroot.sh -O $WORKSPACE/../hudson_chroot.sh --no-check-certificate
 
 sed -i '3aRELEASE=---ROSRELEASE---' $WORKSPACE/../hudson_chroot.sh
 sed -i '4aGITHUBUSER=---GITHUBUSER---' $WORKSPACE/../hudson_chroot.sh
 sed -i '5aREPOSITORY=---REPOSITORY---' $WORKSPACE/../hudson_chroot.sh
 
-$WORKSPACE/../run_chroot.py --chroot-dir /home/jenkins/chroot --distro ---DISTRIBUTION--- --arch ---ARCHITECTURE--- --script=$WORKSPACE/../hudson_chroot.sh --debug-chroot --workspace $WORKSPACE/../</command>
+$WORKSPACE/../run_chroot.py --chroot-dir /home/jenkins/chroot --distro ---DISTRIBUTION--- --arch ---ARCHITECTURE--- --script=$WORKSPACE/../hudson_chroot.sh --debug-chroot --workspace $WORKSPACE/../ --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
