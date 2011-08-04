@@ -20,7 +20,6 @@ def main():
     regex = ".*\[jenkins]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
     gitinfo = re.match(regex, gitconfig, re.DOTALL)
 
-    
     ARCHITECTURE = ['i386', 'amd64']
     UBUNTUDISTRO = ['natty', 'maverick', 'lucid']
     STACKLIST = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps', 'cob3_intern']
@@ -43,7 +42,7 @@ def send_stop(job_name, username, password):
     # send 'stop' post to jenkins API
     path = '/job/' + job_name + '/lastBuild/stop'
 
-    base64string = base64.encodestring('%s:%s' % (username, password).strip()
+    base64string = base64.encodestring('%s:%s' % (username, password)).strip()
     headers = {"Content-Type": "text/xml", "charset": "UTF-8", "Authorization": "Basic %s" % base64string }
     conn = httplib.HTTPConnection("cob-kitchen-server", 8080)
     conn.request('POST', path, None, headers)
