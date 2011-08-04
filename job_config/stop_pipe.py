@@ -30,11 +30,11 @@ def main():
         for distro in UBUNTUDISTRO:
                     
             if not stack == init_stack:
-                job_name = release + "__" + githubuser + "__" + repo + "__pipe"
+                job_name = release + "__" + githubuser + "__" + stack + "__pipe"
                 send_stop(job_name, gitinfo.group(1), gitinfo.group(2))
             
             for arch in ARCHITECTURE:
-                job_name = release + "__" + githubuser + "__" + repo + "__" + distro + "__" + arch
+                job_name = release + "__" + githubuser + "__" + stack + "__" + distro + "__" + arch
                 send_stop(job_name, gitinfo.group(1), gitinfo.group(2))
 
         
