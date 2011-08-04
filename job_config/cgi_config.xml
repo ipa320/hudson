@@ -58,7 +58,7 @@
       <command>cp /home/jenkins/.gitconfig $WORKSPACE/../.gitconfig
 cp -r /home/jenkins/.ssh $WORKSPACE/../
 
-wget https://code.ros.org/svn/ros/stacks/ros_release/trunk/hudson/scripts/devel_run_chroot.py -O $WORKSPACE/../devel_run_chroot.py
+wget https://github.com/ipa320/hudson/raw/master/run/devel_run_chroot.py -O $WORKSPACE/../devel_run_chroot.py
 chmod +x $WORKSPACE/../devel_run_chroot.py
 wget https://github.com/ipa320/hudson/raw/master/run/hudson_chroot.sh -O $WORKSPACE/../hudson_chroot.sh --no-check-certificate
 
