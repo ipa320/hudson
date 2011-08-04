@@ -59,7 +59,9 @@
   <customWorkspace>/home/jenkins/---ROSRELEASE---/---GITHUBUSER---/---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__pipe</customWorkspace>
   <builders>
     <hudson.tasks.Shell>
-      <command></command>
+      <command>wget https://github.com/ipa320/hudson/raw/master/job_config/stop_pipe.py -O $WORKSPACE/../stop_pipe.py --no-check-certificate
+chmod +x $WORKSPACE/../stop_pipe.py
+$WORKSPACE/../stop_pipe.py ---ROSRELEASE--- ---GITHUBUSER--- ---REPOSITORY---</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
