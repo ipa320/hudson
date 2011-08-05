@@ -66,7 +66,7 @@ sed -i '3aRELEASE=---ROSRELEASE---' $WORKSPACE/../hudson_chroot.sh
 sed -i '4aGITHUBUSER=---GITHUBUSER---' $WORKSPACE/../hudson_chroot.sh
 sed -i '5aREPOSITORY=---REPOSITORY---' $WORKSPACE/../hudson_chroot.sh
 
-$WORKSPACE/../run_chroot.py --chroot-dir /home/jenkins/chroot --distro ---DISTRIBUTION--- --arch ---ARCHITECTURE--- --script=$WORKSPACE/../hudson_chroot.sh --debug-chroot --workspace $WORKSPACE/../ --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu</command>
+$WORKSPACE/../devel_run_chroot.py --chroot-dir /home/jenkins/chroot --distro ---DISTRIBUTION--- --arch ---ARCHITECTURE--- --script=$WORKSPACE/../hudson_chroot.sh --debug-chroot --workspace $WORKSPACE/../ --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
