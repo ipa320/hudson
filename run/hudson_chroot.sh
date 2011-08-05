@@ -122,12 +122,16 @@ echo "-------------------------------------------------------"
 echo "Computing and installing dependencies of $REPOSITORY"
 dependencies=""
 if [ -f $WORKSPACE/stack.xml ]; then
-    rosstack depends $REPOSITORY > dependencies.txt
-    sed -i "s/_/-/g" dependencies.txt
     while read myline
     do
-    dependencies=$dependencies" ros-$RELEASE-$myline"
-    done < dependencies.txt
+        if [[ $myline == *<depend\ stack=* ]]; then
+            right='\"\ /'
+            myline=${myline##*depend\ stack=\"}
+            myline=${myline"$right"%%}
+            myline=$(echo $myline|sed "s/_/-/g")
+            dependencies=$dependencies" ros-$RELEASE-$myline"
+        fi
+    done < $WORKSPACE/stack.xml
     echo "Installing $dependencies"
     sudo apt-get install $dependencies -y
 else
