@@ -116,6 +116,25 @@ rosinstall $WORKSPACE/../ $WORKSPACE/../$REPOSITORY.rosinstall $WORKSPACE --dele
 # setup ROS environment
 . $WORKSPACE/../setup.sh
 
+# get and install stack dependencies
+echo ""
+echo "-------------------------------------------------------"
+echo "Computing and installing dependencies of $REPOSITORY"
+if [ -f $WORKSPACE/stack.xml ]; then
+    rosstack depends $REPOSITORY > dependencies.txt
+    sed -i "s/_/-/g" dependencies.txt
+    while read myline
+    do
+    dependencies=$dependencies" ros-$RELEASE-$myline"
+    done < dependencies.txt
+    echo "Installing $dependencies"
+    sudo apt-get install $dependencies -y
+else
+    echo "stack.xml doesn't exist"
+fi
+echo "-------------------------------------------------------"
+echo ""
+
 # define amount of ros prozesses during build for multi-prozessor machines
 COUNT=$(cat /proc/cpuinfo | grep 'processor' | wc -l)
 COUNT=$(echo "$COUNT*2" | bc)
