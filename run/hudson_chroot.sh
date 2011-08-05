@@ -10,9 +10,9 @@ cp -r $WORKSPACE/../.ssh ~/
 mkdir -p $WORKSPACE/test_results # create test_results directory
 ## create dummy test result file in case the script aborts before actual tests start
 touch $WORKSPACE/test_results/no_test.xml
-echo '<testsuite errors="1" failures="0" name="no_test" tests="1" time="0.01">
+echo '<testsuite errors="0" failures="1" name="no_test" tests="1" time="0.01">
 <testcase classname="NoTest.NoTest" name="no_test" time="0.01">
-</testcase>
+<failure type="AssertionError"><![CDATA[no test started]]</failure>  </testcase>
 <system-out><![CDATA[Script aborted before actual tests could be started]]></system-out>
 <system-err><![CDATA[]]></system-err>
 </testsuite>' >> $WORKSPACE/test_results/no_test.xml
@@ -115,30 +115,6 @@ rosinstall $WORKSPACE/../ $WORKSPACE/../$REPOSITORY.rosinstall $WORKSPACE --dele
 
 # setup ROS environment
 . $WORKSPACE/../setup.sh
-
-# get and install stack dependencies
-echo ""
-echo "-------------------------------------------------------"
-echo "Computing and installing dependencies of $REPOSITORY"
-dependencies=""
-if [ -f $WORKSPACE/stack.xml ]; then
-    while read myline
-    do
-        if [[ $myline == *<depend\ stack=* ]]; then
-            right='\"\ /'
-            myline=${myline##*depend\ stack=\"}
-            myline=${myline"$right"%%}
-            myline=$(echo $myline|sed "s/_/-/g")
-            dependencies=$dependencies" ros-$RELEASE-$myline"
-        fi
-    done < $WORKSPACE/stack.xml
-    echo "Installing $dependencies"
-    sudo apt-get install $dependencies -y
-else
-    echo "stack.xml doesn't exist"
-fi
-echo "-------------------------------------------------------"
-echo ""
 
 # define amount of ros prozesses during build for multi-prozessor machines
 COUNT=$(cat /proc/cpuinfo | grep 'processor' | wc -l)
