@@ -120,6 +120,7 @@ rosinstall $WORKSPACE/../ $WORKSPACE/../$REPOSITORY.rosinstall $WORKSPACE --dele
 echo ""
 echo "-------------------------------------------------------"
 echo "Computing and installing dependencies of $REPOSITORY"
+dependencies=""
 if [ -f $WORKSPACE/stack.xml ]; then
     rosstack depends $REPOSITORY > dependencies.txt
     sed -i "s/_/-/g" dependencies.txt
