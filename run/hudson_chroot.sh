@@ -66,9 +66,8 @@ do_testing(){
 sudo apt-get update
 sudo apt-get install python-setuptools -y
 sudo easy_install -U rosinstall
-sudo apt-get install ros-$RELEASE-ros -y
-#sudo apt-get install ros-$RELEASE-care-o-bot -y
-#sudo apt-get install ros-$RELEASE-openni-kinect -y
+#sudo apt-get install ros-$RELEASE-ros -y
+sudo apt-get install ros-$RELEASE-care-o-bot -y
 sudo apt-get install bc -y                                                      ######################
 
 
