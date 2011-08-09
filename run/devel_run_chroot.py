@@ -393,7 +393,7 @@ grub-pc grub-pc/install_devices_empty boolean true
             print "Adding packages.ros.org as source"
             #tf.write("deb http://code.ros.org/packages/ros/ubuntu %s main\n" % self.distro)
             #tf.write("deb http://packages.ros.org/ros-shadow-fixed/ubuntu %s main\n" % self.distro)
-            tf.write("deb http://packages.ros.org/ros/ubuntu %s main\n" % self.distro)
+            tf.write("deb http://cob-kitchen-server:3142/packages.ros.org/ros/ubuntu %s main\n" % self.distro)
             tf.flush()
             cmd = ['sudo', 'cp', tf.name, ros_source]
             print "Runing cmd", cmd
