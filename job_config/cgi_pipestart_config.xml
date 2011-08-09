@@ -32,7 +32,7 @@
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
     <authorOrCommitter>false</authorOrCommitter>
     <clean>false</clean>
-    <wipeOutWorkspace>true</wipeOutWorkspace>
+    <wipeOutWorkspace>false</wipeOutWorkspace>
     <pruneBranches>false</pruneBranches>
     <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
     <gitTool>Default</gitTool>
@@ -56,17 +56,18 @@
     </hudson.triggers.SCMTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
-  <customWorkspace>/home/jenkins/---ROSRELEASE---/---GITHUBUSER---/---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__pipe</customWorkspace>
+  <customWorkspace>/home/jenkins/workspace/---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__pipe</customWorkspace>
   <builders>
     <hudson.tasks.Shell>
-      <command>wget https://github.com/ipa320/hudson/raw/master/job_config/stop_pipe.py -O $WORKSPACE/../stop_pipe.py --no-check-certificate
-chmod +x $WORKSPACE/../stop_pipe.py
-$WORKSPACE/../stop_pipe.py ---ROSRELEASE--- ---GITHUBUSER--- ---REPOSITORY---</command>
+      <command>wget https://github.com/ipa320/hudson/raw/master/job_config/stop_pipe.py -O $WORKSPACE/stop_pipe.py --no-check-certificate
+chmod +x $WORKSPACE/stop_pipe.py
+# not stopping at the moment -> TODO only stop jobs in build queue, not running jobs
+#$WORKSPACE/stop_pipe.py ---ROSRELEASE--- ---GITHUBUSER--- ---REPOSITORY---</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
     <hudson.tasks.BuildTrigger>
-      <childProjects>---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__natty__i386</childProjects>
+      <childProjects>---POSTJOBS---</childProjects>
       <threshold>
         <name>SUCCESS</name>
         <ordinal>0</ordinal>
