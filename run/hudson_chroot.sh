@@ -98,7 +98,7 @@ do
     # repository is for sure just dependent on stack > continue 
     echo "  WARNING: Stack $myline not forked to $GITHUBUSER at github.com. Using release stack instead."
   fi
-done < $WORKSPACE/REPOSITORY.deps
+done < $WORKSPACE/$REPOSITORY.deps
 echo "--------------------------------------------------------------------------------"
 echo ""
 
