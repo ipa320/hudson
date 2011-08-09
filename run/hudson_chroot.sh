@@ -80,6 +80,9 @@ echo "- other: {local-name: /opt/ros/---ROSRELEASE---/ros}
 rm $WORKSPACE/$REPOSITORY.deps
 wget https://github.com/ipa320/hudson/raw/master/run/"$REPOSITORY".deps -O $WORKSPACE/$REPOSITORY.deps --no-check-certificate
 
+echo $WORKSPACE
+tree $WORKSPACE
+
 echo ""
 echo "--------------------------------------------------------------------------------"
 echo "Checking dependencies for $REPOSITORY"
@@ -109,6 +112,8 @@ sed -i "s/---JOBNAME---/$JOB_NAME/g" $WORKSPACE/$REPOSITORY.rosinstall
 sed -i "s/---REPOSITORY---/$REPOSITORY/g" $WORKSPACE/$REPOSITORY.rosinstall
 
 # print rosinstall file
+echo ""
+echo "rosinstall file:"
 cat $WORKSPACE/$REPOSITORY.rosinstall
 
 # perform clean rosinstall
