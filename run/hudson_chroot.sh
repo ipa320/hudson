@@ -30,12 +30,9 @@ check_stack(){
 	STACK="$1"
 	user=`git config --global github.user`
 	token=`git config --global github.token`
-	cat ~/.gitconfig
-	echo $user
-	echo $token
 	#wget --post-data "login=$user&token=$token" --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/Makefile --no-check-certificate 2> $WORKSPACE/wget_response.txt
 	wget --post-data "login=$user&token=$token" --spider https://raw.github.com/"$GITHUBUSER"/"$STACK"/master/Makefile --no-check-certificate 2> $WORKSPACE/wget_response.txt
-	cat $WORKSPACE/wget_response.txt
+	#cat $WORKSPACE/wget_response.txt
 	return $(grep -c "200 OK" $WORKSPACE/wget_response.txt)
 }
 
