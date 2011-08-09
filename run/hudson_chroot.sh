@@ -108,6 +108,9 @@ sed -i "s/---ROSRELEASE---/$RELEASE/g" $WORKSPACE/$REPOSITORY.rosinstall
 sed -i "s/---JOBNAME---/$JOB_NAME/g" $WORKSPACE/$REPOSITORY.rosinstall
 sed -i "s/---REPOSITORY---/$REPOSITORY/g" $WORKSPACE/$REPOSITORY.rosinstall
 
+# print rosinstall file
+cat $WORKSPACE/$REPOSITORY.rosinstall
+
 # perform clean rosinstall
 rm $WORKSPACE/.rosinstall
 rosinstall $WORKSPACE $WORKSPACE/$REPOSITORY.rosinstall --delete-changed-uris
