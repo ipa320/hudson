@@ -74,14 +74,15 @@ sudo apt-get install bc -y                                                      
 # create .rosinstall file
 echo "- other: {local-name: /opt/ros/---ROSRELEASE---/ros}
 - other: {local-name: /opt/ros/---ROSRELEASE---/stacks}
+- git: 
+    local-name: $REPOSITORY
+    uri: git://github.com/$GITHUBUSER/$REPOSITORY.git
+    branch-name: master
 " > $WORKSPACE/$REPOSITORY.rosinstall
 
 # get dependencies
 rm $WORKSPACE/$REPOSITORY.deps
 wget https://github.com/ipa320/hudson/raw/master/run/"$REPOSITORY".deps -O $WORKSPACE/$REPOSITORY.deps --no-check-certificate
-
-echo $WORKSPACE
-tree $WORKSPACE
 
 echo ""
 echo "--------------------------------------------------------------------------------"
