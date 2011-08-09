@@ -5,7 +5,7 @@
 
 cd /tmp/workspace
 WORKSPACE=/tmp/workspace/$REPOSITORY 
-cp $WORKSPACE/.gitconfig /home/rosbuild/.gitconfig
+cp /home/jenkins/.gitconfig ~/.gitconfig
 cp -r $WORKSPACE/.ssh ~/
 mkdir -p $WORKSPACE/test_results # create test_results directory
 ## create dummy test result file in case the script aborts before actual tests start
