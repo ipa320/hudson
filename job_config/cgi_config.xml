@@ -15,7 +15,7 @@
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
   </properties>
   <scm class="hudson.scm.NullSCM"/>
-  <assignedNode>chroot</assignedNode>
+  <assignedNode>---LABEL---</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -36,7 +36,7 @@ sed -i '3aRELEASE=---ROSRELEASE---' $WORKSPACE/hudson_chroot.sh
 sed -i '4aGITHUBUSER=---GITHUBUSER---' $WORKSPACE/hudson_chroot.sh
 sed -i '5aREPOSITORY=---REPOSITORY---' $WORKSPACE/hudson_chroot.sh
 
-$WORKSPACE/devel_run_chroot.py --chroot-dir /home/jenkins/chroot --distro ---DISTRIBUTION--- --arch ---ARCHITECTURE--- --script=$WORKSPACE/hudson_chroot.sh --debug-chroot --ramdisk --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu</command>
+$WORKSPACE/devel_run_chroot.py --chroot-dir /home/jenkins/chroot --distro ---DISTRIBUTION--- --arch ---ARCHITECTURE--- --script=$WORKSPACE/hudson_chroot.sh --debug-chroot --ramdisk --ramdisk-size 6000M --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

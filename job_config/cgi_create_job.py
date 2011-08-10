@@ -112,7 +112,7 @@ def spawn_jobs(githubuser, email, REPOSITORY, ROSRELEASES):
                     if (not distro == prio_distro) or (not arch == prio_arch): # if job is not prio_job
                         post_jobs.append(release + "__" + githubuser + "__" + repo + "__" + distro + "__" + arch) # append all missing jobs for repo
                         results = results + create_job("build", githubuser, release, repo, email, distro, arch)
-            results = results + create_job("build", githubuser, release, repo, email, prio_distro, prio_arch, post_jobs)
+            results = results + create_job("build_prio", githubuser, release, repo, email, prio_distro, prio_arch, post_jobs)
     return results
 
 
@@ -178,7 +178,7 @@ def create_job(job_type, githubuser, release, repo, email="", distro="", arch=""
     if job_type == "pipe": 
         UNIVERSAL_CONFIG = open("cgi_pipestart_config.xml", "r+w")
         job_name = release + "__" + githubuser + "__" + repo + "__pipe"
-    elif job_type == "build":    
+    elif job_type == "build" or job_type == "build_prio":    
         UNIVERSAL_CONFIG = open("cgi_config.xml", "r+w")
         job_name = release + "__" + githubuser + "__" + repo + "__" + distro + "__" + arch
     else:    
@@ -186,13 +186,14 @@ def create_job(job_type, githubuser, release, repo, email="", distro="", arch=""
 
     # replacing placeholder
     jenkins_config = UNIVERSAL_CONFIG.read()
+    jenkins_config = jenkins_config.replace('---LABEL---', job_type)
     jenkins_config = jenkins_config.replace('---GITHUBUSER---', githubuser)
     jenkins_config = jenkins_config.replace('---EMAIL---', email)
     jenkins_config = jenkins_config.replace('---ROSRELEASE---', release)
     jenkins_config = jenkins_config.replace('---REPOSITORY---', repo)
     jenkins_config = jenkins_config.replace('---DISTRIBUTION---', distro)
     jenkins_config = jenkins_config.replace('---ARCHITECTURE---', arch)
-    jenkins_config = jenkins_config.replace('---POSTJOBS---', ','.join(str(n) for n in post_jobs)) 
+    jenkins_config = jenkins_config.replace('---POSTJOBS---', ','.join(str(n) for n in post_jobs))
 
     # check if job already exists
     exists = job_exists(job_name)
