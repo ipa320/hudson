@@ -7,6 +7,7 @@ cd /tmp/workspace
 WORKSPACE=/tmp/workspace
 cp $WORKSPACE/.gitconfig ~/.gitconfig
 cp -r $WORKSPACE/.ssh ~/
+rm -rf $WORKSPACE/test_results
 mkdir -p $WORKSPACE/test_results # create test_results directory
 ## create dummy test result file in case the script aborts before actual tests start
 touch $WORKSPACE/test_results/no_test.xml
@@ -168,7 +169,6 @@ echo "--------------------------------------------------------------------------
 echo "Rostest for $REPOSITORY"
 
 rm -rf ~/.ros/test_results # delete old rostest logs
-rm -f $WORKSPACE/test_results/no_test.xml # delete dummy test file
 
 if [ ! -s $WORKSPACE/all.tests ]; then
 	echo "all.tests-file not found or empty, creating dummy test result file"
