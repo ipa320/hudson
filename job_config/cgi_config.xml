@@ -14,64 +14,34 @@
       <projectUrl>https://github.com/---GITHUBUSER---/---REPOSITORY---/</projectUrl>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM">
-    <configVersion>2</configVersion>
-    <userRemoteConfigs>
-      <hudson.plugins.git.UserRemoteConfig>
-        <name>origin</name>
-        <refspec>+refs/heads/*:refs/remotes/origin/*</refspec>
-        <url>git@github.com:---GITHUBUSER---/---REPOSITORY---.git</url>
-      </hudson.plugins.git.UserRemoteConfig>
-    </userRemoteConfigs>
-    <branches>
-      <hudson.plugins.git.BranchSpec>
-        <name>master</name>
-      </hudson.plugins.git.BranchSpec>
-    </branches>
-    <recursiveSubmodules>false</recursiveSubmodules>
-    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
-    <authorOrCommitter>false</authorOrCommitter>
-    <clean>false</clean>
-    <wipeOutWorkspace>true</wipeOutWorkspace>
-    <pruneBranches>false</pruneBranches>
-    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
-    <gitTool>Default</gitTool>
-    <submoduleCfg class="list"/>
-    <relativeTargetDir></relativeTargetDir>
-    <excludedRegions></excludedRegions>
-    <excludedUsers></excludedUsers>
-    <gitConfigName></gitConfigName>
-    <gitConfigEmail></gitConfigEmail>
-    <skipTag>false</skipTag>
-    <scmName></scmName>
-  </scm>
-  <assignedNode>chroot</assignedNode>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>---LABEL---</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
-  <customWorkspace>/home/jenkins/---ROSRELEASE---/---GITHUBUSER---/---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__---DISTRIBUTION---__---ARCHITECTURE---/---REPOSITORY---</customWorkspace>
+  <customWorkspace>/home/jenkins/workspace/---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__---DISTRIBUTION---__---ARCHITECTURE---</customWorkspace>
   <builders>
     <hudson.tasks.Shell>
-      <command>cp /home/jenkins/.gitconfig $WORKSPACE/../.gitconfig
-cp -r /home/jenkins/.ssh $WORKSPACE/../
+      <command>cp /home/jenkins/.gitconfig $WORKSPACE/.gitconfig
+cp -r /home/jenkins/.ssh $WORKSPACE
 
-wget https://github.com/ipa320/hudson/raw/master/run/devel_run_chroot.py -O $WORKSPACE/../devel_run_chroot.py
-chmod +x $WORKSPACE/../devel_run_chroot.py
-wget https://github.com/ipa320/hudson/raw/master/run/hudson_chroot.sh -O $WORKSPACE/../hudson_chroot.sh --no-check-certificate
+wget https://github.com/ipa320/hudson/raw/master/run/devel_run_chroot.py -O $WORKSPACE/devel_run_chroot.py
+chmod +x $WORKSPACE/devel_run_chroot.py
+wget https://github.com/ipa320/hudson/raw/master/run/hudson_chroot.sh -O $WORKSPACE/hudson_chroot.sh --no-check-certificate
 
-sed -i '3aRELEASE=---ROSRELEASE---' $WORKSPACE/../hudson_chroot.sh
-sed -i '4aGITHUBUSER=---GITHUBUSER---' $WORKSPACE/../hudson_chroot.sh
-sed -i '5aREPOSITORY=---REPOSITORY---' $WORKSPACE/../hudson_chroot.sh
+sed -i '3aRELEASE=---ROSRELEASE---' $WORKSPACE/hudson_chroot.sh
+sed -i '4aGITHUBUSER=---GITHUBUSER---' $WORKSPACE/hudson_chroot.sh
+sed -i '5aREPOSITORY=---REPOSITORY---' $WORKSPACE/hudson_chroot.sh
 
-$WORKSPACE/../run_chroot.py --chroot-dir /home/jenkins/chroot --distro ---DISTRIBUTION--- --arch ---ARCHITECTURE--- --script=$WORKSPACE/../hudson_chroot.sh --debug-chroot --workspace $WORKSPACE/../ --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu</command>
+$WORKSPACE/devel_run_chroot.py --chroot-dir /home/jenkins/chroot --distro ---DISTRIBUTION--- --arch ---ARCHITECTURE--- --script=$WORKSPACE/hudson_chroot.sh --debug-chroot --ramdisk --ramdisk-size 6000M --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
     <hudson.tasks.BuildTrigger>
-      <childProjects>---CHILDPROJECT---</childProjects>
+      <childProjects>---POSTJOBS---</childProjects>
       <threshold>
         <name>SUCCESS</name>
         <ordinal>0</ordinal>

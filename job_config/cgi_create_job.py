@@ -20,26 +20,26 @@ def main():
     print "Content-Type: text/html\n\n"     # HTML is following
 
     form = cgi.FieldStorage() # keys from HTML form
-        
+
     # check if necessary keys (username & email) are available
     if "username" not in form: # raise error if not
         print "<H1>ERROR<H1>"
         print "Please fill in your Github username and email address."
         print '<p><input type=button value="Back" onClick="history.back()">'
         return
-    
+
     if "email" not in form and ( form["username"].value != "ipa-fmw" or form["username"].value != "ipa320" ):
         print "<H1>ERROR<H1>"
         print "Please fill in your Github username and email address."
         print '<p><input type=button value="Back" onClick="history.back()">'
         return
-    
+
     # if available check other parameters
     else:
         print "<p>Creating jobs for:<br>"
         print "<ul><p>Username: ", form["username"].value  
         print "<p>Email: ", form["email"].value, "</ul>"
-        
+
         # get chosen releases
         releases = form.getlist('release')
         if releases == []:
@@ -50,7 +50,7 @@ def main():
         else:
             for release in releases:
                 rosrelease = rosrelease[:] + [release]
-        
+
         # check chosen stacks
         otherstacks = form.getlist('otherstack')
         if form['stacks'].value == 'All':
@@ -65,68 +65,54 @@ def main():
             else:
                 for stack in stacks:
                     repositories = repositories[:] + [stack]
-        
+
         if otherstacks != []:
             for stack in otherstacks:
                 find_stack(stack)
-                
+
         # printing planed job creations
         print "<p>Creating jobs to test:<br><ul>"    
         for stack in repositories:
             print "- ", stack, "<br>"
         print "</ul>"
         print "<hr>"
-        
+
         print spawn_jobs(form["username"].value, form["email"].value, repositories, rosrelease)
 
     print '<p><input type=button value="Back" onClick="history.back()">'    
 
 def spawn_jobs(githubuser, email, REPOSITORY, ROSRELEASES):
     # function to spawn jobs
-    
+
     results = """<p>JOB CREATION RESULTS<br>
 ====================<br>\n"""
     
     # all available options
     ARCHITECTURE = ['i386', 'amd64'] # i686
-    UBUNTUDISTRO = ['natty', 'maverick','lucid'] # karmic
-    
+    UBUNTUDISTRO = ['lucid', 'maverick','natty'] # karmic
+    prio_arch = 'i386'
+    prio_distro = 'natty'
+
     for release in ROSRELEASES:
         for repo in REPOSITORY:
             results = results + "<br>"
-                        
+
             # check if stack is forked
             if not stack_forked(githubuser, repo):
                 results = results + "<b>" + repo + "</b>" + ": stack is not forked\n"
                 continue
-                
-            results = results + create_job("pipe", githubuser, release, repo)
-            
+
+            post_jobs = [release + "__" + githubuser + "__" + repo + "__" + prio_distro + "__" + prio_arch]
+            results = results + create_job("pipe", githubuser, release, repo, post_jobs=post_jobs)
+
+            post_jobs = []
+
             for distro in UBUNTUDISTRO:
-
-                child_distro = distro
-
                 for arch in ARCHITECTURE:
-                    
-                    # name of job to be triggered after successful build
-                    if ARCHITECTURE.index(arch) == len(ARCHITECTURE)-1:
-                       child_arch = ARCHITECTURE[0]
-                       child_name = release + "__" + githubuser + "__" + repo + "__" + child_distro + "__" + child_arch
-                       if UBUNTUDISTRO.index(distro) == len(UBUNTUDISTRO)-1:
-                           STACKLIST = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps', 'cob3_intern', '']
-                           next_repo = STACKLIST[STACKLIST.index(repo) + 1]
-                           if next_repo == '':
-                               child_name = ''
-                           child_name = release + "__" + githubuser + "__" + next_repo + "__pipe"
-                       else:
-                           child_distro = UBUNTUDISTRO[UBUNTUDISTRO.index(distro)+1]
-                           child_name = release + "__" + githubuser + "__" + repo + "__" + child_distro + "__" + child_arch
-                    else:
-                       child_arch = ARCHITECTURE[ARCHITECTURE.index(arch)+1]
-                       child_name = release + "__" + githubuser + "__" + repo + "__" + child_distro + "__" + child_arch
-                           
-                    results = results + create_job("build", githubuser, release, repo, email, distro, arch, child_name)
-
+                    if (not distro == prio_distro) or (not arch == prio_arch): # if job is not prio_job
+                        post_jobs.append(release + "__" + githubuser + "__" + repo + "__" + distro + "__" + arch) # append all missing jobs for repo
+                        results = results + create_job("build", githubuser, release, repo, email, distro, arch)
+            results = results + create_job("build_prio", githubuser, release, repo, email, prio_distro, prio_arch, post_jobs)
     return results
 
 
@@ -186,13 +172,13 @@ def job_exists(job_name):
         return False
       
         
-def create_job(job_type, githubuser, release, repo, email="", distro="", arch="", child_name=""):
+def create_job(job_type, githubuser, release, repo, email="", distro="", arch="", post_jobs=[]):
     # function to create pipeline config (config for first job of pipeline)
     
     if job_type == "pipe": 
         UNIVERSAL_CONFIG = open("cgi_pipestart_config.xml", "r+w")
         job_name = release + "__" + githubuser + "__" + repo + "__pipe"
-    elif job_type == "build":    
+    elif job_type == "build" or job_type == "build_prio":    
         UNIVERSAL_CONFIG = open("cgi_config.xml", "r+w")
         job_name = release + "__" + githubuser + "__" + repo + "__" + distro + "__" + arch
     else:    
@@ -200,13 +186,14 @@ def create_job(job_type, githubuser, release, repo, email="", distro="", arch=""
 
     # replacing placeholder
     jenkins_config = UNIVERSAL_CONFIG.read()
+    jenkins_config = jenkins_config.replace('---LABEL---', job_type)
     jenkins_config = jenkins_config.replace('---GITHUBUSER---', githubuser)
     jenkins_config = jenkins_config.replace('---EMAIL---', email)
     jenkins_config = jenkins_config.replace('---ROSRELEASE---', release)
     jenkins_config = jenkins_config.replace('---REPOSITORY---', repo)
     jenkins_config = jenkins_config.replace('---DISTRIBUTION---', distro)
     jenkins_config = jenkins_config.replace('---ARCHITECTURE---', arch)
-    jenkins_config = jenkins_config.replace('---CHILDPROJECT---', child_name) 
+    jenkins_config = jenkins_config.replace('---POSTJOBS---', ','.join(str(n) for n in post_jobs))
 
     # check if job already exists
     exists = job_exists(job_name)
@@ -231,14 +218,14 @@ def create_job(job_type, githubuser, release, repo, email="", distro="", arch=""
     conn.close
     if response.status != 200:
         if exists:
-            return job_name + ": failed to update: %d %s<br>" %(response.status, response.reason)
+            return job_name + ": <big>FAILED</big> to update: %d %s<br>" %(response.status, response.reason)
         else:
-            return job_name + ": failed to create: %d %s<br>" %(response.status, response.reason)
+            return job_name + ": <big>FAILED</big> to create: %d %s<br>" %(response.status, response.reason)
     else:
         if exists:
-            return job_name + ": updated successfully<br>"
+            return job_name + ": updated <big>SUCCESSFULLY</big><SMALL> with post_jobs: " + str(post_jobs) + "</SMALL><br>"
         else:
-            return job_name + ": created successfully<br>"
+            return job_name + ": created <big>SUCCESSFULLY</big><SMALL> with post_jobs: " + str(post_jobs) + "</SMALL><br>"
 
 
 

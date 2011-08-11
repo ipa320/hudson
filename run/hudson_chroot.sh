@@ -4,9 +4,10 @@
 
 
 cd /tmp/workspace
-WORKSPACE=/tmp/workspace/$REPOSITORY 
-cp $WORKSPACE/../.gitconfig ~/.gitconfig
-cp -r $WORKSPACE/../.ssh ~/
+WORKSPACE=/tmp/workspace
+cp $WORKSPACE/.gitconfig ~/.gitconfig
+cp -r $WORKSPACE/.ssh ~/
+rm -rf $WORKSPACE/test_results
 mkdir -p $WORKSPACE/test_results # create test_results directory
 ## create dummy test result file in case the script aborts before actual tests start
 touch $WORKSPACE/test_results/no_test.xml
@@ -23,17 +24,17 @@ write_rosinstall(){
 	echo "- git: 
     local-name: $STACK
     uri: git://github.com/$GITHUBUSER/$STACK.git
-    branch-name: master" >> $WORKSPACE/../$REPOSITORY.rosinstall
+    branch-name: master" >> $WORKSPACE/$REPOSITORY.rosinstall
 }
 
 check_stack(){
 	STACK="$1"
 	user=`git config --global github.user`
 	token=`git config --global github.token`
-	#wget --post-data "login=$user&token=$token" --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/Makefile --no-check-certificate 2> $WORKSPACE/../wget_response.txt
-	wget --post-data "login=$user&token=$token" --spider https://raw.github.com/"$GITHUBUSER"/"$STACK"/master/Makefile --no-check-certificate 2> $WORKSPACE/../wget_response.txt
-	cat $WORKSPACE/../wget_response.txt
-	return $(grep -c "200 OK" $WORKSPACE/../wget_response.txt)
+	#wget --post-data "login=$user&token=$token" --spider https://github.com/"$GITHUBUSER"/"$STACK"/blob/master/Makefile --no-check-certificate 2> $WORKSPACE/wget_response.txt
+	wget --post-data "login=$user&token=$token" --spider https://raw.github.com/"$GITHUBUSER"/"$STACK"/master/Makefile --no-check-certificate 2> $WORKSPACE/wget_response.txt
+	#cat $WORKSPACE/wget_response.txt
+	return $(grep -c "200 OK" $WORKSPACE/wget_response.txt)
 }
 
 do_testing(){
@@ -74,11 +75,15 @@ sudo apt-get install bc -y                                                      
 # create .rosinstall file
 echo "- other: {local-name: /opt/ros/---ROSRELEASE---/ros}
 - other: {local-name: /opt/ros/---ROSRELEASE---/stacks}
-" > $WORKSPACE/../$REPOSITORY.rosinstall
+- git: 
+    local-name: $REPOSITORY
+    uri: git://github.com/$GITHUBUSER/$REPOSITORY.git
+    branch-name: master
+" > $WORKSPACE/$REPOSITORY.rosinstall
 
 # get dependencies
-rm $WORKSPACE/../$REPOSITORY.deps
-wget https://github.com/ipa320/hudson/raw/master/run/"$REPOSITORY".deps -O $WORKSPACE/../$REPOSITORY.deps --no-check-certificate
+rm $WORKSPACE/$REPOSITORY.deps
+wget https://github.com/ipa320/hudson/raw/master/run/"$REPOSITORY".deps -O $WORKSPACE/$REPOSITORY.deps --no-check-certificate
 
 echo ""
 echo "--------------------------------------------------------------------------------"
@@ -95,25 +100,30 @@ do
     # repository is for sure just dependent on stack > continue 
     echo "  WARNING: Stack $myline not forked to $GITHUBUSER at github.com. Using release stack instead."
   fi
-done < $WORKSPACE/../$REPOSITORY.deps
+done < $WORKSPACE/$REPOSITORY.deps
 echo "--------------------------------------------------------------------------------"
 echo ""
 
 # delete unnecessary wget_response.txt
-rm $WORKSPACE/../wget_response.txt
+rm $WORKSPACE/wget_response.txt
 
 # generate .rosinstall file
-sed -i "s/---GITHUBUSER---/$GITHUBUSER/g" $WORKSPACE/../$REPOSITORY.rosinstall
-sed -i "s/---ROSRELEASE---/$RELEASE/g" $WORKSPACE/../$REPOSITORY.rosinstall
-sed -i "s/---JOBNAME---/$JOB_NAME/g" $WORKSPACE/../$REPOSITORY.rosinstall
-sed -i "s/---REPOSITORY---/$REPOSITORY/g" $WORKSPACE/../$REPOSITORY.rosinstall
+sed -i "s/---GITHUBUSER---/$GITHUBUSER/g" $WORKSPACE/$REPOSITORY.rosinstall
+sed -i "s/---ROSRELEASE---/$RELEASE/g" $WORKSPACE/$REPOSITORY.rosinstall
+sed -i "s/---JOBNAME---/$JOB_NAME/g" $WORKSPACE/$REPOSITORY.rosinstall
+sed -i "s/---REPOSITORY---/$REPOSITORY/g" $WORKSPACE/$REPOSITORY.rosinstall
+
+# print rosinstall file
+echo ""
+echo "rosinstall file:"
+cat $WORKSPACE/$REPOSITORY.rosinstall
 
 # perform clean rosinstall
-rm $WORKSPACE/../.rosinstall
-rosinstall $WORKSPACE/../ $WORKSPACE/../$REPOSITORY.rosinstall $WORKSPACE --delete-changed-uris
+rm $WORKSPACE/.rosinstall
+rosinstall $WORKSPACE $WORKSPACE/$REPOSITORY.rosinstall --delete-changed-uris
 
 # setup ROS environment
-. $WORKSPACE/../setup.sh
+. $WORKSPACE/setup.sh
 
 # define amount of ros prozesses during build for multi-prozessor machines
 COUNT=$(cat /proc/cpuinfo | grep 'processor' | wc -l)
@@ -159,7 +169,6 @@ echo "--------------------------------------------------------------------------
 echo "Rostest for $REPOSITORY"
 
 rm -rf ~/.ros/test_results # delete old rostest logs
-rm -f $WORKSPACE/test_results/no_test.xml # delete dummy test file
 
 if [ ! -s $WORKSPACE/all.tests ]; then
 	echo "all.tests-file not found or empty, creating dummy test result file"
