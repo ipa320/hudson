@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/ros/!svn/ver/14381/stacks/ros_release/trunk/vcstools/test
+END
+test_vcstools_legacy_vcs.py
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/ros/!svn/ver/11994/stacks/ros_release/trunk/vcstools/test/test_vcstools_legacy_vcs.py
+END
+test_bzr.py
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/ros/!svn/ver/12768/stacks/ros_release/trunk/vcstools/test/test_bzr.py
+END
+test_hg.py
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/ros/!svn/ver/14381/stacks/ros_release/trunk/vcstools/test/test_hg.py
+END
+test_git.py
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/ros/!svn/ver/12293/stacks/ros_release/trunk/vcstools/test/test_git.py
+END
+test_svn.py
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/ros/!svn/ver/12224/stacks/ros_release/trunk/vcstools/test/test_svn.py
+END
+test_tar.py
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/ros/!svn/ver/13039/stacks/ros_release/trunk/vcstools/test/test_tar.py
+END

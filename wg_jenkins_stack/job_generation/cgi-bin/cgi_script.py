@@ -1,0 +1,144 @@
+#!/usr/bin/python
+
+import cgi
+import cgitb; cgitb.enable()
+import pycurl
+import re
+import StringIO
+import urllib
+#import sys
+from subprocess import Popen, PIPE
+import shlex
+
+
+
+def main():
+    
+    rosrelease = []
+    repositories = []
+    
+    print "Content-Type: text/html\n\n"     # HTML is following
+
+    form = cgi.FieldStorage() # keys from HTML form
+
+    # check if necessary keys (username & email) are available
+    if "username" not in form or "email" not in form: # raise error if not
+        print "<H1>ERROR<H1>"
+        print "Please fill in your Github username and email address."
+        print '<p><input type=button value="Back" onClick="history.back()">'
+        return
+    
+    # if available check other parameters
+    else:
+        print "<p>Creating jobs for:<br>"
+        print "<ul><p>Username: ", form["username"].value  
+        print "<p>Email: ", form["email"].value, "</ul>"
+    
+    # get chosen releases
+    releases = form.getlist('release')
+    if releases == []:
+        print "<H1>ERROR<H1>"
+        print "You have to select at least one release! <br>"
+        print '<input type=button value="Back" onClick="history.back()">'
+        return
+    else:
+        for release in releases:
+            rosrelease = rosrelease[:] + [release]
+    
+    # check chosen stacks
+    otherstacks = form.getlist('otherstack')
+    if form['stacks'].value == 'All':
+        repositories = ['cob_apps', 'cob_common', 'cob_driver', 'cob_extern', 'cob_simulation']
+    else:
+        stacks = form.getlist('stack')
+        if stacks == [] and otherstacks == []:
+            print "<H1>ERROR<H1>"
+            print "You have to select at least one stack! <br>"
+            print '<input type=button value="Back" onClick="history.back()">'
+            return
+        else:
+            for stack in stacks:
+                repositories = repositories[:] + [stack]
+
+    if otherstacks != []:
+        for stack in otherstacks:
+            find_stack(stack)
+    
+    # printing planed job creations
+    print "<p>Creating jobs to test:<br><ul>"    
+    for stack in repositories:
+        print "- ", stack, "<br>"
+    print "</ul>"
+    print "<hr>"
+
+    # call spawn_jobs depending on 'delete' was selected
+    if "delete" in form:
+        print spawn_jobs(form["username"].value, form["email"].value, repositories, rosrelease, del_stacks=True)
+    else:
+        print spawn_jobs(form["username"].value, form["email"].value, repositories, rosrelease)
+
+    print '<br>'
+    print '<p><input type=button value="Back" onClick="history.back()">'
+
+
+def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
+    
+    # function to spawn jobs
+
+    results = """<p>JOB CREATION RESULTS<br>
+====================<br>\n"""
+    
+    for release in ROSRELEASES:
+        for repo in REPOSITORIES:
+            results = results + "<br>"
+            
+            if not stack_forked(githubuser, repo):
+                results = results + "<b>" + repo + "</b>" + ": stack is not forked\n"
+                results = results + "Using 'ipa320' stack instead. If that isn't desired, fork " + repo + " on github.com!"
+            
+            #TODO find right folder, output, try
+            # call generate_prerelease.py with parameters: 'stack', 'rosdistro', 'githubuser', 'email'
+            generate_prerelease = "/???/job_generation/scripts/generate_prerelease.py "
+            parameters = "--stack %s --rosdistro %s --githubuser %s --email %s"%(repo, release, githubuser, email)
+            if del_stacks:
+                parameters = parameters + " --delete"
+            p = Popen(shlex.split(generate_prerelease + parameters), stdout=PIPE, shell=False)
+            out, err = p.communicate()
+            results = results + "<br>" + out + "<br>"
+    
+    return results
+
+
+def stack_forked(githubuser, stack):
+    # function to check if stack is forked on Github.com
+    
+    # get token from jenkins' .gitconfig file for private github forks
+    try:
+        gitconfig = open("/home/jenkins/.gitconfig", "r") 
+        gitconfig = gitconfig.read()
+    except IOError as err:
+        print "<b>" + err + "</b>"
+        return False
+    # extract necessary data
+    regex = ".*\[github]\s*user\s*=\s*([^\s]*)\s*token\s*=\s*([^\s]*).*"
+    gitinfo = re.match(regex, gitconfig, re.DOTALL)
+    post = {'login' : gitinfo.group(1), 'token' : gitinfo.group(2)}
+    fields = urllib.urlencode(post)
+    
+    path = "https://github.com/" + githubuser + "/" + stack + "/blob/master/Makefile"
+    file1 = StringIO.StringIO()
+    
+    c = pycurl.Curl()
+    c.setopt(pycurl.URL, path)
+    c.setopt(pycurl.POSTFIELDS, fields)
+    c.setopt(pycurl.WRITEFUNCTION, file1.write) # to avoid to show the called page
+    c.perform()
+    c.close
+    if c.getinfo(pycurl.HTTP_CODE) == 200:
+        return True
+    else:
+        print "ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE)
+        return False
+
+
+main()
