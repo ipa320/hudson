@@ -68,7 +68,12 @@ sudo apt-get update
 sudo apt-get install python-setuptools -y
 sudo easy_install -U rosinstall
 #sudo apt-get install ros-$RELEASE-ros -y
-sudo apt-get install ros-$RELEASE-care-o-bot -y
+#sudo apt-get install ros-$RELEASE-care-o-bot -y
+sudo apt-get install ros-$RELEASE-cob-extern -y
+sudo apt-get install ros-$RELEASE-cob-common -y
+sudo apt-get install ros-$RELEASE-cob-driver -y
+sudo apt-get install ros-$RELEASE-cob-simulation -y
+sudo apt-get install ros-$RELEASE-cob-apps -y
 sudo apt-get install bc -y                                                      ######################
 
 
