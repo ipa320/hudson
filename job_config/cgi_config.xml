@@ -22,21 +22,23 @@
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
-  <customWorkspace>/home/jenkins/workspace/---ROSRELEASE---__---GITHUBUSER---__---REPOSITORY---__---DISTRIBUTION---__---ARCHITECTURE---</customWorkspace>
   <builders>
     <hudson.tasks.Shell>
-      <command>cp /home/jenkins/.gitconfig $WORKSPACE/.gitconfig
-cp -r /home/jenkins/.ssh $WORKSPACE
+      <command># copy gitconfig and ssh key to slave
+scp cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
+scp -r cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE
 
+# get scripts
 wget https://github.com/ipa320/hudson/raw/master/run/devel_run_chroot.py -O $WORKSPACE/devel_run_chroot.py
 chmod +x $WORKSPACE/devel_run_chroot.py
 wget https://github.com/ipa320/hudson/raw/master/run/hudson_chroot.sh -O $WORKSPACE/hudson_chroot.sh --no-check-certificate
 
+# substitute variables
 sed -i '3aRELEASE=---ROSRELEASE---' $WORKSPACE/hudson_chroot.sh
 sed -i '4aGITHUBUSER=---GITHUBUSER---' $WORKSPACE/hudson_chroot.sh
 sed -i '5aREPOSITORY=---REPOSITORY---' $WORKSPACE/hudson_chroot.sh
 
-$WORKSPACE/devel_run_chroot.py --chroot-dir /home/jenkins/chroot --distro ---DISTRIBUTION--- --arch ---ARCHITECTURE--- --script=$WORKSPACE/hudson_chroot.sh --debug-chroot --ramdisk --ramdisk-size 6000M --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu</command>
+$WORKSPACE/devel_run_chroot.py --chroot-dir $HOME/chroot --distro ---DISTRIBUTION--- --arch ---ARCHITECTURE--- --script=$WORKSPACE/hudson_chroot.sh --debug-chroot --ramdisk --ramdisk-size 6000M --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
@@ -59,7 +61,8 @@ $WORKSPACE/devel_run_chroot.py --chroot-dir /home/jenkins/chroot --distro ---DIS
           </logTexts>
           <EscalateStatus>false</EscalateStatus>
           <RunIfJobSuccessful>false</RunIfJobSuccessful>
-          <script>sudo rm -rf /home/jenkins/chroot/$JOB_NAME</script>
+          <script>sudo rm -rf $HOME/chroot/&#xd;
+#sudo rm -rf $HOME/workspace/</script>
         </hudson.plugins.postbuildtask.TaskProperties>
       </tasks>
     </hudson.plugins.postbuildtask.PostbuildTask>
