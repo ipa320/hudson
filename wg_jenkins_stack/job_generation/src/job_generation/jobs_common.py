@@ -373,6 +373,8 @@ def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
         for job_name in jobs:
             if 'pipe' in job_name:
                 start=True
+            else:
+                start=False
             
             exists = hudson_obj.job_exists(job_name)
 
