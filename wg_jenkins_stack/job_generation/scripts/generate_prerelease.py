@@ -7,8 +7,10 @@ import hudson
 
 # template to create pre-release hudson configuration file
 #TODO file location
-HUDSON_CONFIG = open("build_config.xml", "r+w")
-HUDSON_PIPE_CONFIG = open("pipe_config.xml", "r+w")
+with open("build_config.xml", "r") as f1:
+    HUDSON_CONFIG = f1.read()
+with open("pipe_config.xml", "r") as f2:
+    HUDSON_PIPE_CONFIG = f2.read()
 
 
 def prerelease_job_name(jobtype, rosdistro, stack_list, githubuser, ubuntu, arch):
@@ -29,16 +31,16 @@ def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubunt
     hudson_config = hudson_config.replace('GITHUBUSER', githubuser)
     hudson_config = hudson_config.replace('REPEAT', str(repeat))
     hudson_config = hudson_config.replace('LABEL', job_type)
-    
+
     if post_jobs != []:
-        hudson_config = hudson_config.replace('POSTJOBS', ','.join(str(n) for n in post_jobs))
+        hudson_config = hudson_config.replace('POSTJOBS', ', '.join(str(n) for n in post_jobs))
     else:
         hudson_config = hudson_config.replace('POSTJOBS', '')
     if source_only:
         hudson_config = hudson_config.replace('SOURCE_ONLY', '--source-only')
     else:
         hudson_config = hudson_config.replace('SOURCE_ONLY', '')
-        
+
     return hudson_config
 
 
@@ -49,7 +51,7 @@ def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, 
         arches = ARCHES
     if not ubuntudistros:
         ubuntudistros = UBUNTU_DISTRO_MAP
-    
+
     prio_arch = "i386"
     prio_ubuntudistro = "natty"
     configs = {}
@@ -59,19 +61,19 @@ def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, 
     
     # create pipe_job
     name = get_job_name(rosdistro, stack_list, githubuser, jobtype="pipe")
-    configs[name] = replace_param(HUDSON_PIPE_CONFIG.read(), rosdistro, githubuser, "pipe", stack_list=stack_list, post_jobs=[get_job_name(rosdistro, stack_list, githubuser, ubuntu=prio_ubuntudistro, arch=prio_arch)])
+    configs[name] = replace_param(HUDSON_PIPE_CONFIG, rosdistro, githubuser, "pipe", stack_list=stack_list, post_jobs=[get_job_name(rosdistro, stack_list, githubuser, ubuntu=prio_ubuntudistro, arch=prio_arch)])
     
     # create hudson config files for each ubuntu distro
     for ubuntudistro in ubuntudistros:
         for arch in arches:
             if ubuntudistro != prio_ubuntudistro or arch != prio_arch: # if job is not prio_job
                 name = get_job_name(rosdistro, stack_list, githubuser, ubuntudistro, arch)
-                post_jobs.append(name) 
-                configs[name] = replace_param(HUDSON_CONFIG.read(), rosdistro, githubuser, "build", arch, ubuntudistro, stack_list, email, repeat, source_only)
-                
+                post_jobs.append(name)
+                configs[name] = replace_param(HUDSON_CONFIG, rosdistro, githubuser, "build", arch, ubuntudistro, stack_list, email, repeat, source_only)
+    
     # create prio_job
     name = get_job_name(rosdistro, stack_list, githubuser, prio_ubuntudistro, prio_arch)
-    configs[name] = replace_param(HUDSON_CONFIG.read(), rosdistro, githubuser, "build_prio", prio_arch, prio_ubuntudistro, stack_list, email, repeat, source_only, post_jobs)
+    configs[name] = replace_param(HUDSON_CONFIG, rosdistro, githubuser, "build_prio", prio_arch, prio_ubuntudistro, stack_list, email, repeat, source_only, post_jobs)
 
     return configs
 
@@ -80,15 +82,16 @@ def main():
     (options, args) = get_options(['stack', 'rosdistro', 'githubuser', 'email'], ['repeat', 'source-only', 'arch', 'ubuntu', 'delete'])
     if not options:
         return -1
-
+    
     try:
         # create hudson instance
         if len(args) == 2:
             hudson_instance = hudson.Hudson(SERVER, args[0], args[1])
         else:
-            info = get_auth_keys('jenkins')
+            info = get_auth_keys('jenkins', '/home-local/jenkins')
             hudson_instance = hudson.Hudson(SERVER, info.group(1), info.group(2))
         prerelease_configs = create_prerelease_configs(options.rosdistro, options.stack, options.githubuser, options.email, options.repeat, options.source_only, options.arch, options.ubuntu)
+        #print prerelease_configs.keys() + "<br>"
         
         #TODO necessary??? change???
         # check if jobs are not already running
@@ -100,13 +103,13 @@ def main():
                 return 
 
         # send prerelease tests to Hudson
-        print 'Creating pre-release Hudson jobs:'
-        schedule_jobs(prerelease_configs, start=True, hudson_obj=hudson_instance, delete=options.delete)
+        print 'Creating pre-release Hudson jobs:<br>'
+        schedule_jobs(prerelease_configs, start=False, hudson_obj=hudson_instance, delete=options.delete)
         if options.delete:
-            print 'Jobs have been deleted. You can now start new jobs'
+            print 'Jobs have been deleted. You can now start new jobs<br>'
         else:
-            print '%s will receive %d emails on %s, one for each job'%(options.githubuser, len(prerelease_configs), options.email)
-            print 'You can follow the progress of these jobs on <%s>'%(SERVER)
+            print '%s will receive %d emails on %s, one for each job<br>'%(options.githubuser, len(prerelease_configs), options.email)
+            print 'You can follow the progress of these jobs on <%s><br>'%(SERVER)
 
     # catch all exceptions
     except Exception, e:

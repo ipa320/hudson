@@ -7,8 +7,10 @@ import re
 import StringIO
 import urllib
 #import sys
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 import shlex
+import os
+import stat
 
 
 
@@ -18,6 +20,11 @@ def main():
     repositories = []
     
     print "Content-Type: text/html\n\n"     # HTML is following
+
+    keys = os.environ.keys()
+    keys.sort()
+    for k in keys:
+        print "<li><b>%s:</b>\t\t%s<br>" %(k, os.environ[k]) 
 
     form = cgi.FieldStorage() # keys from HTML form
 
@@ -98,13 +105,38 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
             
             #TODO find right folder, output, try
             # call generate_prerelease.py with parameters: 'stack', 'rosdistro', 'githubuser', 'email'
-            generate_prerelease = "/???/job_generation/scripts/generate_prerelease.py "
+            script = "generate_prerelease.py "
             parameters = "--stack %s --rosdistro %s --githubuser %s --email %s"%(repo, release, githubuser, email)
             if del_stacks:
                 parameters = parameters + " --delete"
-            p = Popen(shlex.split(generate_prerelease + parameters), stdout=PIPE, shell=False)
+            bash_script = os.path.join("/home-local/jenkins", "bash_script.bash")
+            with open(bash_script, "w") as f:
+                f.write("""#!/bin/bash
+                source /opt/ros/electric/setup.bash
+                export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/home-local/jenkins/git/hudson
+                export HOME=/home-local/jenkins
+                echo "ROS_ROOT: " $ROS_ROOT "<br>"
+                echo "ROS_PACKAGE_PATH: " $ROS_PACKAGE_PATH "<br>"
+                roscd job_generation/scripts
+                echo "PWD: " 
+                pwd 
+                echo "<br>"
+                git config --get user.name
+                echo "<br>"
+                echo "HOME: " $HOME ~
+                echo "<br>"
+                echo "rospack: " 
+                rospack find rospy\n 
+                echo "<br>"
+                ./%s %s
+                """%(script, parameters))
+                os.chmod(bash_script, stat.S_IRWXU)
+            #p = Popen(shlex.split(generate_prerelease + parameters), stdout=PIPE, shell=False)
+            p = Popen(bash_script, stdout=PIPE, stderr=STDOUT)
             out, err = p.communicate()
             results = results + "<br>" + out + "<br>"
+            if err != None:
+                results = results + "ERROR: " + err + "<br>"
     
     return results
 
@@ -114,7 +146,7 @@ def stack_forked(githubuser, stack):
     
     # get token from jenkins' .gitconfig file for private github forks
     try:
-        gitconfig = open("/home/jenkins/.gitconfig", "r") 
+        gitconfig = open("/home-local/jenkins/.gitconfig", "r") 
         gitconfig = gitconfig.read()
     except IOError as err:
         print "<b>" + err + "</b>"

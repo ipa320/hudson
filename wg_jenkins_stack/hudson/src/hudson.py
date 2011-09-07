@@ -262,9 +262,10 @@ class Hudson(object):
         @param config_xml: config file text
         @type  config_xml: str
         """
+        
         if self.job_exists(name):
             raise HudsonException("job[%s] already exists"%(name))
-
+            
         headers = {'Content-Type': 'text/xml'}
         self.hudson_open(urllib2.Request(self.server + CREATE_JOB%locals(), config_xml, headers))
         if not self.job_exists(name):

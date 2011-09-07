@@ -1,4 +1,5 @@
-<actions/>
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
   <description>Build of STACKNAME for ROSDISTRO on UBUNTUDISTRO, ARCH</description>
   <logRotator>
     <daysToKeep>-1</daysToKeep>
@@ -20,12 +21,12 @@
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
-  <customWorkspace>/home/jenkins/workspace/ROSDISTRO__GITHUBUSER__STACKNAME__UBUNTUDISTRO__ARCH</customWorkspace>
+  <customWorkspace>/home-local/jenkins/workspace/ROSDISTRO__GITHUBUSER__STACKNAME__UBUNTUDISTRO__ARCH</customWorkspace>
   <builders> 
     <hudson.tasks.Shell> 
       <command>
 BOOTSTRAP_SCRIPT
-rosrun job_generation run_auto_stack_prerelease.py STACKARGS --rosdistro ROSDISTRO --repeat REPEAT SOURCE_ONLY
+rosrun job_generation run_auto_stack_prerelease_devel.py STACKARGS --rosdistro ROSDISTRO --githubuser GITHUBUSER --repeat REPEAT SOURCE_ONLY
 SHUTDOWN_SCRIPT
      </command> 
     </hudson.tasks.Shell> 
@@ -36,8 +37,15 @@ SHUTDOWN_SCRIPT
       <keepLongStdio>false</keepLongStdio> 
       <testDataPublishers/> 
     </hudson.tasks.junit.JUnitResultArchiver> 
-    <hudson.plugins.emailext.ExtendedEmailPublisher> 
-      <recipientList>EMAIL,fmw@ipa.fhg.de</recipientList> 
+    <hudson.tasks.BuildTrigger>
+      <childProjects>POSTJOBS</childProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+      </threshold>
+    </hudson.tasks.BuildTrigger><hudson.plugins.emailext.ExtendedEmailPublisher> 
+      <recipientList>EMAIL</recipientList> 
       <configuredTriggers> 
         EMAIL_TRIGGERS
       </configuredTriggers> 

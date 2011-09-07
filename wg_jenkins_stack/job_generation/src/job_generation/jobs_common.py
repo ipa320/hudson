@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import roslib; roslib.load_manifest("job_generation")
+from roslib import stack_manifest
 import optparse
 import hudson
 import urllib
@@ -8,6 +9,11 @@ import time
 import re
 import os
 import rosdistro
+import StringIO
+import pycurl
+import subprocess
+
+
 
 BOOTSTRAP_SCRIPT = """
 cat &gt; $WORKSPACE/script.sh &lt;&lt;DELIM
@@ -16,6 +22,7 @@ set -o errexit
 echo "_________________________________BEGIN SCRIPT______________________________________"
 sudo apt-get install bzr --yes
 sudo apt-get install ros-ROSDISTRO-ros --yes
+sudo apt-get install python-pycurl
 source /opt/ros/ROSDISTRO/setup.sh
 
 export INSTALL_DIR=/tmp/install_dir
@@ -29,10 +36,19 @@ export ROS_PACKAGE_PATH=\$INSTALL_DIR/ros_release:/opt/ros/ROSDISTRO/stacks
 mkdir -p \$INSTALL_DIR
 cd \$INSTALL_DIR
 
-scp jenkins@cob-kitchen-server:~/.gitconfig ~/.gitconfig
+echo "---------------"
+pwd 
+ls -la
+ls -la ../
+ls -la ../workspace
+echo "----------------"
+cp /tmp/workspace/.gitconfig ~/.gitconfig
+sudo mv -f /tmp/workspace/ros_release .
+echo "---------------"
+git config --get user.name
+echo "----------------"
 wget  --no-check-certificate http://code.ros.org/svn/ros/installers/trunk/hudson/hudson_helper 
 chmod +x  hudson_helper
-svn co https://code.ros.org/svn/ros/stacks/ros_release/trunk ros_release
 """ #TODO hudson_helper and ros_release from hudson stack on github
 # scp user???
 
@@ -45,10 +61,12 @@ set -o errexit
 rm -rf $WORKSPACE/test_results
 rm -rf $WORKSPACE/test_output
 
+scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
+cp -r ~/git/hudson/wg_jenkins_stack $WORKSPACE/ros_release
 wget https://github.com/ipa320/hudson/raw/master/run/devel_run_chroot.py -O $WORKSPACE/devel_run_chroot.py
 chmod +x $WORKSPACE/devel_run_chroot.py
-cd $WORKSPACE &amp;&amp; $WORKSPACE/devel_run_chroot.py --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot --ramdisk --ramdisk-size 6000M --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --ssh-key-file=/home/rosbuild/rosbuild-ssh.tar --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu
-""" #TODO --ssh-key ??? & wget devel_run_chroot.py from other location
+cd $WORKSPACE &amp;&amp; $WORKSPACE/devel_run_chroot.py --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot --ramdisk --ramdisk-size 6000M --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu
+""" #TODO wget devel_run_chroot.py from other location --ssh-key-file=/home/rosbuild/rosbuild-ssh.tar
 
 # the supported Ubuntu distro's for each ros distro
 ARCHES = ['amd64', 'i386']
@@ -57,7 +75,7 @@ ARCHES = ['amd64', 'i386']
 UBUNTU_DISTRO_MAP = ['lucid', 'maverick', 'natty']
 
 # Path to hudson server
-SERVER = 'http://cob-kitchen-server:8080'
+SERVER = 'http://jenkins-test-server:8080' #cob-kitchen-server
 
 # list of public an d private IPA Fraunhofer stacks
 FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps']
@@ -78,81 +96,113 @@ EMAIL_TRIGGER="""
 """
 
 
+def stack_to_deb(stack, rosdistro):
+    return '-'.join(['ros', rosdistro, str(stack).replace('_','-')])
+
+def stacks_to_debs(stack_list, rosdistro):
+    if not stack_list or len(stack_list) == 0:
+        return ''
+    return ' '.join([stack_to_deb(s, rosdistro) for s in stack_list])
+
+
 def get_depends_one(stack_name, githubuser):
     # in case the 'stack' is cob3_intern
+    print "step Y.1"
     if stack_name == "cob3_intern":
         return [str(d) for d in get_cob3_intern_deps]
     # get stack.xml from github
-    stack_xml = get_stack_xml(stack_name, githubuser, get_stack_membership(stack_name))
+    print "step Y.2"
+    stack_xml = get_stack_xml(stack_name, githubuser)#, get_stack_membership(stack_name))
     # convert to list
+    print "step Y.3"
     depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
+    print "step Y.4"
     return depends_one
 
 
 def get_depends_all(stack_name, depends_all, githubuser):
     #TODO output
-    depend_all_list = []
+    print "step 9.1"
+    print depends_all
+    depends_all_list = []
     start_depth = len(depends_all)
     print start_depth, " depends all ", stack_name
-    [[depend_all_list.append(value) for value in valuelist] for valuelist in depend_all.itervalues()]
+    [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
+    print "step 9.2 " + str(depends_all_list)
     if not stack_name in depends_all_list:
-        # append stack to the right list in depend_all
+        # append stack to the right list in depends_all
+        print "step 9.3"
         depends_all[get_stack_membership(stack_name)].append(stack_name)
+        print depends_all
         # find and append all IPA dependencies
+        print "step 9.4"
         if get_stack_membership(stack_name) == "private" or get_stack_membership(stack_name) == "public":
+            print "step 9.5"
             for d in get_depends_one(stack_name, githubuser):
+                print "step 9.6"
                 get_depends_all(d, depends_all, githubuser)
     print start_depth, " DEPENDS_ALL ", stack_name, " end depth ", len(depends_all)
 
 
 def get_stack_membership(stack_name):
+    print "step 9.3.1"
     if stack_name in FHG_STACKS_PUBLIC:
+        print "public"
         return "public"
     elif stack_name in FHG_STACKS_PRIVATE:
+        print "private"
         return "private"
     else:
+        print "other"
         return "other"
 
 
 #TODO check whether stack is forked on github or not
 def stack_forked(githubuser, stack_name):
-    
-    git_auth = get_auth_keys(github)
+    print "step5.1"
+    git_auth = get_auth_keys('github', "/tmp/workspace")
     post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
     fields = urllib.urlencode(post)
-    
-    path = "https://github.com/" + githubuser + "/" + stack + "/blob/master/Makefile"
+    print "step5.2" + str(git_auth)
+    path = "https://github.com/" + githubuser + "/" + stack_name + "/blob/master/Makefile"
+    print path
     file1 = StringIO.StringIO()
-    
+    print "step5.3"
     c = pycurl.Curl()
     c.setopt(pycurl.URL, path)
     c.setopt(pycurl.POSTFIELDS, fields)
     c.setopt(pycurl.WRITEFUNCTION, file1.write) # to avoid to show the called page
     c.perform()
     c.close
+    print "step5.4"
     if c.getinfo(pycurl.HTTP_CODE) == 200:
+        print "step5.5 True"
         return True
     else:
         print "ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE)
+        print "step5.5 False"
         return False
         
 def get_stack_xml(stack_name, githubuser):
+    print "step X.1"
     if not stack_forked(githubuser, stack_name):
         githubuser = "ipa320"
+    print "step X.2"
     try:
-        git_auth = get_auth_keys(github)
+        git_auth = get_auth_keys('github', '/tmp/workspace')
         post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
         fields = urllib.urlencode(post)
-        
+        print "step X.3"
         path = "https://raw.github.com/" + githubuser + "/" + stack_name + "/master/stack.xml"
         tmpfile = StringIO.StringIO()
-        
+        print "step X.4"
         c = pycurl.Curl()
         c.setopt(pycurl.URL, path)
         c.setopt(pycurl.POSTFIELDS, fields)
         c.setopt(pycurl.WRITEFUNCTION, tmpfile.write)
         c.perform()
         stack_xml = tmpfile.getvalue()
+        print "step X.1" + stack_xml
         c.close
     except :
         #TODO
@@ -185,19 +235,24 @@ def get_cob3_intern_deps(githubuser):
     
     
         
-def get_auth_keys(server):
+def get_auth_keys(server, location):
     # get password/token from .gitconfig file
-    gitconfig = open("~/.gitconfig", "r") 
-    gitconfig = gitconfig.read()
-    # extract necessary data
-    if server == "github":
-        regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*token\s*=\s*([^\s]*).*"
-    elif server == "jenkins":
-        regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
-    else:
-        print "ERROR: invalid server"
-        # TODO error raise
-    auth_keys = re.match(regex, gitconfig, re.DOTALL)
+    print "step 5.1.1"
+    with open(location + "/.gitconfig", "r") as f:
+        print "step 5.1.2"
+        gitconfig = f.read()
+        # extract necessary data
+        if server == "github":
+            regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*token\s*=\s*([^\s]*).*"
+            
+        elif server == "jenkins":
+            regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
+        else:
+            print "ERROR: invalid server"
+            # TODO error raise
+        print "step 5.1.3"
+        auth_keys = re.match(regex, gitconfig, re.DOTALL)
+        print "step 5.1.4" + str(auth_keys)
     return auth_keys
 
 
@@ -279,7 +334,7 @@ def get_options(required, optional):
     # postprocessing
     if 'email' in ops and options.email and not '@' in options.email:
         print 'You provided an invalid email address'
-        return (None, args)       
+        return (None, args)
 
 
     # check if rosdistro exists
@@ -309,40 +364,43 @@ def get_options(required, optional):
 def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
     # create hudson instance
     if not hudson_obj:
-        info = get_auth_keys('jenkins')
+        info = get_auth_keys('jenkins', '/home-local/jenkins')
         hudson_obj = hudson.Hudson(SERVER, info.group(1), info.group(2))
 
     finished = False
     while not finished:
         jobs_todo = {}
         for job_name in jobs:
+            if 'pipe' in job_name:
+                start=True
+            
             exists = hudson_obj.job_exists(job_name)
 
             # job is already running
             if exists and hudson_obj.job_is_running(job_name):
                 jobs_todo[job_name] = jobs[job_name]
-                print "Not reconfiguring running job %s because it is still running"%job_name
+                print "Not reconfiguring running job %s because it is still running <br>"%job_name
 
 
             # delete old job
             elif delete:
                 if exists:
                     hudson_obj.delete_job(job_name)
-                    print " - Deleting job %s"%job_name
+                    print " - Deleting job %s <br>"%job_name
 
             # reconfigure job
             elif exists:
                 hudson_obj.reconfig_job(job_name, jobs[job_name])
                 if start:
                     hudson_obj.build_job(job_name)
-                print " - %s"%job_name
+                print " - %s <br>"%job_name
 
             # create job
             elif not exists:
                 hudson_obj.create_job(job_name, jobs[job_name])
                 if start:
                     hudson_obj.build_job(job_name)
-                print " - %s"%job_name
+                print " - %s <br>"%job_name
 
         if wait and len(jobs_todo) > 0:
             jobs = jobs_todo
@@ -376,4 +434,34 @@ def get_job_name(rosdistro, stack_name, githubuser, ubuntu="", arch="", jobtype=
     if jobtype == "pipe":
         return "__".join([rosdistro, githubuser, stack_name, "pipe"])
     else:
-        return "__".join([rosdistro, githubuser, stack_name, ubuntu, arch])    
+        return "__".join([rosdistro, githubuser, stack_name, ubuntu, arch])
+
+
+def call(command, env=None, message='', ignore_fail=False):
+    res = ''
+    err = ''
+    try:
+        print message+'\nExecuting command "%s"'%command
+        helper = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+        res, err = helper.communicate()
+        print str(res)
+        print str(err)
+        if helper.returncode != 0:
+            raise Exception
+        return res
+    except Exception:
+        if not ignore_fail:
+            message += "\n=========================================\n"
+            message += "Failed to execute '%s'"%command
+            message += "\n=========================================\n"
+            message += str(res)
+            message += "\n=========================================\n"
+            message += str(err)
+            message += "\n=========================================\n"
+            if env:
+                message += "ROS_PACKAGE_PATH = %s\n"%env['ROS_PACKAGE_PATH']
+                message += "ROS_ROOT = %s\n"%env['ROS_ROOT']
+                message += "PYTHONPATH = %s\n"%env['PYTHONPATH']
+                message += "\n=========================================\n"
+                generate_email(message, env)
+            raise Exception

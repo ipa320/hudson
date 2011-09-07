@@ -55,7 +55,7 @@
     </hudson.triggers.SCMTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
-  <customWorkspace>/home/jenkins/workspace/ROSDISTRO__GITHUBUSER__STACKNAME__pipe</customWorkspace>
+  <customWorkspace>/home-local/jenkins/workspace/ROSDISTRO__GITHUBUSER__STACKNAME__pipe</customWorkspace>
   <builders>
     <hudson.tasks.Shell>
       <command>
