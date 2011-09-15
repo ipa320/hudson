@@ -6,7 +6,6 @@ import pycurl
 import re
 import StringIO
 import urllib
-#import sys
 from subprocess import Popen, PIPE, STDOUT
 import shlex
 import os
@@ -69,7 +68,8 @@ def main():
 
     if otherstacks != []:
         for stack in otherstacks:
-            find_stack(stack)
+            if valid_stack(stack):
+                repositories = repositories[:] + [stack]
     
     # printing planed job creations
     print "<p>Creating jobs to test:<br><ul>"    
@@ -89,7 +89,6 @@ def main():
 
 
 def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
-    
     # function to spawn jobs
 
     results = """<p>JOB CREATION RESULTS<br>
@@ -99,10 +98,14 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
         for repo in REPOSITORIES:
             results = results + "<br>"
             
-            if not stack_forked(githubuser, repo):
-                results = results + "<b>" + repo + "</b>" + ": stack is not forked\n"
+            try:
+                if not stack_forked(githubuser, repo):
+                    results = results + "<b>" + repo + "</b>" + ": stack is not forked\n"
+                    results = results + "Using 'ipa320' stack instead. If that isn't desired, fork " + repo + " on github.com!"
+            except:
+                results = results + "<b>Error: Checking whether stack %s is forked failed</b>"%repo
                 results = results + "Using 'ipa320' stack instead. If that isn't desired, fork " + repo + " on github.com!"
-            
+                
             #TODO find right folder, output, try
             # call generate_prerelease.py with parameters: 'stack', 'rosdistro', 'githubuser', 'email'
             script = "generate_prerelease.py "
@@ -113,25 +116,14 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
             with open(bash_script, "w") as f:
                 f.write("""#!/bin/bash
                 source /opt/ros/electric/setup.bash
-                export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/home-local/jenkins/git/hudson
+                export ROS_PACKAGE_PATH=/home-local/jenkins/git/hudson:$ROS_PACKAGE_PATH
                 export HOME=/home-local/jenkins
                 echo "ROS_ROOT: " $ROS_ROOT "<br>"
                 echo "ROS_PACKAGE_PATH: " $ROS_PACKAGE_PATH "<br>"
                 roscd job_generation/scripts
-                echo "PWD: " 
-                pwd 
-                echo "<br>"
-                git config --get user.name
-                echo "<br>"
-                echo "HOME: " $HOME ~
-                echo "<br>"
-                echo "rospack: " 
-                rospack find rospy\n 
-                echo "<br>"
                 ./%s %s
                 """%(script, parameters))
                 os.chmod(bash_script, stat.S_IRWXU)
-            #p = Popen(shlex.split(generate_prerelease + parameters), stdout=PIPE, shell=False)
             p = Popen(bash_script, stdout=PIPE, stderr=STDOUT)
             out, err = p.communicate()
             results = results + "<br>" + out + "<br>"
@@ -139,6 +131,20 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
                 results = results + "ERROR: " + err + "<br>"
     
     return results
+
+
+def valid_stack(stack):
+    # function to check if inserted stack is available
+    available_stacks = ['cob_apps', 'cob_common', 'cob_driver', 'cob_extern', 'cob_simulation', 'cob3_intern', 'srs', 'interaid']
+    # correct common mistakes
+    stack = stack.lower()
+    stack = stack.replace('-', '_')
+    if stack in available_stacks:
+        return True
+    else:
+        print "<p><font color='#FF0000'>ERROR:"
+        print "Stack <b>" + stack + " </b>could not be found. Please check spelling!</font>"
+        return False
 
 
 def stack_forked(githubuser, stack):
@@ -149,27 +155,36 @@ def stack_forked(githubuser, stack):
         gitconfig = open("/home-local/jenkins/.gitconfig", "r") 
         gitconfig = gitconfig.read()
     except IOError as err:
-        print "<b>" + err + "</b>"
+        print "<b>ERROR" + err + "</b>"
         return False
+    
     # extract necessary data
     regex = ".*\[github]\s*user\s*=\s*([^\s]*)\s*token\s*=\s*([^\s]*).*"
     gitinfo = re.match(regex, gitconfig, re.DOTALL)
+    if gitinfo == None:
+        print "<b>ERROR: No match found in 'gitconfig'</b>"
+        raise
     post = {'login' : gitinfo.group(1), 'token' : gitinfo.group(2)}
     fields = urllib.urlencode(post)
     
     path = "https://github.com/" + githubuser + "/" + stack + "/blob/master/Makefile"
     file1 = StringIO.StringIO()
     
-    c = pycurl.Curl()
-    c.setopt(pycurl.URL, path)
-    c.setopt(pycurl.POSTFIELDS, fields)
-    c.setopt(pycurl.WRITEFUNCTION, file1.write) # to avoid to show the called page
-    c.perform()
-    c.close
+    try:
+        c = pycurl.Curl()
+        c.setopt(pycurl.URL, path)
+        c.setopt(pycurl.POSTFIELDS, fields)
+        c.setopt(pycurl.WRITEFUNCTION, file1.write) # to avoid to show the called page
+        c.perform()
+        c.close
+    except:
+        print "<b>ERROR: Problem occured while checking for 'Makefile'</b>"
+        raise
+        
     if c.getinfo(pycurl.HTTP_CODE) == 200:
         return True
     else:
-        print "ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE)
+        print "<b>ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE), "</b>"
         return False
 
 

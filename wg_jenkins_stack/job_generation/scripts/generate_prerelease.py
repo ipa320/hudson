@@ -56,8 +56,6 @@ def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, 
     prio_ubuntudistro = "natty"
     configs = {}
     post_jobs = []
-
-    #TODO include "join plugin"
     
     # create pipe_job
     name = get_job_name(rosdistro, stack_list, githubuser, jobtype="pipe")
@@ -91,7 +89,6 @@ def main():
             info = get_auth_keys('jenkins', '/home-local/jenkins')
             hudson_instance = hudson.Hudson(SERVER, info.group(1), info.group(2))
         prerelease_configs = create_prerelease_configs(options.rosdistro, options.stack, options.githubuser, options.email, options.repeat, options.source_only, options.arch, options.ubuntu)
-        #print prerelease_configs.keys() + "<br>"
         
         #TODO necessary??? change???
         # check if jobs are not already running

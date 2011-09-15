@@ -24,20 +24,17 @@ def remove(list1, list2):
 def main():
     # global try
     try:
-
         # parse command line options
-        print "step1"
-        (options, args) = get_options(['stack', 'rosdistro', 'githubuser'], ['repeat', 'source-only'])
+        (options, args) = get_options(['stack', 'rosdistro', 'githubuser', 'email'], ['repeat', 'source-only'])
         if not options:
             return -1
 
         # set environment
-        print "step2"
         env = get_environment()
         env['ROS_PACKAGE_PATH'] = '%s:%s:/opt/ros/%s/stacks'%(env['INSTALL_DIR']+'/'+STACK_DIR,
                                                                  env['INSTALL_DIR']+'/'+DEPENDS_DIR,
                                                                  options.rosdistro) # env['INSTALL_DIR']+'/'+DEPENDS_ON_DIR,
-        print "step3"
+
         if 'ros' in options.stack:
             env['ROS_ROOT'] = env['INSTALL_DIR']+'/'+STACK_DIR+'/ros'
             print "We're building ROS, so setting the ROS_ROOT to %s"%(env['ROS_ROOT'])
@@ -45,33 +42,29 @@ def main():
             env['ROS_ROOT'] = '/opt/ros/%s/ros'%options.rosdistro
         env['PYTHONPATH'] = env['ROS_ROOT']+'/core/roslib/src'
         env['PATH'] = '/opt/ros/%s/ros/bin:%s'%(options.rosdistro, os.environ['PATH'])
+        print "HOME: %s"%(env['HOME'])
 
 
         # Parse distro file
-        print "step4"
         rosdistro_obj = rosdistro.Distro(get_rosdistro_file(options.rosdistro))
         print 'Operating on ROS distro %s'%rosdistro_obj.release_name
 
 
         # Install the stacks to test from source
         print 'Installing the stacks to test from source'
-        # public stacks
         rosinstall = ''
-        print options.stack
         for stack in options.stack:
-            print "step5 " + stack + options.githubuser
             if not stack_forked(options.githubuser, stack):
                 print "Stack %s is not forked for user %s" %(stack, options.githubuser)
                 print "Using 'ipa320' stack instead"
                 options.githubuser = "ipa320"
-            print "step6"
             if stack in FHG_STACKS_PUBLIC: # create rosinstall file for public stacks
                 rosinstall += '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack, options.githubuser, stack)
             elif stack in FHG_STACKS_PRIVATE: # clone private stacks
                 call('git clone git@github.com:%s/%s.git %s'%(options.githubuser, stack, STACK_DIR), env, 'Clone private stack [%s] to test'%(stack))
             else:
                 rosinstall += stack_to_rosinstall(rosdistro_obj.stacks[stack], 'devel')
-        print "step7"
+
         if rosinstall != '': # call rosinstall command
             print "step8"
             rosinstall_file = '%s.rosinstall'%STACK_DIR
@@ -89,17 +82,18 @@ def main():
         # get all stack dependencies of stacks we're testing
         print "step9"
         depends_all = {"public" : [], "private" : [], "other" : []}
-        for stack in options.stack:    
-            stack_xml = '%s/%s/stack.xml'%(STACK_DIR, stack)
-            call('ls %s'%stack_xml, env, 'Checking if stack %s contains "stack.xml" file'%stack)
-            with open(stack_xml) as stack_file:
-                depends_one = [str(d) for d in stack_manifest.parse(stack_file.read()).depends]  # convert to list
-                print 'Dependencies of stack %s: %s'%(stack, str(depends_one))
-                for d in depends_one:
-                    if not d in options.stack and not d in depends_all:
-                        print 'Adding dependencies of stack %s'%d
-                        get_depends_all(d, depends_all, options.githubuser)
-                        print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all)
+        for stack in options.stack:
+#            stack_xml = '%s/%s/stack.xml'%(STACK_DIR, stack)
+#            call('ls %s'%stack_xml, env, 'Checking if stack %s contains "stack.xml" file'%stack)
+#            with open(stack_xml) as stack_file:
+#                depends_one = [str(d) for d in stack_manifest.parse(stack_file.read()).depends]  # convert to list
+            depends_one = get_depends_one(stack, options.githubuser)
+            print 'Dependencies of stack %s: %s'%(stack, str(depends_one))
+            for d in depends_one:
+                if not d in options.stack and not d in depends_all and not d in COB3_INTERN_STACKS_DEPS and not d in COB3_INTERN_STACKS:
+                    print 'Adding dependencies of stack %s'%d
+                    get_depends_all(d, depends_all, options.githubuser)
+                    print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all)
         
         print "step10"
         if len(depends_all["private"]) > 0:
@@ -138,8 +132,12 @@ def main():
         print "Installing system dependencies of stacks we're testing"
         call('rosmake rosdep', env)
         for stack in options.stack:
-            call('rosdep install -y %s'%stack, env,
-                 'Install system dependencies of stack %s'%stack)
+            if stack == "cob3_intern":
+                call('make -f /tmp/install_dir/%s/Makefile ros-install'%STACK_DIR, env, 'ros-install')
+                call('make -f /tmp/install_dir/%s/Makefile ros-skip-blacklist'%STACK_DIR, env, 'ros-skip-blacklist')
+            else:
+                call('rosdep install -y %s'%stack, env,
+                     'Install system dependencies of stack %s'%stack)
                  
         print "step15"
         # Run hudson helper for stacks only
@@ -147,7 +145,9 @@ def main():
         res = 0
         for r in range(0, int(options.repeat)+1):
             env['ROS_TEST_RESULTS_DIR'] = env['ROS_TEST_RESULTS_DIR'] + '/' + STACK_DIR + '_run_' + str(r)
-            helper = subprocess.Popen(('./hudson_helper --dir-test %s build'%STACK_DIR).split(' '), env=env)
+            print "step 16"
+            helper = subprocess.Popen(('./hudson_helper_fhg.py --dir-test %s --email %s build'%(STACK_DIR, options.email)).split(' '), env=env)
+            print "step 17"
             helper.communicate()
             if helper.returncode != 0:
                 res = helper.returncode

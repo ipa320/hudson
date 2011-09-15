@@ -26,7 +26,7 @@
     <hudson.tasks.Shell> 
       <command>
 BOOTSTRAP_SCRIPT
-rosrun job_generation run_auto_stack_prerelease_devel.py STACKARGS --rosdistro ROSDISTRO --githubuser GITHUBUSER --repeat REPEAT SOURCE_ONLY
+rosrun job_generation run_auto_stack_prerelease_devel.py STACKARGS --rosdistro ROSDISTRO --githubuser GITHUBUSER --email EMAIL --repeat REPEAT SOURCE_ONLY
 SHUTDOWN_SCRIPT
      </command> 
     </hudson.tasks.Shell> 
@@ -42,9 +42,10 @@ SHUTDOWN_SCRIPT
       <threshold>
         <name>SUCCESS</name>
         <ordinal>0</ordinal>
-        <color>BLUE</color>
+        <color>YELLOW</color>
       </threshold>
-    </hudson.tasks.BuildTrigger><hudson.plugins.emailext.ExtendedEmailPublisher> 
+    </hudson.tasks.BuildTrigger>
+    <hudson.plugins.emailext.ExtendedEmailPublisher> 
       <recipientList>EMAIL</recipientList> 
       <configuredTriggers> 
         EMAIL_TRIGGERS

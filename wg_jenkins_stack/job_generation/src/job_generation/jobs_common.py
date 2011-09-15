@@ -36,19 +36,16 @@ export ROS_PACKAGE_PATH=\$INSTALL_DIR/ros_release:/opt/ros/ROSDISTRO/stacks
 mkdir -p \$INSTALL_DIR
 cd \$INSTALL_DIR
 
-echo "---------------"
-pwd 
-ls -la
-ls -la ../
-ls -la ../workspace
-echo "----------------"
 cp /tmp/workspace/.gitconfig ~/.gitconfig
+cp -r /tmp/workspace/.ssh ~/.ssh
+sudo chmod 600 ~/.ssh/id_rsa.pub ~/.ssh/id_rsa
+ssh-keygen -e -f ~/.ssh/id_rsa
 sudo mv -f /tmp/workspace/ros_release .
-echo "---------------"
-git config --get user.name
-echo "----------------"
-wget  --no-check-certificate http://code.ros.org/svn/ros/installers/trunk/hudson/hudson_helper 
-chmod +x  hudson_helper
+ls -la
+ls -la ros_release/
+cp ros_release/hudson/src/hudson_helper_fhg.py .
+#wget  --no-check-certificate http://code.ros.org/svn/ros/installers/trunk/hudson/hudson_helper 
+sudo chmod +x  hudson_helper_fhg.py
 """ #TODO hudson_helper and ros_release from hudson stack on github
 # scp user???
 
@@ -62,11 +59,13 @@ rm -rf $WORKSPACE/test_results
 rm -rf $WORKSPACE/test_output
 
 scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
-cp -r ~/git/hudson/wg_jenkins_stack $WORKSPACE/ros_release
+scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.ssh
+scp -r jenkins@jenkins-test-server:~/git/hudson/wg_jenkins_stack $WORKSPACE/ros_release
+#tar -cf $WORKSPACE/rosbuild-ssh.tar $WORKSPACE/.ssh/
 wget https://github.com/ipa320/hudson/raw/master/run/devel_run_chroot.py -O $WORKSPACE/devel_run_chroot.py
 chmod +x $WORKSPACE/devel_run_chroot.py
-cd $WORKSPACE &amp;&amp; $WORKSPACE/devel_run_chroot.py --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot --ramdisk --ramdisk-size 6000M --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu
-""" #TODO wget devel_run_chroot.py from other location --ssh-key-file=/home/rosbuild/rosbuild-ssh.tar
+cd $WORKSPACE &amp;&amp; $WORKSPACE/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot --ramdisk --ramdisk-size 6000M --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu #--ssh-key-file=$WORKSPACE/rosbuild-ssh.tar 
+""" #TODO wget devel_run_chroot.py from other location
 
 # the supported Ubuntu distro's for each ros distro
 ARCHES = ['amd64', 'i386']
@@ -74,12 +73,26 @@ ARCHES = ['amd64', 'i386']
 # ubuntu distro mapping to ros distro
 UBUNTU_DISTRO_MAP = ['lucid', 'maverick', 'natty']
 
+
 # Path to hudson server
 SERVER = 'http://jenkins-test-server:8080' #cob-kitchen-server
 
 # list of public an d private IPA Fraunhofer stacks
 FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps']
 FHG_STACKS_PRIVATE = ['cob3_intern', 'interaid', 'srs']
+
+COB3_INTERN_STACKS = ["cob_manipulation", "cob_navigation", "cob_rcc", "cob_sandbox", "cob_scenarios", "cob_vision"]
+COB3_INTERN_STACKS_DEPS = ["cob_arm_ik", "cob_lasertracker", "cob_LibArmClient", "cob_LibCollisionDetect", "cob_LibGenericArmCtrl",
+                      "cob_LibGrasping", "cob_LibKinematics", "cob_LibLevmar", "cob_LibManipUtil", "cob_LibNeobotix", "cob_LibPlanning",
+                      "cob_LibPowerCubeCtrl", "cob_LibSocket", "cob_LibSyncMM", "cob_LibUtilities", "MoveArmIPA", 
+                      "cob_person_association", "cob_person_detection", "cob_person_tracking_filter", "cob_palette_detection", 
+                      "cob_platform_remote",
+                      "cob_RobotControlCenter", "cob_RobotControlCenterPlugins", "libwm4",
+                      "cob_hardware_test", "cob_wimicare",
+                      "cob_movearm_svn", "cob_platform_svn",
+                      "cob_camera_viewer", "cob_camshift", "cob_env_model", "cob_object_detection", "cob_sensor_fusion", "cob_vision_features",
+                      "cob_vision_ipa_utils", "cob_vision_slam", "sag_objrec",
+                      "people", "motion_planning_common", "kinematics"]
 
 EMAIL_TRIGGER="""
         <hudson.plugins.emailext.plugins.trigger.WHENTrigger> 
@@ -107,15 +120,21 @@ def stacks_to_debs(stack_list, rosdistro):
 
 def get_depends_one(stack_name, githubuser):
     # in case the 'stack' is cob3_intern
+    depends_one = []
     print "step Y.1"
     if stack_name == "cob3_intern":
-        return [str(d) for d in get_cob3_intern_deps]
+        for stack in COB3_INTERN_STACKS:
+            cob3_intern_depends_one = []
+            stack_xml = get_stack_xml("cob3_intern", githubuser, "/master/" + stack + "/stack.xml")
+            cob3_intern_depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
+            depends_one += cob3_intern_depends_one
     # get stack.xml from github
-    print "step Y.2"
-    stack_xml = get_stack_xml(stack_name, githubuser)#, get_stack_membership(stack_name))
+        print "step Y.1.1"
+    else:
+        stack_xml = get_stack_xml(stack_name, githubuser)#, get_stack_membership(stack_name))
     # convert to list
-    print "step Y.3"
-    depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
+        print "step Y.1.2"
+        depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
     print "step Y.4"
     return depends_one
 
@@ -157,7 +176,6 @@ def get_stack_membership(stack_name):
         return "other"
 
 
-#TODO check whether stack is forked on github or not
 def stack_forked(githubuser, stack_name):
     print "step5.1"
     git_auth = get_auth_keys('github', "/tmp/workspace")
@@ -182,8 +200,9 @@ def stack_forked(githubuser, stack_name):
         print "ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE)
         print "step5.5 False"
         return False
-        
-def get_stack_xml(stack_name, githubuser):
+
+
+def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
     print "step X.1"
     if not stack_forked(githubuser, stack_name):
         githubuser = "ipa320"
@@ -193,7 +212,7 @@ def get_stack_xml(stack_name, githubuser):
         post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
         fields = urllib.urlencode(post)
         print "step X.3"
-        path = "https://raw.github.com/" + githubuser + "/" + stack_name + "/master/stack.xml"
+        path = "https://raw.github.com/" + githubuser + "/" + stack_name + appendix
         tmpfile = StringIO.StringIO()
         print "step X.4"
         c = pycurl.Curl()
@@ -208,31 +227,6 @@ def get_stack_xml(stack_name, githubuser):
         #TODO
         pass
     return stack_xml
-
-
-def get_cob3_intern_deps(githubuser):
-    # use until cob3_intern is split ino stacks
-    if not stack_forked(githubuser, "cob3_intern"):
-        githubuser = "ipa320"
-    try:
-        git_auth = get_auth_keys(github)
-        post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
-        fields = urllib.urlencode(post)
-        
-        path = "https://raw.github.com/" + githubuser + "/" + stack_name + "/master/stack.xml"
-        tmpfile = StringIO.StringIO()
-
-        c = pycurl.Curl()
-        c.setopt(pycurl.URL, path)
-        c.setopt(pycurl.POSTFIELDS, fields)
-        c.setopt(pycurl.WRITEFUNCTION, tmpfile.write)
-        c.perform()
-        stack_xml = tmpfile.getvalue()
-        c.close
-    except :
-        #TODO
-        pass
-    
     
         
 def get_auth_keys(server, location):
@@ -437,6 +431,23 @@ def get_job_name(rosdistro, stack_name, githubuser, ubuntu="", arch="", jobtype=
         return "__".join([rosdistro, githubuser, stack_name, "pipe"])
     else:
         return "__".join([rosdistro, githubuser, stack_name, ubuntu, arch])
+
+
+def ensure_dir(f):
+    d = os.path.dirname(f)
+    if not os.path.exists(d):
+        os.makedirs(d)
+
+def write_file(filename, msg):
+    ensure_dir(filename)
+    with open(filename, 'w') as f:
+        f.write(msg)
+
+def generate_email(message, env):
+    print message
+    write_file(env['WORKSPACE']+'/build_output/buildfailures.txt', message)
+    write_file(env['WORKSPACE']+'/test_output/testfailures.txt', '')
+    write_file(env['WORKSPACE']+'/build_output/buildfailures-with-context.txt', '')
 
 
 def call(command, env=None, message='', ignore_fail=False):
