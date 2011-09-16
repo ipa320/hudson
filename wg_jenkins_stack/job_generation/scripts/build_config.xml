@@ -53,16 +53,7 @@ SHUTDOWN_SCRIPT
       <defaultSubject>$DEFAULT_SUBJECT</defaultSubject> 
       <defaultContent>$DEFAULT_CONTENT&#xd;
 &#xd;
-&lt;% &#xd;
-def ws = build.getParent().getWorkspace()&#xd;
-def computer = build.getExecutor().getOwner()&#xd;
-def build_failures = hudson.util.RemotingDiagnostics.executeGroovy(&quot;new File(\&quot;${ws}/build_output/buildfailures.txt\&quot;).text&quot;,computer.getChannel())&#xd;
-println &quot;${build_failures}&quot;&#xd;
-def test_failures = hudson.util.RemotingDiagnostics.executeGroovy(&quot;new File(\&quot;${ws}/test_output/testfailures.txt\&quot;).text&quot;,computer.getChannel())&#xd;
-println &quot;${test_failures}&quot;&#xd;
-def build_failures_context = hudson.util.RemotingDiagnostics.executeGroovy(&quot;new File(\&quot;${ws}/build_output/buildfailures-with-context.txt\&quot;).text&quot;,computer.getChannel())&#xd;
-println &quot;${build_failures_context}&quot;&#xd;
-%&gt;</defaultContent> 
+<!--${JELLY_SCRIPT,template=&quot;email_content&quot;}--></defaultContent> 
       <defaultContentTypeHTML>false</defaultContentTypeHTML> 
       <defaultContentIsScript>true</defaultContentIsScript> 
     </hudson.plugins.emailext.ExtendedEmailPublisher> 

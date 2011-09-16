@@ -1,0 +1,31 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define">
+GENERAL INFO
+
+BUILD ${build.result}
+Build URL: ${rooturl}${build.url}
+Project: ${project.name}
+Date of build: ${it.timestampString}
+Build duration: ${build.durationString}
+
+<j:set var="ws" value="${build.getParent().getWorkspace()}" />
+<j:set var="computer" value="${build.getExecutor().getOwner()}" />
+${ws}
+${computer}
+
+
+<!--j:set var="build_failures" value="${hudson.util.RemotingDiagnostics.executeGroovy("new File(\"${ws}/build_output/buildfailures.txt\").text",computer.getChannel())}" />
+<j:if test="${build_failures!=null}">
+    ${build_failures}
+</j:if>
+
+<j:set var="test_failures" value="hudson.util.RemotingDiagnostics.executeGroovy("new File(\"${ws}/test_output/testfailures.txt\").text",computer.getChannel())" />
+<j:if test="${test_failures!=null}">
+    ${test_failures}
+</j:if>
+
+<j:set var="build_failures_context" value="${hudson.util.RemotingDiagnostics.executeGroovy("new File(\"${ws}/build_output/buildfailures-with-context.txt\").text",computer.getChannel())}" />
+<j:if test="${build_failures_context!=null}">
+    ${build_failures_context}
+</j:if-->
+
+</j:jelly>
