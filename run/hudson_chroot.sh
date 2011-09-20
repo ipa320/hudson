@@ -11,9 +11,9 @@ rm -rf $WORKSPACE/test_results
 mkdir -p $WORKSPACE/test_results # create test_results directory
 ## create dummy test result file in case the script aborts before actual tests start
 touch $WORKSPACE/test_results/no_test.xml
-echo '<testsuite errors="1" failures="0" name="no_test" tests="1" time="0.01">
+echo '<testsuite errors="0" failures="1" name="no_test" tests="1" time="0.01">
 <testcase classname="NoTest.NoTest" name="no_test" time="0.01">
-</testcase>
+<failure type="AssertionError"><![CDATA[no test started]]</failure>  </testcase>
 <system-out><![CDATA[Script aborted before actual tests could be started]]></system-out>
 <system-err><![CDATA[]]></system-err>
 </testsuite>' >> $WORKSPACE/test_results/no_test.xml

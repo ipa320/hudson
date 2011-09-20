@@ -1,0 +1,17 @@
+<package>
+  <description brief="job_generation">
+
+    job_generation, modified for IPA Fraunhofer
+
+  </description>
+  <author>Wim Meeussen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/job_generation</url>
+  <depend package="rosdistro"/>
+  <depend package="hudson"/>
+  <!--depend package="rosdeb"/-->
+
+</package>
+
+

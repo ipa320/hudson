@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <description>Build of STACKNAME for ROSDISTRO on UBUNTUDISTRO, ARCH</description>
+  <logRotator>
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>20</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty>
+      <projectUrl>https://github.com/GITHUBUSER/STACKNAME/</projectUrl>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>LABEL</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <customWorkspace>~/workspace/ROSDISTRO__GITHUBUSER__STACKNAME__UBUNTUDISTRO__ARCH</customWorkspace>
+  <builders> 
+    <hudson.tasks.Shell> 
+      <command>
+BOOTSTRAP_SCRIPT
+rosrun job_generation run_auto_stack_prerelease_devel.py STACKARGS --rosdistro ROSDISTRO --githubuser GITHUBUSER --email EMAIL --repeat REPEAT SOURCE_ONLY
+SHUTDOWN_SCRIPT
+     </command> 
+    </hudson.tasks.Shell> 
+  </builders> 
+  <publishers>
+    <hudson.tasks.junit.JUnitResultArchiver> 
+      <testResults>test_results/**/_hudson/*.xml</testResults> 
+      <keepLongStdio>false</keepLongStdio> 
+      <testDataPublishers/> 
+    </hudson.tasks.junit.JUnitResultArchiver> 
+    <hudson.tasks.BuildTrigger>
+      <childProjects>POSTJOBS</childProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>YELLOW</color>
+      </threshold>
+    </hudson.tasks.BuildTrigger>
+    <hudson.plugins.emailext.ExtendedEmailPublisher> 
+      <recipientList>EMAIL</recipientList> 
+      <configuredTriggers> 
+        EMAIL_TRIGGERS
+      </configuredTriggers> 
+      <defaultSubject>$DEFAULT_SUBJECT</defaultSubject> 
+      <defaultContent>$DEFAULT_CONTENT&#xd;
+&#xd;
+<!--${JELLY_SCRIPT,template=&quot;email_content&quot;}--></defaultContent> 
+      <defaultContentTypeHTML>false</defaultContentTypeHTML> 
+      <defaultContentIsScript>true</defaultContentIsScript> 
+    </hudson.plugins.emailext.ExtendedEmailPublisher> 
+  </publishers> 
+  <buildWrappers/> 
+</project>

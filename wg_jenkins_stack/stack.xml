@@ -1,0 +1,20 @@
+<stack>
+  <description brief="ros_release">
+    <p>
+      This stack contains tools for releasing and installing ROS-packaged software through various channels including:
+    <ul>
+      <li>rosinstall</li>
+      <li>Debian toolchains</li>
+      <li>Hudson continuous-integration infrastructure for releasing</li>
+    </ul>
+    </p>
+
+  </description>
+  <author>Maintained by Kenneth Conley</author>
+  <license>BSD,Python License</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/ros_release</url>
+  <depend stack="ros" /> <!-- roslib, rosdep -->
+  <depend stack="ros_comm" /> <!-- rostest -->
+
+</stack>

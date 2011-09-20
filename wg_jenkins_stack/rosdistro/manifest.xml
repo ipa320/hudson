@@ -1,0 +1,20 @@
+<package>
+  <description brief="rosdistro">
+
+     rosdistro
+
+  </description>
+  <author>Ken Conley</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/rosdistro</url>
+
+  <depend package="vcstools" />
+
+  <export>
+    <rosdoc config="rosdoc.yaml"/>    
+  </export>
+
+</package>
+
+
