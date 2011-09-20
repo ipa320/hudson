@@ -21,7 +21,7 @@
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
-  <customWorkspace>/home-local/jenkins/workspace/ROSDISTRO__GITHUBUSER__STACKNAME__UBUNTUDISTRO__ARCH</customWorkspace>
+  <customWorkspace>~/workspace/ROSDISTRO__GITHUBUSER__STACKNAME__UBUNTUDISTRO__ARCH</customWorkspace>
   <builders> 
     <hudson.tasks.Shell> 
       <command>

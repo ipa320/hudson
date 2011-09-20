@@ -46,8 +46,8 @@ ls -la ros_release/
 cp ros_release/hudson/src/hudson_helper_fhg.py .
 #wget  --no-check-certificate http://code.ros.org/svn/ros/installers/trunk/hudson/hudson_helper 
 sudo chmod +x  hudson_helper_fhg.py
-""" #TODO hudson_helper and ros_release from hudson stack on github
-# scp user???
+""" 
+
 
 SHUTDOWN_SCRIPT = """
 echo "_________________________________END SCRIPT_______________________________________"
@@ -61,7 +61,6 @@ rm -rf $WORKSPACE/test_output
 scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
 scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.ssh
 scp -r jenkins@jenkins-test-server:~/git/hudson/wg_jenkins_stack $WORKSPACE/ros_release
-#tar -cf $WORKSPACE/rosbuild-ssh.tar $WORKSPACE/.ssh/
 wget https://github.com/ipa320/hudson/raw/master/run/devel_run_chroot.py -O $WORKSPACE/devel_run_chroot.py
 chmod +x $WORKSPACE/devel_run_chroot.py
 cd $WORKSPACE &amp;&amp; $WORKSPACE/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot --ramdisk --ramdisk-size 6000M --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu #--ssh-key-file=$WORKSPACE/rosbuild-ssh.tar 
@@ -79,7 +78,7 @@ SERVER = 'http://jenkins-test-server:8080' #cob-kitchen-server
 
 # list of public an d private IPA Fraunhofer stacks
 FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps']
-FHG_STACKS_PRIVATE = ['cob3_intern', 'interaid', 'srs']
+FHG_STACKS_PRIVATE = ['cob3_intern', 'interaid', 'srs', 'r3cob']
 
 COB3_INTERN_STACKS = ["cob_manipulation", "cob_navigation", "cob_rcc", "cob_sandbox", "cob_scenarios", "cob_vision"]
 COB3_INTERN_STACKS_DEPS = ["cob_arm_ik", "cob_lasertracker", "cob_LibArmClient", "cob_LibCollisionDetect", "cob_LibGenericArmCtrl",
@@ -121,7 +120,6 @@ def stacks_to_debs(stack_list, rosdistro):
 def get_depends_one(stack_name, githubuser):
     # in case the 'stack' is cob3_intern
     depends_one = []
-    print "step Y.1"
     if stack_name == "cob3_intern":
         for stack in COB3_INTERN_STACKS:
             cob3_intern_depends_one = []
@@ -129,42 +127,32 @@ def get_depends_one(stack_name, githubuser):
             cob3_intern_depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
             depends_one += cob3_intern_depends_one
     # get stack.xml from github
-        print "step Y.1.1"
     else:
         stack_xml = get_stack_xml(stack_name, githubuser)#, get_stack_membership(stack_name))
     # convert to list
-        print "step Y.1.2"
         depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
-    print "step Y.4"
     return depends_one
 
 
 def get_depends_all(stack_name, depends_all, githubuser):
     #TODO output
-    print "step 9.1"
     print depends_all
     depends_all_list = []
     start_depth = len(depends_all)
     print start_depth, " depends all ", stack_name
     [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
-    print "step 9.2 " + str(depends_all_list)
     if not stack_name in depends_all_list:
         # append stack to the right list in depends_all
-        print "step 9.3"
         depends_all[get_stack_membership(stack_name)].append(stack_name)
         print depends_all
         # find and append all IPA dependencies
-        print "step 9.4"
         if get_stack_membership(stack_name) == "private" or get_stack_membership(stack_name) == "public":
-            print "step 9.5"
             for d in get_depends_one(stack_name, githubuser):
-                print "step 9.6"
                 get_depends_all(d, depends_all, githubuser)
     print start_depth, " DEPENDS_ALL ", stack_name, " end depth ", len(depends_all)
 
 
 def get_stack_membership(stack_name):
-    print "step 9.3.1"
     if stack_name in FHG_STACKS_PUBLIC:
         print "public"
         return "public"
@@ -177,51 +165,44 @@ def get_stack_membership(stack_name):
 
 
 def stack_forked(githubuser, stack_name):
-    print "step5.1"
     git_auth = get_auth_keys('github', "/tmp/workspace")
     post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
     fields = urllib.urlencode(post)
-    print "step5.2" + str(git_auth)
     path = "https://github.com/" + githubuser + "/" + stack_name + "/blob/master/Makefile"
     print path
     file1 = StringIO.StringIO()
-    print "step5.3"
     c = pycurl.Curl()
     c.setopt(pycurl.URL, path)
     c.setopt(pycurl.POSTFIELDS, fields)
     c.setopt(pycurl.WRITEFUNCTION, file1.write) # to avoid to show the called page
     c.perform()
     c.close
-    print "step5.4"
+
     if c.getinfo(pycurl.HTTP_CODE) == 200:
-        print "step5.5 True"
         return True
     else:
         print "ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE)
-        print "step5.5 False"
         return False
 
 
 def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
-    print "step X.1"
     if not stack_forked(githubuser, stack_name):
         githubuser = "ipa320"
-    print "step X.2"
+
     try:
         git_auth = get_auth_keys('github', '/tmp/workspace')
         post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
         fields = urllib.urlencode(post)
-        print "step X.3"
         path = "https://raw.github.com/" + githubuser + "/" + stack_name + appendix
         tmpfile = StringIO.StringIO()
-        print "step X.4"
+
         c = pycurl.Curl()
         c.setopt(pycurl.URL, path)
         c.setopt(pycurl.POSTFIELDS, fields)
         c.setopt(pycurl.WRITEFUNCTION, tmpfile.write)
         c.perform()
         stack_xml = tmpfile.getvalue()
-        print "step X.1" + stack_xml
+
         c.close
     except :
         #TODO
@@ -231,9 +212,7 @@ def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
         
 def get_auth_keys(server, location):
     # get password/token from .gitconfig file
-    print "step 5.1.1"
     with open(location + "/.gitconfig", "r") as f:
-        print "step 5.1.2"
         gitconfig = f.read()
         # extract necessary data
         if server == "github":
@@ -244,9 +223,9 @@ def get_auth_keys(server, location):
         else:
             print "ERROR: invalid server"
             # TODO error raise
-        print "step 5.1.3"
+            
         auth_keys = re.match(regex, gitconfig, re.DOTALL)
-        print "step 5.1.4" + str(auth_keys)
+        
     return auth_keys
 
 

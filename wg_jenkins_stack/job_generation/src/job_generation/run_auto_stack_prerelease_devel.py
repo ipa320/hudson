@@ -66,7 +66,6 @@ def main():
                 rosinstall += stack_to_rosinstall(rosdistro_obj.stacks[stack], 'devel')
 
         if rosinstall != '': # call rosinstall command
-            print "step8"
             rosinstall_file = '%s.rosinstall'%STACK_DIR
             print 'Generating rosinstall file [%s]'%(rosinstall_file)
             print 'Contents:\n\n'+rosinstall+'\n\n'
@@ -80,7 +79,7 @@ def main():
             
         
         # get all stack dependencies of stacks we're testing
-        print "step9"
+
         depends_all = {"public" : [], "private" : [], "other" : []}
         for stack in options.stack:
 #            stack_xml = '%s/%s/stack.xml'%(STACK_DIR, stack)
@@ -95,14 +94,14 @@ def main():
                     get_depends_all(d, depends_all, options.githubuser)
                     print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all)
         
-        print "step10"
+
         if len(depends_all["private"]) > 0:
             print 'Cloning private github fork(s)'
             for stack in depends_all["private"]:
                 if not stack_forked(options.githubuser, stack):
                     options.githubuser = "ipa320"
                 call('git clone git@github.com:%s/%s.git %s'%(options.githubuser, stack, DEPENDS_DIR), env, 'Clone private stack [%s] to test'%(stack))
-        print "step11"
+
         if len(depends_all["public"]) > 0:
             for stack in depends_all["public"]:
                 if not stack_forked(options.githubuser, stack):
@@ -115,20 +114,19 @@ def main():
                 f.write(rosinstall)
             call('rosinstall --rosdep-yes %s /opt/ros/%s %s'%(DEPENDS_DIR, options.rosdistro, rosinstall_file), env,
                  'Install the stack dependencies from source.')
-        print "step12"        
+     
         if len(depends_all["other"]) > 0:
             # Install Debian packages of stack dependencies
             print 'Installing debian packages of "%s" dependencies: %s'%(stack, str(depends_all["other"]))
             call('sudo apt-get update', env)
             call('sudo apt-get install %s --yes'%(stacks_to_debs(depends_all["other"], options.rosdistro)), env)
-        print "step13"    
+ 
         depends_no = 0
         for i in iter(depends_all): depends_no += len(depends_all[i])
         if depends_no == 0:
             print 'Stack(s) %s do(es) not have any dependencies, not installing anything now'%str(options.stack)
             
-        print "step14"
-        # Install system dependencies of stacks re're testing
+        # Install system dependencies of stacks we're testing
         print "Installing system dependencies of stacks we're testing"
         call('rosmake rosdep', env)
         for stack in options.stack:
@@ -139,15 +137,12 @@ def main():
                 call('rosdep install -y %s'%stack, env,
                      'Install system dependencies of stack %s'%stack)
                  
-        print "step15"
         # Run hudson helper for stacks only
         print 'Running Hudson Helper'
         res = 0
         for r in range(0, int(options.repeat)+1):
             env['ROS_TEST_RESULTS_DIR'] = env['ROS_TEST_RESULTS_DIR'] + '/' + STACK_DIR + '_run_' + str(r)
-            print "step 16"
             helper = subprocess.Popen(('./hudson_helper_fhg.py --dir-test %s --email %s build'%(STACK_DIR, options.email)).split(' '), env=env)
-            print "step 17"
             helper.communicate()
             if helper.returncode != 0:
                 res = helper.returncode
