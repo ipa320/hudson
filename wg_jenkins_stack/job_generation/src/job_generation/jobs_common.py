@@ -16,6 +16,11 @@ import subprocess
 
 
 BOOTSTRAP_SCRIPT = """
+sudo chown -R jenkins:jenkins $WORKSPACE
+rm -rf $WORKSPACE/test_results
+rm -rf $WORKSPACE/test_output
+rm -rf $WORKSPACE/hudson
+
 cat &gt; $WORKSPACE/script.sh &lt;&lt;DELIM
 #!/usr/bin/env bash
 set -o errexit
@@ -55,15 +60,14 @@ DELIM
 
 set -o errexit
 
-rm -rf $WORKSPACE/test_results
-rm -rf $WORKSPACE/test_output
-
 scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
 scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.ssh
-scp -r jenkins@jenkins-test-server:~/git/hudson/wg_jenkins_stack $WORKSPACE/ros_release
-wget https://github.com/ipa320/hudson/raw/master/run/devel_run_chroot.py -O $WORKSPACE/devel_run_chroot.py
-chmod +x $WORKSPACE/devel_run_chroot.py
-cd $WORKSPACE &amp;&amp; $WORKSPACE/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot --ramdisk --ramdisk-size 6000M --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu #--ssh-key-file=$WORKSPACE/rosbuild-ssh.tar 
+#scp -r jenkins@jenkins-test-server:~/git/hudson/wg_jenkins_stack $WORKSPACE/ros_release # TODO get from github
+git clone git://github.com/ipa320/hudson.git $WORKSPACE/hudson
+cp -r $WORKSPACE/hudson/wg_jenkins_stack $WORKSPACE/ros_release
+#wget https://github.com/ipa320/hudson/raw/master/run/devel_run_chroot.py -O $WORKSPACE/devel_run_chroot.py
+#chmod +x $WORKSPACE/devel_run_chroot.py
+cd $WORKSPACE &amp;&amp; $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot --ramdisk --ramdisk-size 6000M --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu #--ssh-key-file=$WORKSPACE/rosbuild-ssh.tar 
 """ #TODO wget devel_run_chroot.py from other location
 
 # the supported Ubuntu distro's for each ros distro
@@ -74,9 +78,9 @@ UBUNTU_DISTRO_MAP = ['lucid', 'maverick', 'natty']
 
 
 # Path to hudson server
-SERVER = 'http://jenkins-test-server:8080' #cob-kitchen-server
+SERVER = 'http://cob-kitchen-server:8080' #cob-kitchen-server
 
-# list of public an d private IPA Fraunhofer stacks
+# list of public and private IPA Fraunhofer stacks
 FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps']
 FHG_STACKS_PRIVATE = ['cob3_intern', 'interaid', 'srs', 'r3cob']
 
@@ -337,7 +341,7 @@ def get_options(required, optional):
 def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
     # create hudson instance
     if not hudson_obj:
-        info = get_auth_keys('jenkins', '/home-local/jenkins')
+        info = get_auth_keys('jenkins', '/home/jenkins')
         hudson_obj = hudson.Hudson(SERVER, info.group(1), info.group(2))
 
     finished = False

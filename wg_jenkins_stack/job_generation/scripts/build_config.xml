@@ -21,7 +21,6 @@
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
-  <customWorkspace>~/workspace/ROSDISTRO__GITHUBUSER__STACKNAME__UBUNTUDISTRO__ARCH</customWorkspace>
   <builders> 
     <hudson.tasks.Shell> 
       <command>

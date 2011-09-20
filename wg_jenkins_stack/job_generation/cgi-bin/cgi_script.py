@@ -112,12 +112,12 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
             parameters = "--stack %s --rosdistro %s --githubuser %s --email %s"%(repo, release, githubuser, email)
             if del_stacks:
                 parameters = parameters + " --delete"
-            bash_script = os.path.join("/home-local/jenkins", "bash_script.bash")
+            bash_script = os.path.join("/tmp", "bash_script.bash")
             with open(bash_script, "w") as f:
                 f.write("""#!/bin/bash
                 source /opt/ros/electric/setup.bash
-                export ROS_PACKAGE_PATH=/home-local/jenkins/git/hudson:$ROS_PACKAGE_PATH
-                export HOME=/home-local/jenkins
+                export ROS_PACKAGE_PATH=/home/jenkins/git/hudson:$ROS_PACKAGE_PATH
+                export HOME=/home/jenkins
                 echo "ROS_ROOT: " $ROS_ROOT "<br>"
                 echo "ROS_PACKAGE_PATH: " $ROS_PACKAGE_PATH "<br>"
                 roscd job_generation/scripts
@@ -152,7 +152,7 @@ def stack_forked(githubuser, stack):
     
     # get token from jenkins' .gitconfig file for private github forks
     try:
-        gitconfig = open("/home-local/jenkins/.gitconfig", "r") 
+        gitconfig = open("/home/jenkins/.gitconfig", "r") 
         gitconfig = gitconfig.read()
     except IOError as err:
         print "<b>ERROR" + err + "</b>"
