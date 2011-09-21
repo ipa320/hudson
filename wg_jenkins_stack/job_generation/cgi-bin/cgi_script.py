@@ -68,7 +68,7 @@ def main():
 
     if otherstacks != []:
         for stack in otherstacks:
-            if valid_stack(stack):
+            if valid_stack(form["username"].value, stack):
                 repositories = repositories[:] + [stack]
     
     # printing planed job creations
@@ -133,13 +133,15 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
     return results
 
 
-def valid_stack(stack):
+def valid_stack(githubuser, stack):
     # function to check if inserted stack is available
-    available_stacks = ['cob_apps', 'cob_common', 'cob_driver', 'cob_extern', 'cob_simulation', 'cob3_intern', 'srs', 'interaid']
+    
     # correct common mistakes
     stack = stack.lower()
     stack = stack.replace('-', '_')
-    if stack in available_stacks:
+    if stack_forked(githubuser, stack):
+        return True
+    elif stack_forked("ipa320", stack):
         return True
     else:
         print "<p><font color='#FF0000'>ERROR:"
