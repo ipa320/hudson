@@ -109,7 +109,7 @@ def main():
                     if not stack_forked(options.githubuser, "cob3_intern", "/blob/master/%s/Makefile"%stack):
                         options.githubuser = "ipa320"
                     print "step 2"
-                    call('git clone git@github.com:%s/cob3_intern.git %s'(options.githubuser, "/tmp/cob3_intern"), env, 'Clone private stack cob3_intern')
+                    call('git clone git@github.com:%s/cob3_intern.git %s'%(options.githubuser, "/tmp/cob3_intern"), env, 'Clone private stack cob3_intern')
                     print "step 3"
                     call('mv -r /tmp/cob3_intern/%s %s'%(stack, DEPENDS_DIR), env, 'Move required stack %s to %s'%(stack, DEPENDS_DIR))
                 else:
