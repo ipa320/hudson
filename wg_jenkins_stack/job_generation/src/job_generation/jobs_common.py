@@ -137,7 +137,7 @@ def get_depends_one(stack_name, githubuser):
             cob3_intern_depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
             depends_one += cob3_intern_depends_one
     elif stack_name in COB3_INTERN_STACKS:
-        stack_xml = get_stack_xml("cob3_intern", githubuser, "/master/" + stack + "/stack.xml")
+        stack_xml = get_stack_xml("cob3_intern", githubuser, "/master/" + stack_name + "/stack.xml")
         depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
     # get stack.xml from github
     else:
