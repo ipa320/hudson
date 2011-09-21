@@ -63,7 +63,7 @@ set -o errexit
 scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
 scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.ssh
 
-git clone git://github.com/ipa320/hudson.git $WORKSPACE/hudson
+git clone git://github.com/fmw-jk/hudson.git $WORKSPACE/hudson
 
 cd $WORKSPACE &amp;&amp; $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot --ramdisk --ramdisk-size 6000M --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu
 """
@@ -76,11 +76,11 @@ UBUNTU_DISTRO_MAP = ['lucid', 'maverick', 'natty']
 
 
 # Path to hudson server
-SERVER = 'http://cob-kitchen-server:8080' #cob-kitchen-server
+SERVER = 'http://jenkins-test-server:8080' #cob-kitchen-server
 
 # list of public and private IPA Fraunhofer stacks
 FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps']
-FHG_STACKS_PRIVATE = ['cob3_intern', 'interaid', 'srs', 'r3cob']
+FHG_STACKS_PRIVATE = ['cob3_intern', 'interaid', 'srs', 'r3cop']
 
 COB3_INTERN_STACKS = ["cob_manipulation", "cob_navigation", "cob_rcc", "cob_sandbox", "cob_scenarios", "cob_vision"]
 COB3_INTERN_STACKS_DEPS = ["cob_arm_ik", "cob_lasertracker", "cob_LibArmClient", "cob_LibCollisionDetect", "cob_LibGenericArmCtrl",
@@ -350,7 +350,7 @@ def get_options(required, optional):
 def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
     # create hudson instance
     if not hudson_obj:
-        info = get_auth_keys('jenkins', '/home/jenkins')
+        info = get_auth_keys('jenkins', '/home-local/jenkins')
         hudson_obj = hudson.Hudson(SERVER, info.group(1), info.group(2))
 
     finished = False

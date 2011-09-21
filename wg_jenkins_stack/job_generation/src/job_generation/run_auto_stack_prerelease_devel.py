@@ -89,10 +89,16 @@ def main():
             depends_one = get_depends_one(stack, options.githubuser)
             print 'Dependencies of stack %s: %s'%(stack, str(depends_one))
             for d in depends_one:
-                if not d in options.stack and not d in depends_all and not d in COB3_INTERN_STACKS_DEPS and not d in COB3_INTERN_STACKS:
-                    print 'Adding dependencies of stack %s'%d
-                    get_depends_all(d, depends_all, options.githubuser)
-                    print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all)
+                if not d in options.stack and not d in depends_all:
+                    if stack == "cob3_intern":
+                        if not d in COB3_INTERN_STACKS_DEPS and not d in COB3_INTERN_STACKS:
+                            print 'Adding dependencies of stack %s'%d
+                            get_depends_all(d, depends_all, options.githubuser)
+                            print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all)
+                    else:
+                        print 'Adding dependencies of stack %s'%d
+                        get_depends_all(d, depends_all, options.githubuser)
+                        print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all) 
         
 
         if len(depends_all["private"]) > 0:
