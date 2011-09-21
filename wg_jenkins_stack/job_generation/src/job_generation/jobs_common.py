@@ -44,12 +44,12 @@ cd \$INSTALL_DIR
 cp /tmp/workspace/.gitconfig ~/.gitconfig
 cp -r /tmp/workspace/.ssh ~/.ssh
 sudo chmod 600 ~/.ssh/id_rsa.pub ~/.ssh/id_rsa
-ssh-keygen -e -f ~/.ssh/id_rsa
-sudo mv -f /tmp/workspace/ros_release .
+
+sudo mkdir ros_release
+sudo mv -f /tmp/workspace/hudson/wg_jenkins_stack/* ./ros_release
 ls -la
 ls -la ros_release/
 cp ros_release/hudson/src/hudson_helper_fhg.py .
-#wget  --no-check-certificate http://code.ros.org/svn/ros/installers/trunk/hudson/hudson_helper 
 sudo chmod +x  hudson_helper_fhg.py
 """ 
 
@@ -62,13 +62,11 @@ set -o errexit
 
 scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
 scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.ssh
-#scp -r jenkins@jenkins-test-server:~/git/hudson/wg_jenkins_stack $WORKSPACE/ros_release # TODO get from github
+
 git clone git://github.com/ipa320/hudson.git $WORKSPACE/hudson
-cp -r $WORKSPACE/hudson/wg_jenkins_stack $WORKSPACE/ros_release
-#wget https://github.com/ipa320/hudson/raw/master/run/devel_run_chroot.py -O $WORKSPACE/devel_run_chroot.py
-#chmod +x $WORKSPACE/devel_run_chroot.py
-cd $WORKSPACE &amp;&amp; $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot --ramdisk --ramdisk-size 6000M --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu #--ssh-key-file=$WORKSPACE/rosbuild-ssh.tar 
-""" #TODO wget devel_run_chroot.py from other location
+
+cd $WORKSPACE &amp;&amp; $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot --ramdisk --ramdisk-size 6000M --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu
+"""
 
 # the supported Ubuntu distro's for each ros distro
 ARCHES = ['amd64', 'i386']
