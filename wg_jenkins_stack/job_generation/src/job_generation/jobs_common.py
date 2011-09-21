@@ -110,6 +110,14 @@ EMAIL_TRIGGER="""
 """
 
 
+def stack_to_rosinstall(stack_obj, branch):
+    try:
+        return yaml.dump(rosdistro.stack_to_rosinstall(stack_obj, branch, anonymous=True))
+    except rosdistro.DistroException, ex:
+        print str(ex)
+        return ''
+
+
 def stack_to_deb(stack, rosdistro):
     return '-'.join(['ros', rosdistro, str(stack).replace('_','-')])
 
