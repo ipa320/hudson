@@ -136,6 +136,9 @@ def get_depends_one(stack_name, githubuser):
             stack_xml = get_stack_xml("cob3_intern", githubuser, "/master/" + stack + "/stack.xml")
             cob3_intern_depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
             depends_one += cob3_intern_depends_one
+    elif stack_name in COB3_INTERN_STACKS:
+        stack_xml = get_stack_xml("cob3_intern", githubuser, "/master/" + stack + "/stack.xml")
+        depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
     # get stack.xml from github
     else:
         stack_xml = get_stack_xml(stack_name, githubuser)#, get_stack_membership(stack_name))
@@ -196,8 +199,12 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
 
 
 def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
-    if not stack_forked(githubuser, stack_name):
-        githubuser = "ipa320"
+    if stack_name in COB3_INTERN_STACKS:
+        if not stack_forked(githubuser, "cob3_intern", "/blob/master/%s/Makefile"%stack_name):
+            githubuser = "ipa320"
+    else:
+        if not stack_forked(githubuser, stack_name):
+            githubuser = "ipa320"
 
     try:
         git_auth = get_auth_keys('github', '/tmp/workspace')
