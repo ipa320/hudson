@@ -174,11 +174,11 @@ def get_stack_membership(stack_name):
         return "other"
 
 
-def stack_forked(githubuser, stack_name):
+def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
     git_auth = get_auth_keys('github', "/tmp/workspace")
     post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
     fields = urllib.urlencode(post)
-    path = "https://github.com/" + githubuser + "/" + stack_name + "/blob/master/Makefile"
+    path = "https://github.com/" + githubuser + "/" + stack_name + appendix
     print path
     file1 = StringIO.StringIO()
     c = pycurl.Curl()
