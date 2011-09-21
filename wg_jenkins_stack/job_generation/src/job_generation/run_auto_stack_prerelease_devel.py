@@ -103,17 +103,22 @@ def main():
 
         if len(depends_all["private"]) > 0:
             print 'Cloning private github fork(s)'
+            downloaded = False
             for stack in depends_all["private"]:
                 if stack in COB3_INTERN_STACKS:
-                    if not call('ls /tmp/cob3_intern', env, 'Checking if cob3_intern is already downloaded') # call('ls %s'%stack_xml, env, 'Checking if stack %s contains "stack.xml" file'%stack)
+                    if not downloaded:
                         if not stack_forked(options.githubuser, "cob3_intern", "/blob/master/%s/Makefile"%stack):
                             options.githubuser = "ipa320"
                         call('git clone git@github.com:%s/cob3_intern.git %s'%(options.githubuser, "/tmp/cob3_intern"), env, 'Clone private stack cob3_intern')
+                        downloaded = True
+                        
                     call('mv /tmp/cob3_intern/%s %s'%(stack, DEPENDS_DIR), env, 'Move required stack %s to %s'%(stack, DEPENDS_DIR))
+                    
                 else:
                     if not stack_forked(options.githubuser, stack):
                         options.githubuser = "ipa320"
                     call('git clone git@github.com:%s/%s.git %s'%(options.githubuser, stack, DEPENDS_DIR), env, 'Clone private stack [%s] to test'%(stack))
+                    
 
         if len(depends_all["public"]) > 0:
             for stack in depends_all["public"]:
