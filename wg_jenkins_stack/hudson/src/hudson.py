@@ -67,6 +67,8 @@ RECONFIG_JOB = 'job/%(name)s/config.xml'
 DELETE_JOB   = 'job/%(name)s/doDelete'
 ENABLE_JOB   = 'job/%(name)s/enable'
 DISABLE_JOB  = 'job/%(name)s/disable'
+STOP_JOB     = 'job/%(name)s/lastBuild/stop'
+CANCEL_PENDING_JOB = 'queue/item/%(queue_id)s/cancelQueue'
 COPY_JOB     = 'createItem?name=%(to_name)s&mode=copy&from=%(from_name)s'
 BUILD_JOB    = 'job/%(name)s/build'
 BUILD_WITH_PARAMS_JOB = 'job/%(name)s/buildWithParameters'
@@ -307,6 +309,31 @@ class Hudson(object):
         if not self.job_exists(name):
             raise HudsonException("no such job[%s]"%(name))
         return self.hudson_open(urllib2.Request(self.build_job_url(name, parameters, token), ''))        
+
+    def stop_running_job(self, name):
+        """
+        Stop running job
+        @param name The job name
+        """
+        self.get_job_info(name)
+        self.hudson_open(urllib2.Request(self.server + STOP_JOB%locals(), ''))
+        
+    def cancel_pending_job(self, queue_id):
+        """
+        Cancel job in build queue
+        @param queue_id ID number in build queue
+        """
+        self.hudson_open(urllib2.Request(self.server + CANCEL_PENDING_JOB%locals(), ''))
+
+    def job_in_queue(self, name):
+        """
+        Test if job is in build queue
+        @param name The job name
+        """
+        for pending_job in self.get_queue_info():
+            if name in pending_job['task']['name']:
+                return True
+        return False
 
     def job_is_running(self, name):
         """

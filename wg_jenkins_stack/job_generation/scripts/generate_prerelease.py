@@ -98,21 +98,21 @@ def main():
         
         #TODO necessary??? change???
         # check if jobs are not already running
-        for job_name in prerelease_configs:
-            exists = hudson_instance.job_exists(job_name)
-            if exists and hudson_instance.job_is_running(job_name):
-                print 'Cannot create job %s because a job with the same name is already running.'%job_name
-                print 'Please try again when this job finished running.'
-                return 
+#        for job_name in prerelease_configs:
+#            exists = hudson_instance.job_exists(job_name)
+#            if exists and hudson_instance.job_is_running(job_name):
+#                print 'Cannot create job %s because a job with the same name is already running.'%job_name
+#                print 'Please try again when this job finished running.'
+#                return 
 
         # send prerelease tests to Hudson
         print 'Creating pre-release Hudson jobs:<br>'
-        schedule_jobs(prerelease_configs, start=False, hudson_obj=hudson_instance, delete=options.delete)
+        schedule_jobs(prerelease_configs,wait=True, start=False, hudson_obj=hudson_instance, delete=options.delete)
         if options.delete:
-            print 'Jobs have been deleted. You can now start new jobs<br>'
+            print '<br>Jobs have been deleted. You can now start new jobs<br>'
         else:
-            print '%s will receive %d emails on %s, one for each job<br>'%(options.githubuser, len(prerelease_configs), options.email)
-            print 'You can follow the progress of these jobs on <%s><br>'%(SERVER)
+            print '<br>%s will receive %d emails on %s, one for each job<br>'%(options.githubuser, len(prerelease_configs), options.email)
+            print 'You can follow the progress of these jobs on %s <br>'%(SERVER)
 
     # catch all exceptions
     except Exception, e:

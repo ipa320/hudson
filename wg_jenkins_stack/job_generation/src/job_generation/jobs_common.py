@@ -92,8 +92,7 @@ COB3_INTERN_STACKS_DEPS = ["cob_arm_ik", "cob_lasertracker", "cob_LibArmClient",
                       "cob_hardware_test", "cob_wimicare",
                       "cob_movearm_svn", "cob_platform_svn",
                       "cob_camera_viewer", "cob_camshift", "cob_env_model", "cob_object_detection", "cob_sensor_fusion", "cob_vision_features",
-                      "cob_vision_ipa_utils", "cob_vision_slam", "sag_objrec",
-                      "people", "motion_planning_common", "kinematics"]
+                      "cob_vision_ipa_utils", "cob_vision_slam", "sag_objrec"]
 
 EMAIL_TRIGGER="""
         <hudson.plugins.emailext.plugins.trigger.WHENTrigger> 
@@ -368,14 +367,37 @@ def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
                 start=True
             else:
                 start=False
-            
             exists = hudson_obj.job_exists(job_name)
+            
+            # stop all running and pending jobs of stack
+            if 'pipe' in job_name:
+                build_queue = hudson_obj.get_queue_info()
+                job_name_stem = job_name.replace('pipe', '')
+                if build_queue != []:
+                    for pending_job in build_queue:
+                        if job_name_stem in pending_job['task']['name']:
+                            hudson_obj.cancel_pending_job(pending_job['id'])
+                            print "Canceling pending job %s from build queue <br>"%(pending_job['task']['name'])
+                #building_jobs = hudson_obj.get_jobs()
+                #print str(building_jobs) + "<br>"
+                #for running_job in building_jobs:
+                #    print str(running_job) + "<br>"
+                #    if job_name_stem in running_job['name']:
+                #        hudson_obj.stop_running_job(running_job['name'])
+                #        print "Stopp running job %s  <br>"%running_job['name']
 
             # job is already running
-            if exists and hudson_obj.job_is_running(job_name):
+            if exists and hudson_obj.job_is_running(job_name):           
+                hudson_obj.stop_running_job(job_name)
                 jobs_todo[job_name] = jobs[job_name]
-                print "Not reconfiguring running job %s because it is still running <br>"%job_name
+                print "Job %s is running! Stopping job to reconfigure <br>"%job_name
+#                print "Not reconfiguring running job %s because it is still running <br>"%job_name
 
+            # delete pending job from queue
+            elif exists and hudson_obj.job_in_queue(job_name):
+                hudson_obj.cancel_pending_job(job_name)
+                jobs_todo[job_name] = jobs[job_name]
+                print "Job %s is in build queue! Cancel pending build <br>"%job_name
 
             # delete old job
             elif delete:
@@ -400,7 +422,7 @@ def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
         if wait and len(jobs_todo) > 0:
             jobs = jobs_todo
             jobs_todo = {}
-            time.sleep(10.0)
+            time.sleep(1.0)
         else:
             finished = True
 
