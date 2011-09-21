@@ -17,7 +17,7 @@ def prerelease_job_name(jobtype, rosdistro, stack_list, githubuser, ubuntu, arch
     return get_job_name(jobtype, rosdistro, '_'.join(stack_list), githubuser, ubuntu, arch)
 
 
-def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubuntudistro="", stack_list=[], email="", repeat=0, source_only="", post_jobs=[]):
+def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubuntudistro="", stack_list=[], email="", repeat=0, source_only="", post_jobs=[], not_forked=False):
 
     hudson_config = hudson_config.replace('BOOTSTRAP_SCRIPT', BOOTSTRAP_SCRIPT)
     hudson_config = hudson_config.replace('SHUTDOWN_SCRIPT', SHUTDOWN_SCRIPT)
@@ -36,15 +36,21 @@ def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubunt
         hudson_config = hudson_config.replace('POSTJOBS', ', '.join(str(n) for n in post_jobs))
     else:
         hudson_config = hudson_config.replace('POSTJOBS', '')
+    
     if source_only:
         hudson_config = hudson_config.replace('SOURCE_ONLY', '--source-only')
     else:
         hudson_config = hudson_config.replace('SOURCE_ONLY', '')
+    
+    if not_forked:
+        hudson_config = hudson_config.replace('STACKOWNER', 'ipa320')
+    else:
+        hudson_config = hudson_config.replace('STACKOWNER', githubuser)
 
     return hudson_config
 
 
-def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, source_only, arches=None, ubuntudistros=None):
+def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, source_only, arches=None, ubuntudistros=None, not_forked=False):
     stack_list.sort()
     
     if not arches:
@@ -59,7 +65,7 @@ def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, 
     
     # create pipe_job
     name = get_job_name(rosdistro, stack_list, githubuser, jobtype="pipe")
-    configs[name] = replace_param(HUDSON_PIPE_CONFIG, rosdistro, githubuser, "pipe", stack_list=stack_list, post_jobs=[get_job_name(rosdistro, stack_list, githubuser, ubuntu=prio_ubuntudistro, arch=prio_arch)])
+    configs[name] = replace_param(HUDSON_PIPE_CONFIG, rosdistro, githubuser, "pipe", stack_list=stack_list, post_jobs=[get_job_name(rosdistro, stack_list, githubuser, ubuntu=prio_ubuntudistro, arch=prio_arch)], not_forked=not_forked)
     
     # create hudson config files for each ubuntu distro
     for ubuntudistro in ubuntudistros:
@@ -77,7 +83,7 @@ def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, 
 
 
 def main():
-    (options, args) = get_options(['stack', 'rosdistro', 'githubuser', 'email'], ['repeat', 'source-only', 'arch', 'ubuntu', 'delete'])
+    (options, args) = get_options(['stack', 'rosdistro', 'githubuser', 'email'], ['repeat', 'source-only', 'arch', 'ubuntu', 'delete', 'not-forked'])
     if not options:
         return -1
     
@@ -88,7 +94,7 @@ def main():
         else:
             info = get_auth_keys('jenkins', '/home/jenkins')
             hudson_instance = hudson.Hudson(SERVER, info.group(1), info.group(2))
-        prerelease_configs = create_prerelease_configs(options.rosdistro, options.stack, options.githubuser, options.email, options.repeat, options.source_only, options.arch, options.ubuntu)
+        prerelease_configs = create_prerelease_configs(options.rosdistro, options.stack, options.githubuser, options.email, options.repeat, options.source_only, options.arch, options.ubuntu, options.not_forked)
         
         #TODO necessary??? change???
         # check if jobs are not already running

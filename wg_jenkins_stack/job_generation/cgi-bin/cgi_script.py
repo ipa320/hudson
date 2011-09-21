@@ -97,19 +97,21 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
     for release in ROSRELEASES:
         for repo in REPOSITORIES:
             results = results + "<br>"
+
+            # call generate_prerelease.py with parameters: 'stack', 'rosdistro', 'githubuser', 'email'
+            
+            script = "generate_prerelease.py "
+            parameters = "--stack %s --rosdistro %s --githubuser %s --email %s"%(repo, release, githubuser, email)
             
             try:
                 if not stack_forked(githubuser, repo):
                     results = results + "<b>" + repo + "</b>" + ": stack is not forked\n"
                     results = results + "Using 'ipa320' stack instead. If that isn't desired, fork " + repo + " on github.com!"
+                    parameters = parameters + " --not-forked"
             except:
                 results = results + "<b>Error: Checking whether stack %s is forked failed</b>"%repo
                 results = results + "Using 'ipa320' stack instead. If that isn't desired, fork " + repo + " on github.com!"
-                
-            #TODO find right folder, output, try
-            # call generate_prerelease.py with parameters: 'stack', 'rosdistro', 'githubuser', 'email'
-            script = "generate_prerelease.py "
-            parameters = "--stack %s --rosdistro %s --githubuser %s --email %s"%(repo, release, githubuser, email)
+            
             if del_stacks:
                 parameters = parameters + " --delete"
             bash_script = os.path.join("/tmp", "bash_script.bash")

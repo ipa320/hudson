@@ -292,6 +292,9 @@ def get_options(required, optional):
     if 'database' in ops:
         parser.add_option('--database', dest = 'database', default=None, action='store',
                           help="Specify database file")
+    if 'not-forked' in ops:
+        parser.add_option('--not-forked', dest = 'not_forked', default=False, action='store_true',
+                          help="Stack is not forked for given githubuser")
 
     (options, args) = parser.parse_args()
     

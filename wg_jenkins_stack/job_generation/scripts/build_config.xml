@@ -10,7 +10,7 @@
   <keepDependencies>false</keepDependencies>
   <properties>
     <com.coravy.hudson.plugins.github.GithubProjectProperty>
-      <projectUrl>https://github.com/GITHUBUSER/STACKNAME/</projectUrl>
+      <projectUrl>https://github.com/STACKOWNER/STACKNAME/</projectUrl>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
   </properties>
   <scm class="hudson.scm.NullSCM"/>
