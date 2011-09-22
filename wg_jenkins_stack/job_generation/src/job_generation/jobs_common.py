@@ -130,7 +130,7 @@ def get_depends_one(stack_name, githubuser):
     # in case the 'stack' is cob3_intern
     depends_one = []
     if stack_name == "cob3_intern":
-        COB3_STACKS = get_cob3_intern_stacks('stack_overlay')
+        COB3_STACKS = get_cob3_intern_stacks('stack_overlay/cob3_intern')
         print "Stacks in cob3_intern: %s"%COB3_STACKS
         for stack in COB3_STACKS:
             cob3_intern_depends_one = []

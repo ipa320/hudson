@@ -61,7 +61,7 @@ def main():
             if stack in FHG_STACKS_PUBLIC: # create rosinstall file for public stacks
                 rosinstall += '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack, options.githubuser, stack)
             elif stack in FHG_STACKS_PRIVATE: # clone private stacks
-                call('git clone git@github.com:%s/%s.git %s'%(options.githubuser, stack, STACK_DIR), env, 'Clone private stack [%s] to test'%(stack))
+                call('git clone git@github.com:%s/%s.git %s/%s'%(options.githubuser, stack, STACK_DIR, stack), env, 'Clone private stack [%s] to test'%(stack))
             else:
                 rosinstall += stack_to_rosinstall(rosdistro_obj.stacks[stack], 'devel')
 
@@ -83,8 +83,8 @@ def main():
         depends_all = {"public" : [], "private" : [], "other" : []}
         for stack in options.stack:
             if stack == "cob3_intern":
-                COB3_STACKS = get_cob3_intern_stacks(STACK_DIR)
-                COB3_PACKAGES = get_cob3_intern_stacks(STACK_DIR, packages=True)
+                COB3_STACKS = get_cob3_intern_stacks(STACK_DIR+'/cob3_intern')
+                COB3_PACKAGES = get_cob3_intern_stacks(STACK_DIR+'/cob3_intern', packages=True)
 #            stack_xml = '%s/%s/stack.xml'%(STACK_DIR, stack)
 #            call('ls %s'%stack_xml, env, 'Checking if stack %s contains "stack.xml" file'%stack)
 #            with open(stack_xml) as stack_file:
@@ -109,7 +109,7 @@ def main():
         if len(depends_all["private"]) > 0:
             print 'Cloning private github fork(s)'
             downloaded = False
-            COB3_STACKS = get_cob3_intern_stacks(STACK_DIR)
+            COB3_STACKS = get_cob3_intern_stacks(STACK_DIR+'/cob3_intern')
             print COB3_STACKS
             for stack in depends_all["private"]:
                 if stack in COB3_INTERN_STACKS:

@@ -12,10 +12,11 @@ import os
 import stat
 import socket
 
-
+HOME_FOLDER = ''
 
 def main():
     
+    global HOME_FOLDER
     rosrelease = []
     repositories = []
     
@@ -117,6 +118,7 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
             if del_stacks:
                 parameters = parameters + " --delete"
             bash_script = os.path.join("/tmp", "bash_script.bash")
+            results = results + 'rgtdhg' + HOME_FOLDER
             with open(bash_script, "w") as f:
                 f.write("""#!/bin/bash
                 source /opt/ros/electric/setup.bash
