@@ -63,26 +63,24 @@ def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, 
     if not ubuntudistros:
         ubuntudistros = UBUNTU_DISTRO_MAP
 
-    prio_arch = "i386"
-    prio_ubuntudistro = "natty"
     configs = {}
     post_jobs = []
     
     # create pipe_job
     name = get_job_name(rosdistro, stack_list, githubuser, jobtype="pipe")
-    configs[name] = replace_param(HUDSON_PIPE_CONFIG, rosdistro, githubuser, "pipe", stack_list=stack_list, post_jobs=[get_job_name(rosdistro, stack_list, githubuser, ubuntu=prio_ubuntudistro, arch=prio_arch)], not_forked=not_forked)
+    configs[name] = replace_param(HUDSON_PIPE_CONFIG, rosdistro, githubuser, "pipe", stack_list=stack_list, post_jobs=[get_job_name(rosdistro, stack_list, githubuser, ubuntu=PRIO_UBUNTUDISTRO, arch=PRIO_ARCH)], not_forked=not_forked)
     
     # create hudson config files for each ubuntu distro
     for ubuntudistro in ubuntudistros:
         for arch in arches:
-            if ubuntudistro != prio_ubuntudistro or arch != prio_arch: # if job is not prio_job
+            if ubuntudistro != PRIO_UBUNTUDISTRO or arch != PRIO_ARCH: # if job is not prio_job
                 name = get_job_name(rosdistro, stack_list, githubuser, ubuntudistro, arch)
                 post_jobs.append(name)
                 configs[name] = replace_param(HUDSON_CONFIG, rosdistro, githubuser, "build", arch, ubuntudistro, stack_list, email, repeat, source_only)
     
     # create prio_job
-    name = get_job_name(rosdistro, stack_list, githubuser, prio_ubuntudistro, prio_arch)
-    configs[name] = replace_param(HUDSON_CONFIG, rosdistro, githubuser, "build_prio", prio_arch, prio_ubuntudistro, stack_list, email, repeat, source_only, post_jobs)
+    name = get_job_name(rosdistro, stack_list, githubuser, PRIO_UBUNTUDISTRO, PRIO_ARCH)
+    configs[name] = replace_param(HUDSON_CONFIG, rosdistro, githubuser, "build_prio", PRIO_ARCH, PRIO_UBUNTUDISTRO, stack_list, email, repeat, source_only, post_jobs)
 
     return configs
 

@@ -95,6 +95,9 @@ COB3_INTERN_STACKS = ["cob_manipulation", "cob_navigation", "cob_rcc", "cob_sand
 #                      "cob_camera_viewer", "cob_camshift", "cob_env_model", "cob_object_detection", "cob_sensor_fusion", "cob_vision_features",
 #                      "cob_vision_ipa_utils", "cob_vision_slam", "sag_objrec"]
 
+PRIO_ARCH = "i386"
+PRIO_UBUNTUDISTRO = "natty"
+
 EMAIL_TRIGGER="""
         <hudson.plugins.emailext.plugins.trigger.WHENTrigger> 
           <email> 
