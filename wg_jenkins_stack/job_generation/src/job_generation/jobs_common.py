@@ -12,6 +12,7 @@ import rosdistro
 import StringIO
 import pycurl
 import subprocess
+import string
 
 
 
@@ -83,16 +84,16 @@ FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation',
 FHG_STACKS_PRIVATE = ['cob3_intern', 'interaid', 'srs', 'r3cop']
 
 COB3_INTERN_STACKS = ["cob_manipulation", "cob_navigation", "cob_rcc", "cob_sandbox", "cob_scenarios", "cob_vision"]
-COB3_INTERN_STACKS_DEPS = ["cob_arm_ik", "cob_lasertracker", "cob_LibArmClient", "cob_LibCollisionDetect", "cob_LibGenericArmCtrl",
-                      "cob_LibGrasping", "cob_LibKinematics", "cob_LibLevmar", "cob_LibManipUtil", "cob_LibNeobotix", "cob_LibPlanning",
-                      "cob_LibPowerCubeCtrl", "cob_LibSocket", "cob_LibSyncMM", "cob_LibUtilities", "MoveArmIPA", 
-                      "cob_person_association", "cob_person_detection", "cob_person_tracking_filter", "cob_palette_detection", 
-                      "cob_platform_remote",
-                      "cob_RobotControlCenter", "cob_RobotControlCenterPlugins", "libwm4",
-                      "cob_hardware_test", "cob_wimicare",
-                      "cob_movearm_svn", "cob_platform_svn",
-                      "cob_camera_viewer", "cob_camshift", "cob_env_model", "cob_object_detection", "cob_sensor_fusion", "cob_vision_features",
-                      "cob_vision_ipa_utils", "cob_vision_slam", "sag_objrec"]
+#COB3_INTERN_STACKS_DEPS = ["cob_arm_ik", "cob_lasertracker", "cob_LibArmClient", "cob_LibCollisionDetect", "cob_LibGenericArmCtrl",
+#                      "cob_LibGrasping", "cob_LibKinematics", "cob_LibLevmar", "cob_LibManipUtil", "cob_LibNeobotix", "cob_LibPlanning",
+#                      "cob_LibPowerCubeCtrl", "cob_LibSocket", "cob_LibSyncMM", "cob_LibUtilities", "MoveArmIPA", 
+#                      "cob_person_association", "cob_person_detection", "cob_person_tracking_filter", "cob_palette_detection", 
+#                      "cob_platform_remote",
+#                      "cob_RobotControlCenter", "cob_RobotControlCenterPlugins", "libwm4",
+#                      "cob_hardware_test", "cob_wimicare",
+#                      "cob_movearm_svn", "cob_platform_svn",
+#                      "cob_camera_viewer", "cob_camshift", "cob_env_model", "cob_object_detection", "cob_sensor_fusion", "cob_vision_features",
+#                      "cob_vision_ipa_utils", "cob_vision_slam", "sag_objrec"]
 
 EMAIL_TRIGGER="""
         <hudson.plugins.emailext.plugins.trigger.WHENTrigger> 
@@ -162,6 +163,25 @@ def get_depends_all(stack_name, depends_all, githubuser):
             for d in get_depends_one(stack_name, githubuser):
                 get_depends_all(d, depends_all, githubuser)
     print start_depth, " DEPENDS_ALL ", stack_name, " end depth ", len(depends_all)
+
+
+def get_cob3_intern_stacks(folder, env, packages=False):
+    stack_list = []
+    package_list = []
+    call('ls -l /opt/ros/%s/cob3_intern > /tmp/folder_entries'%folder, env, 'Get stack list of cob3_intern')
+    for line in open('/tmp/folder_entries', 'r'):
+        if line[0] == "d":
+            line.replace('\n', '')
+            stack_list.append(string.split(line)[-1])
+    if not packages:
+        return stack_list
+    
+    for stack in stack_list:
+        call('ls -l /opt/ros/%s/cob3_intern/%s > /tmp/folder_entries'%(folder, stack), env, 'Get package list of cob3_intern stack %s'%stack)
+        for line in open('/tmp/folder_entries', 'r'):
+            if line[0] == "d":
+                package_list.append(string.split(line)[-1])
+    return package_list
 
 
 def get_stack_membership(stack_name):
