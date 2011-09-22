@@ -154,8 +154,8 @@ def main():
         call('rosmake rosdep', env)
         for stack in options.stack:
             if stack == "cob3_intern":
-                call('make -f /tmp/install_dir/%s/Makefile ros-install-%s'%(STACK_DIR, options.rosdistro), env, 'ros-install')
-                call('make -f /tmp/install_dir/%s/Makefile ros-skip-blacklist'%STACK_DIR, env, 'ros-skip-blacklist')
+                call('make -f /tmp/install_dir/%s/cob3_intern/Makefile ros-install-%s'%(STACK_DIR, options.rosdistro), env, 'ros-install')
+                call('make -f /tmp/install_dir/%s/cob3_intern/Makefile ros-skip-blacklist'%STACK_DIR, env, 'ros-skip-blacklist')
             else:
                 call('rosdep install -y %s'%stack, env,
                      'Install system dependencies of stack %s'%stack)
