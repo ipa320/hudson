@@ -141,7 +141,7 @@ def main():
      
         if len(depends_all["other"]) > 0:
             # Install Debian packages of stack dependencies
-            print 'Installing debian packages of "%s" dependencies: %s'%(stack, str(depends_all["other"]))
+            print 'Installing debian packages of "%s" dependencies: %s'%(str(options.stack), str(depends_all["other"]))
             call('sudo apt-get update', env)
             call('sudo apt-get install %s --yes'%(stacks_to_debs(depends_all["other"], options.rosdistro)), env)
  
