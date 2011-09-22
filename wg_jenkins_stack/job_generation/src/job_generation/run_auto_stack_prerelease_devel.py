@@ -96,11 +96,11 @@ def main():
                     if stack == "cob3_intern":
                         if not d in COB3_PACKAGES and not d in COB3_STACKS:
                             print 'Adding dependencies of stack %s'%d
-                            get_depends_all(d, depends_all, options.githubuser)
+                            get_depends_all(d, depends_all, options.githubuser, 1)
                             print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all)
                     else:
                         print 'Adding dependencies of stack %s'%d
-                        get_depends_all(d, depends_all, options.githubuser)
+                        get_depends_all(d, depends_all, options.githubuser, 1)
                         print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all) 
         
         print 'Dependencies of %s:'%str(options.stack)

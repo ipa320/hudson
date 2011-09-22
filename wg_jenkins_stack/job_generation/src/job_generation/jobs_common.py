@@ -152,11 +152,11 @@ def get_depends_one(stack_name, githubuser):
     return depends_one
 
 
-def get_depends_all(stack_name, depends_all, githubuser):
+def get_depends_all(stack_name, depends_all, githubuser, start_depth):
     #TODO output
     #print depends_all
     depends_all_list = []
-    start_depth = len(depends_all['private']) + len(depends_all['public']) + len(depends_all['other'])
+    #start_depth = len(depends_all['private']) + len(depends_all['public']) + len(depends_all['other'])
     print start_depth, " depends all ", stack_name
     [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
     if not stack_name in depends_all_list:
@@ -165,8 +165,8 @@ def get_depends_all(stack_name, depends_all, githubuser):
         # find and append all IPA dependencies
         if get_stack_membership(stack_name) == "private" or get_stack_membership(stack_name) == "public":
             for d in get_depends_one(stack_name, githubuser):
-                get_depends_all(d, depends_all, githubuser)
-    print start_depth, " DEPENDS_ALL ", stack_name, " end depth ", (len(depends_all['private']) + len(depends_all['public']) + len(depends_all['other']))
+                get_depends_all(d, depends_all, githubuser, start_depth+1)
+    #print start_depth, " DEPENDS_ALL ", stack_name, " end depth ", (len(depends_all['private']) + len(depends_all['public']) + len(depends_all['other']))
 
 
 def get_cob3_intern_stacks(folder, packages=False):
