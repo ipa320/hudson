@@ -131,10 +131,14 @@ def get_depends_one(stack_name, githubuser):
     # in case the 'stack' is cob3_intern
     depends_one = []
     if stack_name == "cob3_intern":
-        for stack in COB3_INTERN_STACKS:
+        COB3_STACKS = get_cob3_intern_stacks('stack_overlay')
+        print "Stacks in cob3_intern: %s"%COB3_STACKS
+        for stack in COB3_STACKS:
             cob3_intern_depends_one = []
             stack_xml = get_stack_xml("cob3_intern", githubuser, "/master/" + stack + "/stack.xml")
             cob3_intern_depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
+            print "Dependencies of cob3_intern stack %s:"%stack
+            print str(cob3_intern_depends_one)
             depends_one += cob3_intern_depends_one
     elif stack_name in COB3_INTERN_STACKS:
         stack_xml = get_stack_xml("cob3_intern", githubuser, "/master/" + stack_name + "/stack.xml")
