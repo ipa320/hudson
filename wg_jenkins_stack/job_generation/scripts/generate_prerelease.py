@@ -95,7 +95,7 @@ def main():
         if len(args) == 2:
             hudson_instance = hudson.Hudson(SERVER, args[0], args[1])
         else:
-            info = get_auth_keys('jenkins', '/home-local/jenkins')
+            info = get_auth_keys('jenkins', HOME_FOLDER)
             hudson_instance = hudson.Hudson(SERVER, info.group(1), info.group(2))
         prerelease_configs = create_prerelease_configs(options.rosdistro, options.stack, options.githubuser, options.email, options.repeat, options.source_only, options.arch, options.ubuntu, options.not_forked)
         

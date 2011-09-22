@@ -12,7 +12,7 @@ import rosdistro
 import StringIO
 import pycurl
 import subprocess
-import string
+import socket
 
 
 
@@ -77,23 +77,19 @@ UBUNTU_DISTRO_MAP = ['lucid', 'maverick', 'natty']
 
 
 # Path to hudson server
-SERVER = 'http://jenkins-test-server:8080' #cob-kitchen-server ################
+SERVER = 'http://%s:8080'%socket.gethostname()
+
+# Local HOME path
+if socket.gethostname() == "cob-kitchen-server":
+    HOME_FOLDER = '/home/jenkins'
+else:
+    HOME_FOLDER = '/home-local/jenkins'
 
 # list of public and private IPA Fraunhofer stacks
 FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps']
 FHG_STACKS_PRIVATE = ['cob3_intern', 'interaid', 'srs', 'r3cop']
 
 COB3_INTERN_STACKS = ["cob_manipulation", "cob_navigation", "cob_rcc", "cob_sandbox", "cob_scenarios", "cob_vision"]
-#COB3_INTERN_STACKS_DEPS = ["cob_arm_ik", "cob_lasertracker", "cob_LibArmClient", "cob_LibCollisionDetect", "cob_LibGenericArmCtrl",
-#                      "cob_LibGrasping", "cob_LibKinematics", "cob_LibLevmar", "cob_LibManipUtil", "cob_LibNeobotix", "cob_LibPlanning",
-#                      "cob_LibPowerCubeCtrl", "cob_LibSocket", "cob_LibSyncMM", "cob_LibUtilities", "MoveArmIPA", 
-#                      "cob_person_association", "cob_person_detection", "cob_person_tracking_filter", "cob_palette_detection", 
-#                      "cob_platform_remote",
-#                      "cob_RobotControlCenter", "cob_RobotControlCenterPlugins", "libwm4",
-#                      "cob_hardware_test", "cob_wimicare",
-#                      "cob_movearm_svn", "cob_platform_svn",
-#                      "cob_camera_viewer", "cob_camshift", "cob_env_model", "cob_object_detection", "cob_sensor_fusion", "cob_vision_features",
-#                      "cob_vision_ipa_utils", "cob_vision_slam", "sag_objrec"]
 
 PRIO_ARCH = "i386"
 PRIO_UBUNTUDISTRO = "natty"
@@ -380,7 +376,7 @@ def get_options(required, optional):
 def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
     # create hudson instance
     if not hudson_obj:
-        info = get_auth_keys('jenkins', '/home-local/jenkins') ################
+        info = get_auth_keys('jenkins', HOME_FOLDER) ################
         hudson_obj = hudson.Hudson(SERVER, info.group(1), info.group(2))
 
     finished = False

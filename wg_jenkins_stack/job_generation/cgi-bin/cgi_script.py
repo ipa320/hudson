@@ -10,6 +10,7 @@ from subprocess import Popen, PIPE, STDOUT
 import shlex
 import os
 import stat
+import socket
 
 
 
@@ -17,6 +18,12 @@ def main():
     
     rosrelease = []
     repositories = []
+    
+    # Local HOME path
+    if socket.gethostname() == "cob-kitchen-server":
+        HOME_FOLDER = '/home/jenkins'
+    else:
+        HOME_FOLDER = '/home-local/jenkins'
     
     print "Content-Type: text/html\n\n"     # HTML is following
 
@@ -113,11 +120,11 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
             with open(bash_script, "w") as f:
                 f.write("""#!/bin/bash
                 source /opt/ros/electric/setup.bash
-                export ROS_PACKAGE_PATH=/home-local/jenkins/git/hudson:$ROS_PACKAGE_PATH
-                export HOME=/home-local/jenkins
+                export ROS_PACKAGE_PATH=%s/git/hudson:$ROS_PACKAGE_PATH
+                export HOME=%s
                 roscd job_generation/scripts
                 ./%s %s
-                """%(script, parameters))
+                """%(HOME_FOLDER, HOME_FOLDER, script, parameters))
                 os.chmod(bash_script, stat.S_IRWXU)
             p = Popen(bash_script, stdout=PIPE, stderr=STDOUT)
             out, err = p.communicate()
@@ -154,7 +161,7 @@ def stack_forked(githubuser, stack):
     
     # get token from jenkins' .gitconfig file for private github forks
     try:
-        gitconfig = open("/home-local/jenkins/.gitconfig", "r") 
+        gitconfig = open("%s/.gitconfig"%HOME_FOLDER, "r") 
         gitconfig = gitconfig.read()
     except IOError as err:
         print "<b>ERROR" + err + "</b>"
