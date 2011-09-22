@@ -168,7 +168,7 @@ def get_depends_all(stack_name, depends_all, githubuser):
 def get_cob3_intern_stacks(folder, env, packages=False):
     stack_list = []
     package_list = []
-    call('ls -l /opt/ros/%s/cob3_intern > /tmp/folder_entries'%folder, env, 'Get stack list of cob3_intern')
+    call('ls -l /tmp/install_dir/%s > /tmp/folder_entries'%folder, env, 'Get stack list of cob3_intern')
     for line in open('/tmp/folder_entries', 'r'):
         if line[0] == "d":
             line.replace('\n', '')
@@ -177,7 +177,7 @@ def get_cob3_intern_stacks(folder, env, packages=False):
         return stack_list
     
     for stack in stack_list:
-        call('ls -l /opt/ros/%s/cob3_intern/%s > /tmp/folder_entries'%(folder, stack), env, 'Get package list of cob3_intern stack %s'%stack)
+        call('ls -l /tmp/install_dir/%s/%s > /tmp/folder_entries'%(folder, stack), env, 'Get package list of cob3_intern stack %s'%stack)
         for line in open('/tmp/folder_entries', 'r'):
             if line[0] == "d":
                 package_list.append(string.split(line)[-1])
