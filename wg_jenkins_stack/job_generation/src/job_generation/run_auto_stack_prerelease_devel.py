@@ -109,8 +109,6 @@ def main():
         if len(depends_all["private"]) > 0:
             print 'Cloning private github fork(s)'
             downloaded = False
-            COB3_STACKS = get_cob3_intern_stacks(STACK_DIR+'/cob3_intern')
-            print COB3_STACKS
             for stack in depends_all["private"]:
                 if stack in COB3_INTERN_STACKS:
                     if not downloaded:
