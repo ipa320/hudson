@@ -110,8 +110,9 @@ def main():
             print 'Cloning private github fork(s)'
             downloaded = False
             COB3_STACKS = get_cob3_intern_stacks(STACK_DIR)
+            print COB3_STACKS
             for stack in depends_all["private"]:
-                if stack in COB3_STACKS:
+                if stack in COB3_INTERN_STACKS:
                     if not downloaded:
                         if not stack_forked(options.githubuser, "cob3_intern", "/blob/master/%s/Makefile"%stack):
                             options.githubuser = "ipa320"
