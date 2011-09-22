@@ -280,7 +280,7 @@ class HudsonHelper:
     def post_build(self, failure, test_failure, workspace):
         # If --email was passed in, do a poor-man's version of Hudson's
         # email reporting.  Useful for on-demand builds.
-        if self.email:
+        if self.email and (failure or test_failure):
             subject = None
             if failure:
                 subject = '%s - Build # %s - Failure!'%(os.environ['JOB_NAME'], os.environ['BUILD_NUMBER'])
