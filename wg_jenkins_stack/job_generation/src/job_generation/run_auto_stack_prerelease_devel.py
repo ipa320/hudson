@@ -83,8 +83,8 @@ def main():
         depends_all = {"public" : [], "private" : [], "other" : []}
         for stack in options.stack:
             if stack == "cob3_intern":
-                COB3_STACKS = get_cob3_intern_stacks(STACK_DIR, env)
-                COB3_PACKAGES = get_cob3_intern_stacks(STACK_DIR, env, packages=True)
+                COB3_STACKS = get_cob3_intern_stacks(STACK_DIR)
+                COB3_PACKAGES = get_cob3_intern_stacks(STACK_DIR, packages=True)
 #            stack_xml = '%s/%s/stack.xml'%(STACK_DIR, stack)
 #            call('ls %s'%stack_xml, env, 'Checking if stack %s contains "stack.xml" file'%stack)
 #            with open(stack_xml) as stack_file:
@@ -107,7 +107,7 @@ def main():
         if len(depends_all["private"]) > 0:
             print 'Cloning private github fork(s)'
             downloaded = False
-            COB3_STACKS = get_cob3_intern_stacks(STACK_DIR, env)
+            COB3_STACKS = get_cob3_intern_stacks(STACK_DIR)
             for stack in depends_all["private"]:
                 if stack in COB3_STACKS:
                     if not downloaded:

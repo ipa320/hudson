@@ -165,22 +165,22 @@ def get_depends_all(stack_name, depends_all, githubuser):
     print start_depth, " DEPENDS_ALL ", stack_name, " end depth ", len(depends_all)
 
 
-def get_cob3_intern_stacks(folder, env, packages=False):
+def get_cob3_intern_stacks(folder, packages=False):
     stack_list = []
     package_list = []
-    call('ls -l /tmp/install_dir/%s > /tmp/folder_entries'%folder, env, 'Get stack list of cob3_intern')
-    for line in open('/tmp/folder_entries', 'r'):
-        if line[0] == "d":
-            line.replace('\n', '')
-            stack_list.append(string.split(line)[-1])
+    
+    for entry in os.listdir('/tmp/install_dir/%s'%folder):
+        if os.path.isdir('/tmp/install_dir/%s/%s'%(folder, entry)):
+            if "cob" in entry:
+                stack_list.append(entry)
     if not packages:
         return stack_list
     
     for stack in stack_list:
-        call('ls -l /tmp/install_dir/%s/%s > /tmp/folder_entries'%(folder, stack), env, 'Get package list of cob3_intern stack %s'%stack)
-        for line in open('/tmp/folder_entries', 'r'):
-            if line[0] == "d":
-                package_list.append(string.split(line)[-1])
+        for entry in os.listdir('/tmp/install_dir/%s/%s'%(folder, stack)):
+            if os.path.isdir('/tmp/install_dir/%s/%s/%s'%(folder, stack, entry)):
+                if entry[0] != ".":
+                    package_list.append(entry)
     return package_list
 
 
