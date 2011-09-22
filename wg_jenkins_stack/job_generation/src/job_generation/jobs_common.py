@@ -186,13 +186,10 @@ def get_cob3_intern_stacks(folder, packages=False):
 
 def get_stack_membership(stack_name):
     if stack_name in FHG_STACKS_PUBLIC:
-        print "public"
         return "public"
     elif stack_name in FHG_STACKS_PRIVATE or stack_name in COB3_INTERN_STACKS:
-        print "private"
         return "private"
     else:
-        print "other"
         return "other"
 
 

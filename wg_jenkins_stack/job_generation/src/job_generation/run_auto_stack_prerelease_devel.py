@@ -90,7 +90,7 @@ def main():
 #            with open(stack_xml) as stack_file:
 #                depends_one = [str(d) for d in stack_manifest.parse(stack_file.read()).depends]  # convert to list
             depends_one = get_depends_one(stack, options.githubuser)
-            print 'Dependencies of stack %s: %s'%(stack, str(depends_one))
+            #print 'Dependencies of stack %s: %s'%(stack, str(depends_one))
             for d in depends_one:
                 if not d in options.stack and not d in depends_all:
                     if stack == "cob3_intern":
@@ -103,6 +103,8 @@ def main():
                         get_depends_all(d, depends_all, options.githubuser)
                         print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all) 
         
+        print 'Dependencies of %s:'%str(options.stack)
+        print str(depends_all)
 
         if len(depends_all["private"]) > 0:
             print 'Cloning private github fork(s)'
