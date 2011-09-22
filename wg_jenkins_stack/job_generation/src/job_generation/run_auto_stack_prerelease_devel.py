@@ -61,7 +61,7 @@ def main():
             if stack in FHG_STACKS_PUBLIC: # create rosinstall file for public stacks
                 rosinstall += '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack, options.githubuser, stack)
             elif stack in FHG_STACKS_PRIVATE: # clone private stacks
-                call('git clone git@github.com:%s/%s.git %s'%(options.githubuser, stack, STACK_DIR), env, 'Clone private stack [%s] to test'%(stack))
+                call('git clone git@github.com:%s/%s.git %s/%s'%(options.githubuser, stack, STACK_DIR, stack), env, 'Clone private stack [%s] to test'%(stack))
             else:
                 rosinstall += stack_to_rosinstall(rosdistro_obj.stacks[stack], 'devel')
 
@@ -82,25 +82,50 @@ def main():
 
         depends_all = {"public" : [], "private" : [], "other" : []}
         for stack in options.stack:
+            if stack == "cob3_intern":
+                COB3_STACKS = get_cob3_intern_stacks(STACK_DIR+'/cob3_intern')
+                COB3_PACKAGES = get_cob3_intern_stacks(STACK_DIR+'/cob3_intern', packages=True)
 #            stack_xml = '%s/%s/stack.xml'%(STACK_DIR, stack)
 #            call('ls %s'%stack_xml, env, 'Checking if stack %s contains "stack.xml" file'%stack)
 #            with open(stack_xml) as stack_file:
 #                depends_one = [str(d) for d in stack_manifest.parse(stack_file.read()).depends]  # convert to list
             depends_one = get_depends_one(stack, options.githubuser)
-            print 'Dependencies of stack %s: %s'%(stack, str(depends_one))
+            #print 'Dependencies of stack %s: %s'%(stack, str(depends_one))
             for d in depends_one:
-                if not d in options.stack and not d in depends_all and not d in COB3_INTERN_STACKS_DEPS and not d in COB3_INTERN_STACKS:
-                    print 'Adding dependencies of stack %s'%d
-                    get_depends_all(d, depends_all, options.githubuser)
-                    print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all)
+                if not d in options.stack and not d in depends_all:
+                    if stack == "cob3_intern":
+                        if not d in COB3_PACKAGES and not d in COB3_STACKS:
+                            print 'Adding dependencies of stack %s'%d
+                            get_depends_all(d, depends_all, options.githubuser, 1)
+                            print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all)
+                    else:
+                        print 'Adding dependencies of stack %s'%d
+                        get_depends_all(d, depends_all, options.githubuser, 1)
+                        print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all) 
         
+        print 'Dependencies of %s:'%str(options.stack)
+        print str(depends_all)
 
         if len(depends_all["private"]) > 0:
             print 'Cloning private github fork(s)'
+            downloaded = False
+            COB3_STACKS = get_cob3_intern_stacks(STACK_DIR+'/cob3_intern')
+            print COB3_STACKS
             for stack in depends_all["private"]:
-                if not stack_forked(options.githubuser, stack):
-                    options.githubuser = "ipa320"
-                call('git clone git@github.com:%s/%s.git %s'%(options.githubuser, stack, DEPENDS_DIR), env, 'Clone private stack [%s] to test'%(stack))
+                if stack in COB3_INTERN_STACKS:
+                    if not downloaded:
+                        if not stack_forked(options.githubuser, "cob3_intern", "/blob/master/%s/Makefile"%stack):
+                            options.githubuser = "ipa320"
+                        call('git clone git@github.com:%s/cob3_intern.git %s'%(options.githubuser, "/tmp/cob3_intern"), env, 'Clone private stack cob3_intern')
+                        downloaded = True
+                        
+                    call('mv /tmp/cob3_intern/%s %s'%(stack, DEPENDS_DIR), env, 'Move required stack %s to %s'%(stack, DEPENDS_DIR))
+                    
+                else:
+                    if not stack_forked(options.githubuser, stack):
+                        options.githubuser = "ipa320"
+                    call('git clone git@github.com:%s/%s.git %s'%(options.githubuser, stack, DEPENDS_DIR), env, 'Clone private stack [%s] to test'%(stack))
+                    
 
         if len(depends_all["public"]) > 0:
             for stack in depends_all["public"]:
@@ -117,7 +142,7 @@ def main():
      
         if len(depends_all["other"]) > 0:
             # Install Debian packages of stack dependencies
-            print 'Installing debian packages of "%s" dependencies: %s'%(stack, str(depends_all["other"]))
+            print 'Installing debian packages of "%s" dependencies: %s'%(str(options.stack), str(depends_all["other"]))
             call('sudo apt-get update', env)
             call('sudo apt-get install %s --yes'%(stacks_to_debs(depends_all["other"], options.rosdistro)), env)
  
@@ -142,7 +167,7 @@ def main():
         res = 0
         for r in range(0, int(options.repeat)+1):
             env['ROS_TEST_RESULTS_DIR'] = env['ROS_TEST_RESULTS_DIR'] + '/' + STACK_DIR + '_run_' + str(r)
-            helper = subprocess.Popen(('./hudson_helper_fhg.py --dir-test %s --email %s build'%(STACK_DIR, options.email)).split(' '), env=env)
+            helper = subprocess.Popen(('./ros_release/hudson/src/hudson_helper_fhg.py --dir-test %s --email %s build'%(STACK_DIR, options.email)).split(' '), env=env)
             helper.communicate()
             if helper.returncode != 0:
                 res = helper.returncode

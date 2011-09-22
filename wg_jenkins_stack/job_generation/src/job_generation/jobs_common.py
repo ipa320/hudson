@@ -12,6 +12,7 @@ import rosdistro
 import StringIO
 import pycurl
 import subprocess
+import socket
 
 
 
@@ -44,13 +45,13 @@ cd \$INSTALL_DIR
 cp /tmp/workspace/.gitconfig ~/.gitconfig
 cp -r /tmp/workspace/.ssh ~/.ssh
 sudo chmod 600 ~/.ssh/id_rsa.pub ~/.ssh/id_rsa
-ssh-keygen -e -f ~/.ssh/id_rsa
-sudo mv -f /tmp/workspace/ros_release .
+
+sudo mkdir ros_release
+sudo mv -f /tmp/workspace/hudson/wg_jenkins_stack/* ./ros_release
 ls -la
 ls -la ros_release/
-cp ros_release/hudson/src/hudson_helper_fhg.py .
-#wget  --no-check-certificate http://code.ros.org/svn/ros/installers/trunk/hudson/hudson_helper 
-sudo chmod +x  hudson_helper_fhg.py
+#cp ros_release/hudson/src/hudson_helper_fhg.py .
+#sudo chmod +x  hudson_helper_fhg.py
 """ 
 
 
@@ -62,13 +63,11 @@ set -o errexit
 
 scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
 scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.ssh
-#scp -r jenkins@jenkins-test-server:~/git/hudson/wg_jenkins_stack $WORKSPACE/ros_release # TODO get from github
-git clone git://github.com/ipa320/hudson.git $WORKSPACE/hudson
-cp -r $WORKSPACE/hudson/wg_jenkins_stack $WORKSPACE/ros_release
-#wget https://github.com/ipa320/hudson/raw/master/run/devel_run_chroot.py -O $WORKSPACE/devel_run_chroot.py
-#chmod +x $WORKSPACE/devel_run_chroot.py
-cd $WORKSPACE &amp;&amp; $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot --ramdisk --ramdisk-size 6000M --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu #--ssh-key-file=$WORKSPACE/rosbuild-ssh.tar 
-""" #TODO wget devel_run_chroot.py from other location
+
+git clone git://github.com/fmw-jk/hudson.git $WORKSPACE/hudson ################
+
+cd $WORKSPACE &amp;&amp; $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu RAMDISK
+"""
 
 # the supported Ubuntu distro's for each ros distro
 ARCHES = ['amd64', 'i386']
@@ -78,24 +77,22 @@ UBUNTU_DISTRO_MAP = ['lucid', 'maverick', 'natty']
 
 
 # Path to hudson server
-SERVER = 'http://cob-kitchen-server:8080' #cob-kitchen-server
+SERVER = 'http://%s:8080'%socket.gethostname()
+
+# Local HOME path
+if socket.gethostname() == "cob-kitchen-server":
+    HOME_FOLDER = '/home/jenkins'
+else:
+    HOME_FOLDER = '/home-local/jenkins'
 
 # list of public and private IPA Fraunhofer stacks
 FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps']
-FHG_STACKS_PRIVATE = ['cob3_intern', 'interaid', 'srs', 'r3cob']
+FHG_STACKS_PRIVATE = ['cob3_intern', 'interaid', 'srs', 'r3cop']
 
 COB3_INTERN_STACKS = ["cob_manipulation", "cob_navigation", "cob_rcc", "cob_sandbox", "cob_scenarios", "cob_vision"]
-COB3_INTERN_STACKS_DEPS = ["cob_arm_ik", "cob_lasertracker", "cob_LibArmClient", "cob_LibCollisionDetect", "cob_LibGenericArmCtrl",
-                      "cob_LibGrasping", "cob_LibKinematics", "cob_LibLevmar", "cob_LibManipUtil", "cob_LibNeobotix", "cob_LibPlanning",
-                      "cob_LibPowerCubeCtrl", "cob_LibSocket", "cob_LibSyncMM", "cob_LibUtilities", "MoveArmIPA", 
-                      "cob_person_association", "cob_person_detection", "cob_person_tracking_filter", "cob_palette_detection", 
-                      "cob_platform_remote",
-                      "cob_RobotControlCenter", "cob_RobotControlCenterPlugins", "libwm4",
-                      "cob_hardware_test", "cob_wimicare",
-                      "cob_movearm_svn", "cob_platform_svn",
-                      "cob_camera_viewer", "cob_camshift", "cob_env_model", "cob_object_detection", "cob_sensor_fusion", "cob_vision_features",
-                      "cob_vision_ipa_utils", "cob_vision_slam", "sag_objrec",
-                      "people", "motion_planning_common", "kinematics"]
+
+PRIO_ARCH = "i386"
+PRIO_UBUNTUDISTRO = "natty"
 
 EMAIL_TRIGGER="""
         <hudson.plugins.emailext.plugins.trigger.WHENTrigger> 
@@ -112,6 +109,14 @@ EMAIL_TRIGGER="""
 """
 
 
+def stack_to_rosinstall(stack_obj, branch):
+    try:
+        return yaml.dump(rosdistro.stack_to_rosinstall(stack_obj, branch, anonymous=True))
+    except rosdistro.DistroException, ex:
+        print str(ex)
+        return ''
+
+
 def stack_to_deb(stack, rosdistro):
     return '-'.join(['ros', rosdistro, str(stack).replace('_','-')])
 
@@ -125,54 +130,77 @@ def get_depends_one(stack_name, githubuser):
     # in case the 'stack' is cob3_intern
     depends_one = []
     if stack_name == "cob3_intern":
-        for stack in COB3_INTERN_STACKS:
+        COB3_STACKS = get_cob3_intern_stacks('stack_overlay/cob3_intern')
+        print "Stacks in cob3_intern: %s"%COB3_STACKS
+        for stack in COB3_STACKS:
             cob3_intern_depends_one = []
             stack_xml = get_stack_xml("cob3_intern", githubuser, "/master/" + stack + "/stack.xml")
             cob3_intern_depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
+            print "Dependencies of cob3_intern stack %s:"%stack
+            print str(cob3_intern_depends_one)
             depends_one += cob3_intern_depends_one
+    elif stack_name in COB3_INTERN_STACKS:
+        stack_xml = get_stack_xml("cob3_intern", githubuser, "/master/" + stack_name + "/stack.xml")
+        depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
     # get stack.xml from github
     else:
         stack_xml = get_stack_xml(stack_name, githubuser)#, get_stack_membership(stack_name))
     # convert to list
         depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
+    print 'Dependencies of stack %s: %s'%(stack_name, str(depends_one))
     return depends_one
 
 
-def get_depends_all(stack_name, depends_all, githubuser):
+def get_depends_all(stack_name, depends_all, githubuser, start_depth):
     #TODO output
-    print depends_all
+    #print depends_all
     depends_all_list = []
-    start_depth = len(depends_all)
+    #start_depth = len(depends_all['private']) + len(depends_all['public']) + len(depends_all['other'])
     print start_depth, " depends all ", stack_name
     [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
     if not stack_name in depends_all_list:
         # append stack to the right list in depends_all
         depends_all[get_stack_membership(stack_name)].append(stack_name)
-        print depends_all
         # find and append all IPA dependencies
         if get_stack_membership(stack_name) == "private" or get_stack_membership(stack_name) == "public":
             for d in get_depends_one(stack_name, githubuser):
-                get_depends_all(d, depends_all, githubuser)
-    print start_depth, " DEPENDS_ALL ", stack_name, " end depth ", len(depends_all)
+                get_depends_all(d, depends_all, githubuser, start_depth+1)
+    #print start_depth, " DEPENDS_ALL ", stack_name, " end depth ", (len(depends_all['private']) + len(depends_all['public']) + len(depends_all['other']))
+
+
+def get_cob3_intern_stacks(folder, packages=False):
+    stack_list = []
+    package_list = []
+    
+    for entry in os.listdir('/tmp/install_dir/%s'%folder):
+        if os.path.isdir('/tmp/install_dir/%s/%s'%(folder, entry)):
+            if "cob" in entry:
+                stack_list.append(entry)
+    if not packages:
+        return stack_list
+    
+    for stack in stack_list:
+        for entry in os.listdir('/tmp/install_dir/%s/%s'%(folder, stack)):
+            if os.path.isdir('/tmp/install_dir/%s/%s/%s'%(folder, stack, entry)):
+                if entry[0] != ".":
+                    package_list.append(entry)
+    return package_list
 
 
 def get_stack_membership(stack_name):
     if stack_name in FHG_STACKS_PUBLIC:
-        print "public"
         return "public"
-    elif stack_name in FHG_STACKS_PRIVATE:
-        print "private"
+    elif stack_name in FHG_STACKS_PRIVATE or stack_name in COB3_INTERN_STACKS:
         return "private"
     else:
-        print "other"
         return "other"
 
 
-def stack_forked(githubuser, stack_name):
+def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
     git_auth = get_auth_keys('github', "/tmp/workspace")
     post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
     fields = urllib.urlencode(post)
-    path = "https://github.com/" + githubuser + "/" + stack_name + "/blob/master/Makefile"
+    path = "https://github.com/" + githubuser + "/" + stack_name + appendix
     print path
     file1 = StringIO.StringIO()
     c = pycurl.Curl()
@@ -190,8 +218,12 @@ def stack_forked(githubuser, stack_name):
 
 
 def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
-    if not stack_forked(githubuser, stack_name):
-        githubuser = "ipa320"
+    if stack_name in COB3_INTERN_STACKS:
+        if not stack_forked(githubuser, "cob3_intern", "/blob/master/%s/Makefile"%stack_name):
+            githubuser = "ipa320"
+    else:
+        if not stack_forked(githubuser, stack_name):
+            githubuser = "ipa320"
 
     try:
         git_auth = get_auth_keys('github', '/tmp/workspace')
@@ -294,6 +326,9 @@ def get_options(required, optional):
     if 'database' in ops:
         parser.add_option('--database', dest = 'database', default=None, action='store',
                           help="Specify database file")
+    if 'not-forked' in ops:
+        parser.add_option('--not-forked', dest = 'not_forked', default=False, action='store_true',
+                          help="Stack is not forked for given githubuser")
 
     (options, args) = parser.parse_args()
     
@@ -341,7 +376,7 @@ def get_options(required, optional):
 def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
     # create hudson instance
     if not hudson_obj:
-        info = get_auth_keys('jenkins', '/home/jenkins')
+        info = get_auth_keys('jenkins', HOME_FOLDER) ################
         hudson_obj = hudson.Hudson(SERVER, info.group(1), info.group(2))
 
     finished = False
@@ -352,14 +387,36 @@ def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
                 start=True
             else:
                 start=False
-            
             exists = hudson_obj.job_exists(job_name)
+            
+            # cancel all jobs of stack in the build queue 
+            if 'pipe' in job_name:
+                build_queue = hudson_obj.get_queue_info()
+                job_name_stem = job_name.replace('pipe', '')
+                if build_queue != []:
+                    for pending_job in build_queue:
+                        if job_name_stem in pending_job['task']['name']:
+                            hudson_obj.cancel_pending_job(pending_job['id'])
+                            print "Canceling pending job %s from build queue <br>"%(pending_job['task']['name'])
+                #building_jobs = hudson_obj.get_jobs()
+                #print str(building_jobs) + "<br>"
+                #for running_job in building_jobs:
+                #    print str(running_job) + "<br>"
+                #    if job_name_stem in running_job['name']:
+                #        hudson_obj.stop_running_job(running_job['name'])
+                #        print "Stopp running job %s  <br>"%running_job['name']
 
             # job is already running
-            if exists and hudson_obj.job_is_running(job_name):
+            if exists and hudson_obj.job_is_running(job_name):           
+                hudson_obj.stop_running_job(job_name)
                 jobs_todo[job_name] = jobs[job_name]
-                print "Not reconfiguring running job %s because it is still running <br>"%job_name
+                print "Job %s is running! Stopping job to reconfigure <br>"%job_name
 
+            # delete pending job from queue
+            elif exists and hudson_obj.job_in_queue(job_name):
+                hudson_obj.cancel_pending_job(job_name)
+                jobs_todo[job_name] = jobs[job_name]
+                print "Job %s is in build queue! Cancel pending build <br>"%job_name
 
             # delete old job
             elif delete:
@@ -384,7 +441,7 @@ def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
         if wait and len(jobs_todo) > 0:
             jobs = jobs_todo
             jobs_todo = {}
-            time.sleep(10.0)
+            time.sleep(1.0)
         else:
             finished = True
 

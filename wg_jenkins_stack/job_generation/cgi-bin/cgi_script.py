@@ -10,20 +10,23 @@ from subprocess import Popen, PIPE, STDOUT
 import shlex
 import os
 import stat
+import socket
 
-
+HOME_FOLDER = ''
 
 def main():
     
+    global HOME_FOLDER
     rosrelease = []
     repositories = []
     
+    # Local HOME path
+    if socket.gethostname() == "cob-kitchen-server":
+        HOME_FOLDER = '/home/jenkins'
+    else:
+        HOME_FOLDER = '/home-local/jenkins'
+    
     print "Content-Type: text/html\n\n"     # HTML is following
-
-    keys = os.environ.keys()
-    keys.sort()
-    for k in keys:
-        print "<li><b>%s:</b>\t\t%s<br>" %(k, os.environ[k]) 
 
     form = cgi.FieldStorage() # keys from HTML form
 
@@ -68,7 +71,7 @@ def main():
 
     if otherstacks != []:
         for stack in otherstacks:
-            if valid_stack(stack):
+            if valid_stack(form["username"].value, stack):
                 repositories = repositories[:] + [stack]
     
     # printing planed job creations
@@ -97,32 +100,33 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
     for release in ROSRELEASES:
         for repo in REPOSITORIES:
             results = results + "<br>"
+
+            # call generate_prerelease.py with parameters: 'stack', 'rosdistro', 'githubuser', 'email'
+            
+            script = "generate_prerelease.py "
+            parameters = "--stack %s --rosdistro %s --githubuser %s --email %s"%(repo, release, githubuser, email)
             
             try:
                 if not stack_forked(githubuser, repo):
                     results = results + "<b>" + repo + "</b>" + ": stack is not forked\n"
                     results = results + "Using 'ipa320' stack instead. If that isn't desired, fork " + repo + " on github.com!"
+                    parameters = parameters + " --not-forked"
             except:
                 results = results + "<b>Error: Checking whether stack %s is forked failed</b>"%repo
-                results = results + "Using 'ipa320' stack instead. If that isn't desired, fork " + repo + " on github.com!"
-                
-            #TODO find right folder, output, try
-            # call generate_prerelease.py with parameters: 'stack', 'rosdistro', 'githubuser', 'email'
-            script = "generate_prerelease.py "
-            parameters = "--stack %s --rosdistro %s --githubuser %s --email %s"%(repo, release, githubuser, email)
+                results = results + "Skipped job generation for %s!"%repo
+            
             if del_stacks:
                 parameters = parameters + " --delete"
             bash_script = os.path.join("/tmp", "bash_script.bash")
+            results = results + 'rgtdhg' + HOME_FOLDER
             with open(bash_script, "w") as f:
                 f.write("""#!/bin/bash
                 source /opt/ros/electric/setup.bash
-                export ROS_PACKAGE_PATH=/home/jenkins/git/hudson:$ROS_PACKAGE_PATH
-                export HOME=/home/jenkins
-                echo "ROS_ROOT: " $ROS_ROOT "<br>"
-                echo "ROS_PACKAGE_PATH: " $ROS_PACKAGE_PATH "<br>"
+                export ROS_PACKAGE_PATH=%s/git/hudson:$ROS_PACKAGE_PATH
+                export HOME=%s
                 roscd job_generation/scripts
                 ./%s %s
-                """%(script, parameters))
+                """%(HOME_FOLDER, HOME_FOLDER, script, parameters))
                 os.chmod(bash_script, stat.S_IRWXU)
             p = Popen(bash_script, stdout=PIPE, stderr=STDOUT)
             out, err = p.communicate()
@@ -133,17 +137,24 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
     return results
 
 
-def valid_stack(stack):
+def valid_stack(githubuser, stack):
     # function to check if inserted stack is available
-    available_stacks = ['cob_apps', 'cob_common', 'cob_driver', 'cob_extern', 'cob_simulation', 'cob3_intern', 'srs', 'interaid']
+    
     # correct common mistakes
     stack = stack.lower()
     stack = stack.replace('-', '_')
-    if stack in available_stacks:
-        return True
-    else:
+    try:
+        if stack_forked(githubuser, stack):
+            return True
+        elif stack_forked("ipa320", stack):
+            return True
+        else:
+            print "<p><font color='#FF0000'>ERROR:"
+            print "Stack <b>" + stack + " </b>could not be found. Please check spelling!</font>"
+            return False
+    except:
         print "<p><font color='#FF0000'>ERROR:"
-        print "Stack <b>" + stack + " </b>could not be found. Please check spelling!</font>"
+        print "Failed to check validation for <b>" + stack + " </b></font>"
         return False
 
 
@@ -152,7 +163,7 @@ def stack_forked(githubuser, stack):
     
     # get token from jenkins' .gitconfig file for private github forks
     try:
-        gitconfig = open("/home/jenkins/.gitconfig", "r") 
+        gitconfig = open("%s/.gitconfig"%HOME_FOLDER, "r") 
         gitconfig = gitconfig.read()
     except IOError as err:
         print "<b>ERROR" + err + "</b>"
@@ -184,7 +195,7 @@ def stack_forked(githubuser, stack):
     if c.getinfo(pycurl.HTTP_CODE) == 200:
         return True
     else:
-        print "<b>ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE), "</b>"
+        #print "<b>ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE), "</b>"
         return False
 
 
