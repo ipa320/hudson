@@ -46,6 +46,11 @@ def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubunt
         hudson_config = hudson_config.replace('STACKOWNER', 'ipa320')
     else:
         hudson_config = hudson_config.replace('STACKOWNER', githubuser)
+    
+    if "cob3_intern" in stack_list:
+        hudson_config = hudson_config.replace('RAMDISK', '')
+    else:
+        hudson_config = hudson_config.replace('RAMDISK', '--ramdisk --ramdisk-size 6000M')
 
     return hudson_config
 
@@ -111,8 +116,8 @@ def main():
         if options.delete:
             print '<br>Jobs have been deleted. You can now start new jobs<br>'
         else:
-            print '<br>%s will receive %d emails on %s, one for each job<br>'%(options.githubuser, len(prerelease_configs), options.email)
-            print 'You can follow the progress of these jobs on %s <br>'%(SERVER)
+            print '<br><b>%s</b> will receive %d emails on <b>%s</b>, one for each job<br>'%(options.githubuser, len(prerelease_configs), options.email)
+            print 'You can follow the progress of these jobs on the <b> <a href="%s"> Jenkins Server</a> </b> <br>'%(SERVER)
 
     # catch all exceptions
     except Exception, e:

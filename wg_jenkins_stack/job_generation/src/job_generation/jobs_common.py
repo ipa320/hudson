@@ -49,8 +49,8 @@ sudo mkdir ros_release
 sudo mv -f /tmp/workspace/hudson/wg_jenkins_stack/* ./ros_release
 ls -la
 ls -la ros_release/
-cp ros_release/hudson/src/hudson_helper_fhg.py .
-sudo chmod +x  hudson_helper_fhg.py
+#cp ros_release/hudson/src/hudson_helper_fhg.py .
+#sudo chmod +x  hudson_helper_fhg.py
 """ 
 
 
@@ -63,9 +63,9 @@ set -o errexit
 scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
 scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.ssh
 
-git clone git://github.com/fmw-jk/hudson.git $WORKSPACE/hudson
+git clone git://github.com/fmw-jk/hudson.git $WORKSPACE/hudson ################
 
-cd $WORKSPACE &amp;&amp; $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot --ramdisk --ramdisk-size 6000M --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu
+cd $WORKSPACE &amp;&amp; $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu RAMDISK
 """
 
 # the supported Ubuntu distro's for each ros distro
@@ -76,7 +76,7 @@ UBUNTU_DISTRO_MAP = ['lucid', 'maverick', 'natty']
 
 
 # Path to hudson server
-SERVER = 'http://jenkins-test-server:8080' #cob-kitchen-server
+SERVER = 'http://jenkins-test-server:8080' #cob-kitchen-server ################
 
 # list of public and private IPA Fraunhofer stacks
 FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps']
@@ -356,7 +356,7 @@ def get_options(required, optional):
 def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
     # create hudson instance
     if not hudson_obj:
-        info = get_auth_keys('jenkins', '/home-local/jenkins')
+        info = get_auth_keys('jenkins', '/home-local/jenkins') ################
         hudson_obj = hudson.Hudson(SERVER, info.group(1), info.group(2))
 
     finished = False
@@ -369,7 +369,7 @@ def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
                 start=False
             exists = hudson_obj.job_exists(job_name)
             
-            # stop all running and pending jobs of stack
+            # cancel all jobs of stack in the build queue 
             if 'pipe' in job_name:
                 build_queue = hudson_obj.get_queue_info()
                 job_name_stem = job_name.replace('pipe', '')
@@ -391,7 +391,6 @@ def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
                 hudson_obj.stop_running_job(job_name)
                 jobs_todo[job_name] = jobs[job_name]
                 print "Job %s is running! Stopping job to reconfigure <br>"%job_name
-#                print "Not reconfiguring running job %s because it is still running <br>"%job_name
 
             # delete pending job from queue
             elif exists and hudson_obj.job_in_queue(job_name):
