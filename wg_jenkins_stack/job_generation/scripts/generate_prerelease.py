@@ -11,10 +11,12 @@ with open("build_config.xml", "r") as f1:
     HUDSON_CONFIG = f1.read()
 with open("pipe_config.xml", "r") as f2:
     HUDSON_PIPE_CONFIG = f2.read()
+with open("all_config.xml", "r") as f3:
+    HUDSON_ALL_CONFIG = f3.read()
 
 
 def prerelease_job_name(jobtype, rosdistro, stack_list, githubuser, ubuntu, arch):
-    return get_job_name(jobtype, rosdistro, '_'.join(stack_list), githubuser, ubuntu, arch)
+    return get_job_name(jobtype, rosdistro, githubuser, ubuntu, arch, stack_name='_'.join(stack_list))
 
 
 def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubuntudistro="", stack_list=[], email="", repeat=0, source_only="", post_jobs=[], not_forked=False):
@@ -55,9 +57,9 @@ def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubunt
     return hudson_config
 
 
-def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, source_only, arches=None, ubuntudistros=None, not_forked=False):
+def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, source_only, hudson_obj, arches=None, ubuntudistros=None, not_forked=False):
     stack_list.sort()
-    
+
     if not arches:
         arches = ARCHES
     if not ubuntudistros:
@@ -67,20 +69,27 @@ def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, 
     post_jobs = []
     
     # create pipe_job
-    name = get_job_name(rosdistro, stack_list, githubuser, jobtype="pipe")
-    configs[name] = replace_param(HUDSON_PIPE_CONFIG, rosdistro, githubuser, "pipe", stack_list=stack_list, post_jobs=[get_job_name(rosdistro, stack_list, githubuser, ubuntu=PRIO_UBUNTUDISTRO, arch=PRIO_ARCH)], not_forked=not_forked)
-    
+    name_pipe = get_job_name(rosdistro, githubuser, stack_name=stack_list, jobtype="pipe")
+    configs[name_pipe] = replace_param(HUDSON_PIPE_CONFIG, rosdistro, githubuser, "pipe", stack_list=stack_list, post_jobs=[get_job_name(rosdistro, githubuser, stack_name=stack_list, ubuntu=PRIO_UBUNTUDISTRO, arch=PRIO_ARCH)], not_forked=not_forked)
+
     # create hudson config files for each ubuntu distro
     for ubuntudistro in ubuntudistros:
         for arch in arches:
             if ubuntudistro != PRIO_UBUNTUDISTRO or arch != PRIO_ARCH: # if job is not prio_job
-                name = get_job_name(rosdistro, stack_list, githubuser, ubuntudistro, arch)
+                name = get_job_name(rosdistro, githubuser, stack_list, ubuntudistro, arch)
                 post_jobs.append(name)
                 configs[name] = replace_param(HUDSON_CONFIG, rosdistro, githubuser, "build", arch, ubuntudistro, stack_list, email, repeat, source_only)
-    
+
     # create prio_job
-    name = get_job_name(rosdistro, stack_list, githubuser, PRIO_UBUNTUDISTRO, PRIO_ARCH)
+    name = get_job_name(rosdistro, githubuser, stack_list, PRIO_UBUNTUDISTRO, PRIO_ARCH)
     configs[name] = replace_param(HUDSON_CONFIG, rosdistro, githubuser, "build_prio", PRIO_ARCH, PRIO_UBUNTUDISTRO, stack_list, email, repeat, source_only, post_jobs)
+
+    # create 'all' job
+    name = get_job_name(rosdistro, githubuser, jobtype="all")
+    pipe_job_names = hudson_obj.get_pipe_jobs(rosdistro, githubuser)
+    if not name_pipe in pipe_job_names:
+        pipe_job_names.append(name_pipe)
+    configs[name] = replace_param(HUDSON_ALL_CONFIG, rosdistro, githubuser, "all", post_jobs=pipe_job_names)
 
     return configs
 
@@ -97,16 +106,8 @@ def main():
         else:
             info = get_auth_keys('jenkins', HOME_FOLDER)
             hudson_instance = hudson.Hudson(SERVER, info.group(1), info.group(2))
-        prerelease_configs = create_prerelease_configs(options.rosdistro, options.stack, options.githubuser, options.email, options.repeat, options.source_only, options.arch, options.ubuntu, options.not_forked)
-        
-        #TODO necessary??? change???
-        # check if jobs are not already running
-#        for job_name in prerelease_configs:
-#            exists = hudson_instance.job_exists(job_name)
-#            if exists and hudson_instance.job_is_running(job_name):
-#                print 'Cannot create job %s because a job with the same name is already running.'%job_name
-#                print 'Please try again when this job finished running.'
-#                return 
+
+        prerelease_configs = create_prerelease_configs(options.rosdistro, options.stack, options.githubuser, options.email, options.repeat, options.source_only, hudson_instance, options.arch, options.ubuntu, options.not_forked)
 
         # send prerelease tests to Hudson
         print 'Creating pre-release Hudson jobs:<br>'

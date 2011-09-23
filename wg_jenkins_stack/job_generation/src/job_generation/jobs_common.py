@@ -398,13 +398,6 @@ def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
                         if job_name_stem in pending_job['task']['name']:
                             hudson_obj.cancel_pending_job(pending_job['id'])
                             print "Canceling pending job %s from build queue <br>"%(pending_job['task']['name'])
-                #building_jobs = hudson_obj.get_jobs()
-                #print str(building_jobs) + "<br>"
-                #for running_job in building_jobs:
-                #    print str(running_job) + "<br>"
-                #    if job_name_stem in running_job['name']:
-                #        hudson_obj.stop_running_job(running_job['name'])
-                #        print "Stopp running job %s  <br>"%running_job['name']
 
             # job is already running
             if exists and hudson_obj.job_is_running(job_name):           
@@ -463,12 +456,14 @@ def get_email_triggers(when, send_devel=True):
     return triggers
 
 
-def get_job_name(rosdistro, stack_name, githubuser, ubuntu="", arch="", jobtype=""):
+def get_job_name(rosdistro, githubuser, stack_name="", ubuntu="", arch="", jobtype=""):
     if len(stack_name) > 50:
         stack_name = stack_name[0:46]+'_...'
     stack_name = "_".join(stack_name)
     if jobtype == "pipe":
-        return "__".join([rosdistro, githubuser, stack_name, "pipe"])
+        return "__".join([rosdistro, githubuser, stack_name, jobtype])
+    elif jobtype == "all":
+        return "__".join([rosdistro, githubuser, jobtype])
     else:
         return "__".join([rosdistro, githubuser, stack_name, ubuntu, arch])
 
