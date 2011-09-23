@@ -189,13 +189,10 @@ def main():
         if os.path.exists(build_failures_context):
             body += open(build_failures_context).read()
             body += '\n\n'
-        print "******************************************************************"
+        print "\n******************************************************************"
         print "***                   BUILD AND TEST FAILURES                  ***"
-        print "******************************************************************"
-        if body != '':
-            print body
-        else:
-            print "NO FAILURES"
+        print "******************************************************************\n"
+        print body
         print "******************************************************************"
         
         # parse debian repository configuration file to get stack dependencies

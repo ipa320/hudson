@@ -196,6 +196,19 @@ class Hudson(object):
         @rtype: [ { str: str} ]
         """
         return self.get_info()['jobs']
+        
+    def get_pipe_jobs(self, rosdistro, githubuser):
+        """
+        Get a list of all pipe_jobs on Server for a specific user and rosdistro
+        
+        @param rosdistro: Name of the ros distribution
+        @param githubuser: Name of the Githubuser
+        """
+        pipe_jobs = []
+        for job in self.get_jobs():
+            if rosdistro in job['name'] and githubuser in job['name'] and "pipe" in job['name']:
+                pipe_jobs.append(job['name'])
+        return pipe_jobs
 
     def copy_job(self, from_name, to_name):
         """
