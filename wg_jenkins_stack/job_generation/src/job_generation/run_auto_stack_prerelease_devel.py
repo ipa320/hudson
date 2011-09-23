@@ -176,6 +176,27 @@ def main():
         if res != 0:
             return res
         
+        build_failures = os.path.join(os.environ['WORKSPACE'], 'build_output', 'buildfailures.txt')
+        build_failures_context = os.path.join(os.environ['WORKSPACE'], 'build_output', 'buildfailures-with-context.txt')
+        test_failures = os.path.join(os.environ['WORKSPACE'], 'test_output', 'testfailures.txt')
+        body = ''
+        if os.path.exists(build_failures):
+            body += open(build_failures).read()
+            body += '\n\n'
+        if os.path.exists(test_failures):
+            body += open(test_failures).read()
+            body += '\n\n'
+        if os.path.exists(build_failures_context):
+            body += open(build_failures_context).read()
+            body += '\n\n'
+        print "******************************************************************"
+        print "***                   BUILD AND TEST FAILURES                  ***"
+        print "******************************************************************"
+        if body != '':
+            print body
+        else:
+            print "NO FAILURES"
+        print "******************************************************************"
         
         # parse debian repository configuration file to get stack dependencies
         arch = 'i386'
