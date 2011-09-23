@@ -108,7 +108,7 @@ def main():
             hudson_instance = hudson.Hudson(SERVER, info.group(1), info.group(2))
 
         prerelease_configs = create_prerelease_configs(options.rosdistro, options.stack, options.githubuser, options.email, options.repeat, options.source_only, hudson_instance, options.arch, options.ubuntu, options.not_forked)
-        print "end"
+
         # send prerelease tests to Hudson
         print 'Creating pre-release Hudson jobs:<br>'
         schedule_jobs(prerelease_configs,wait=True, start=False, hudson_obj=hudson_instance, delete=options.delete)
