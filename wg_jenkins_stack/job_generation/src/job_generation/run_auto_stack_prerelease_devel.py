@@ -150,7 +150,7 @@ def main():
             print 'Stack(s) %s do(es) not have any dependencies, not installing anything now'%str(options.stack)
         
         print "+++++++++++++++++++++++++"
-        print os.listdir(env['ROS_PACKAGE_PATH'])
+        print os.listdir('/tmp/install_dir/%s'%DEPENDS_DIR)
         print "+++++++++++++++++++++++++"
         
         # Install system dependencies of stacks we're testing

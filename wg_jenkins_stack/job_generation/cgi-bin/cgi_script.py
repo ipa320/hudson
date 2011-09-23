@@ -109,7 +109,7 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
             try:
                 if not stack_forked(githubuser, repo):
                     results = results + "<b>" + repo + "</b>" + ": stack is not forked\n"
-                    results = results + "Using 'ipa320' stack instead. If that isn't desired, fork " + repo + " on github.com!"
+                    results = results + "Using 'ipa320' stack instead. If that is undesirably, fork " + repo + " on github.com!"
                     parameters = parameters + " --not-forked"
             except:
                 results = results + "<b>Error: Checking whether stack %s is forked failed</b>"%repo
