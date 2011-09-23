@@ -148,7 +148,11 @@ def main():
         for i in iter(depends_all): depends_no += len(depends_all[i])
         if depends_no == 0:
             print 'Stack(s) %s do(es) not have any dependencies, not installing anything now'%str(options.stack)
-            
+        
+        print "+++++++++++++++++++++++++"
+        print os.listdir(env['ROS_PACKAGE_PATH'])
+        print "+++++++++++++++++++++++++"
+        
         # Install system dependencies of stacks we're testing
         print "Installing system dependencies of stacks we're testing"
         call('rosmake rosdep', env)
