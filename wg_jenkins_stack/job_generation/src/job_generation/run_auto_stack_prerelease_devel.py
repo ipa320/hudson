@@ -192,20 +192,21 @@ def main():
         print body
         print "******************************************************************"
         
-        # parse debian repository configuration file to get stack dependencies
-        arch = 'i386'
-        if '64' in call('uname -mrs', env):
-            arch = 'amd64'
-        ubuntudistro = call('lsb_release -a', env).split('Codename:')[1].strip()
-        print "Parsing apt repository configuration file to get stack dependencies, for %s machine running %s"%(arch, ubuntudistro)
-        apt_deps = parse_apt(ubuntudistro, arch, options.rosdistro)
-        # all stacks that depends on the tested stacks, excluding the tested stacks.
-        depends_on_all = apt_deps.depends_on_all(options.stack)
-        remove(depends_on_all, options.stack)
-        # all stack dependencies of above stack list, except for the test stack dependencies
-        depends_all_depends_on_all = apt_deps.depends_all(depends_on_all)
-        remove(depends_all_depends_on_all, options.stack)
-        remove(depends_all_depends_on_all, depends_all)
+#no need to test debian package dependencies as long as no debian package exist
+#        # parse debian repository configuration file to get stack dependencies
+#        arch = 'i386'
+#        if '64' in call('uname -mrs', env):
+#            arch = 'amd64'
+#        ubuntudistro = call('lsb_release -a', env).split('Codename:')[1].strip()
+#        print "Parsing apt repository configuration file to get stack dependencies, for %s machine running %s"%(arch, ubuntudistro)
+#        apt_deps = parse_apt(ubuntudistro, arch, options.rosdistro)
+#        # all stacks that depends on the tested stacks, excluding the tested stacks.
+#        depends_on_all = apt_deps.depends_on_all(options.stack)
+#        remove(depends_on_all, options.stack)
+#        # all stack dependencies of above stack list, except for the test stack dependencies
+#        depends_all_depends_on_all = apt_deps.depends_all(depends_on_all)
+#        remove(depends_all_depends_on_all, options.stack)
+#        remove(depends_all_depends_on_all, depends_all)
         
     # global except
     except Exception, ex:
