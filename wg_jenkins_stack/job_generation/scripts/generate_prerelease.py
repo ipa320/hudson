@@ -33,6 +33,7 @@ def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubunt
     hudson_config = hudson_config.replace('GITHUBUSER', githubuser)
     hudson_config = hudson_config.replace('REPEAT', str(repeat))
     hudson_config = hudson_config.replace('LABEL', job_type)
+    hudson_config = hudson_config.replace('RAMDISK', '--ramdisk --ramdisk-size 6000M')
 
     if post_jobs != []:
         hudson_config = hudson_config.replace('POSTJOBS', ', '.join(str(n) for n in post_jobs))
@@ -48,11 +49,6 @@ def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubunt
         hudson_config = hudson_config.replace('STACKOWNER', 'ipa320')
     else:
         hudson_config = hudson_config.replace('STACKOWNER', githubuser)
-    
-    if "cob3_intern" in stack_list:
-        hudson_config = hudson_config.replace('RAMDISK', '--ramdisk')
-    else:
-        hudson_config = hudson_config.replace('RAMDISK', '--ramdisk --ramdisk-size 6000M')
 
     return hudson_config
 
