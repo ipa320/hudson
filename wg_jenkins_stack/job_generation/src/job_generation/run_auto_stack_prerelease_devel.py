@@ -59,10 +59,13 @@ def main():
                 print "Using 'ipa320' stack instead"
                 options.githubuser = "ipa320"
             if stack in FHG_STACKS_PUBLIC: # create rosinstall file for public stacks
+                print "Stack %s is a public ipa stack" %(stack)
                 rosinstall += '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack, options.githubuser, stack)
             elif stack in FHG_STACKS_PRIVATE: # clone private stacks
+                print "Stack %s is a private ipa stack" %(stack)
                 call('git clone git@github.com:%s/%s.git %s/%s'%(options.githubuser, stack, STACK_DIR, stack), env, 'Clone private stack [%s] to test'%(stack))
             else:
+                print "Stack %s is not a ipa stack, using released version" %(stack)
                 rosinstall += stack_to_rosinstall(rosdistro_obj.stacks[stack], 'devel')
 
         if rosinstall != '': # call rosinstall command
