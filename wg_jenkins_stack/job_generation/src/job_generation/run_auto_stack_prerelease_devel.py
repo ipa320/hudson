@@ -71,7 +71,7 @@ def main():
             
         
         # get all stack dependencies of stacks we're testing
-        rosinstall = ''
+        #rosinstall = ''
         depends_all = {"public" : [], "private" : [], "other" : []}
         for stack in options.stack:
 #            stack_xml = '%s/%s/stack.xml'%(STACK_DIR, stack)
@@ -92,12 +92,12 @@ def main():
         if len(depends_all["private"]) > 0:#TODO released private stack???
             print 'Cloning private github fork(s)'
             for stack in depends_all["private"]:
-                stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env)
+                stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
                     
 
         if len(depends_all["public"]) > 0:
             for stack in depends_all["public"]:
-                stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env)
+                stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
             
             print 'Installing stack dependencies from public github fork'
             rosinstall_file = '%s.rosinstall'%DEPENDS_DIR
