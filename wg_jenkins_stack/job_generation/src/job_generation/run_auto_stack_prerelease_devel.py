@@ -55,7 +55,7 @@ def main():
         rosinstall = ''
         print options.stack
         for stack in options.stack:
-            stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env) #TODO
+            rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env) #TODO
             print "ROSINSTALL"
             print rosinstall
             
@@ -94,12 +94,12 @@ def main():
         if len(depends_all["private"]) > 0:#TODO released private stack???
             print 'Cloning private github fork(s)'
             for stack in depends_all["private"]:
-                stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
+                rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
                     
 
         if len(depends_all["public"]) > 0:
             for stack in depends_all["public"]:
-                stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
+                rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
             
             print 'Installing stack dependencies from public github fork'
             rosinstall_file = '%s.rosinstall'%DEPENDS_DIR

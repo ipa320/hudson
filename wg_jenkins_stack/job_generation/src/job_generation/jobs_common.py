@@ -189,7 +189,7 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
            print "Stack %s is not forked for user %s, using 'ipa320' stack instead" %(stack_name, githubuser)
            githubuser = 'ipa320'
         call('git clone git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone private stack [%s] to test'%(stack_name))
-        return
+        return ''
     elif stack_name in FHG_STACKS_PUBLIC:
         print "Stack %s is a public ipa stack" %(stack_name)
         if not stack_forked(githubuser, stack_name):
@@ -197,15 +197,12 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
             githubuser = 'ipa320'
             if stack_name in rosdistro_obj.stacks:
                 print "Using released version"
-                rosinstall += stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release)
-                return
+                return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release)
             print "Using 'ipa320' stack instead"
-        rosinstall +=  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack_name, githubuser, stack_name)
-        return
+        return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack_name, githubuser, stack_name)
     elif stack_name in rosdistro_obj.stacks:
         print "Stack %s is not a ipa stack, using released version" %(stack_name)
-        rosinstall += stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'devel')
-        return
+        return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'devel')
     else:
         raise ex, "ERROR: Stack %s not found! This should never happen!"%(stack_name)
         
