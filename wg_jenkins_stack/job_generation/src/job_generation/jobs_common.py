@@ -87,9 +87,7 @@ else:
 
 # list of public and private IPA Fraunhofer stacks
 FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_driver', 'cob_simulation', 'cob_apps', 'cob_manipulation', 'cob_navigation', 'cob_environment_perception', 'cob_people_perception', 'cob_object_perception', 'cob_scenarios']
-FHG_STACKS_PRIVATE = ['cob3_intern', 'cob_manipulation_intern', 'cob_navigation_intern', 'cob_environment_perception_intern', 'cob_object_perception_intern', 'cob_scenarios_intern', 'interaid', 'srs', 'r3cop']
-
-COB3_INTERN_STACKS = ["cob_manipulation", "cob_navigation", "cob_rcc", "cob_sandbox", "cob_scenarios", "cob_vision"]
+FHG_STACKS_PRIVATE = ['cob_manipulation_intern', 'cob_navigation_intern', 'cob_environment_perception_intern', 'cob_object_perception_intern', 'cob_scenarios_intern', 'interaid', 'srs', 'r3cop']
 
 PRIO_ARCH = "i386"
 PRIO_UBUNTUDISTRO = "natty"
@@ -127,26 +125,10 @@ def stacks_to_debs(stack_list, rosdistro):
 
 
 def get_depends_one(stack_name, githubuser):
-    # in case the 'stack' is cob3_intern
-    depends_one = []
-    if stack_name == "cob3_intern":
-        COB3_STACKS = get_cob3_intern_stacks('stack_overlay/cob3_intern')
-        print "Stacks in cob3_intern: %s"%COB3_STACKS
-        for stack in COB3_STACKS:
-            cob3_intern_depends_one = []
-            stack_xml = get_stack_xml("cob3_intern", githubuser, "/master/" + stack + "/stack.xml")
-            cob3_intern_depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
-            print "Dependencies of cob3_intern stack %s:"%stack
-            print str(cob3_intern_depends_one)
-            depends_one += cob3_intern_depends_one
-    elif stack_name in COB3_INTERN_STACKS:
-        stack_xml = get_stack_xml("cob3_intern", githubuser, "/master/" + stack_name + "/stack.xml")
-        depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
     # get stack.xml from github
-    else:
-        stack_xml = get_stack_xml(stack_name, githubuser)#, get_stack_membership(stack_name))
+    stack_xml = get_stack_xml(stack_name, githubuser)#, get_stack_membership(stack_name))
     # convert to list
-        depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
+    depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
     print 'Dependencies of stack %s: %s'%(stack_name, str(depends_one))
     return depends_one
 
@@ -168,29 +150,10 @@ def get_depends_all(stack_name, depends_all, githubuser, start_depth):
     #print start_depth, " DEPENDS_ALL ", stack_name, " end depth ", (len(depends_all['private']) + len(depends_all['public']) + len(depends_all['other']))
 
 
-def get_cob3_intern_stacks(folder, packages=False):
-    stack_list = []
-    package_list = []
-    
-    for entry in os.listdir('/tmp/install_dir/%s'%folder):
-        if os.path.isdir('/tmp/install_dir/%s/%s'%(folder, entry)):
-            if "cob" in entry:
-                stack_list.append(entry)
-    if not packages:
-        return stack_list
-    
-    for stack in stack_list:
-        for entry in os.listdir('/tmp/install_dir/%s/%s'%(folder, stack)):
-            if os.path.isdir('/tmp/install_dir/%s/%s/%s'%(folder, stack, entry)):
-                if entry[0] != ".":
-                    package_list.append(entry)
-    return package_list
-
-
 def get_stack_membership(stack_name):
     if stack_name in FHG_STACKS_PUBLIC:
         return "public"
-    elif stack_name in FHG_STACKS_PRIVATE or stack_name in COB3_INTERN_STACKS:
+    elif stack_name in FHG_STACKS_PRIVATE:
         return "private"
     else:
         return "other"
@@ -220,12 +183,8 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
 
 
 def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
-    if stack_name in COB3_INTERN_STACKS:
-        if not stack_forked(githubuser, "cob3_intern", "/blob/master/%s/Makefile"%stack_name):
-            githubuser = "ipa320"
-    else:
-        if not stack_forked(githubuser, stack_name):
-            githubuser = "ipa320"
+    if not stack_forked(githubuser, stack_name):
+        githubuser = "ipa320"
 
     try:
         git_auth = get_auth_keys('github', '/tmp/workspace')

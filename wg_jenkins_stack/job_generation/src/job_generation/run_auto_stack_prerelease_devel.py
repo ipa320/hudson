@@ -83,12 +83,8 @@ def main():
             
         
         # get all stack dependencies of stacks we're testing
-
         depends_all = {"public" : [], "private" : [], "other" : []}
         for stack in options.stack:
-            if stack == "cob3_intern":
-                COB3_STACKS = get_cob3_intern_stacks(STACK_DIR+'/cob3_intern')
-                COB3_PACKAGES = get_cob3_intern_stacks(STACK_DIR+'/cob3_intern', packages=True)
 #            stack_xml = '%s/%s/stack.xml'%(STACK_DIR, stack)
 #            call('ls %s'%stack_xml, env, 'Checking if stack %s contains "stack.xml" file'%stack)
 #            with open(stack_xml) as stack_file:
@@ -97,36 +93,19 @@ def main():
             #print 'Dependencies of stack %s: %s'%(stack, str(depends_one))
             for d in depends_one:
                 if not d in options.stack and not d in depends_all:
-                    if stack == "cob3_intern":
-                        if not d in COB3_PACKAGES and not d in COB3_STACKS:
-                            print 'Adding dependencies of stack %s'%d
-                            get_depends_all(d, depends_all, options.githubuser, 1)
-                            print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all)
-                    else:
-                        print 'Adding dependencies of stack %s'%d
-                        get_depends_all(d, depends_all, options.githubuser, 1)
-                        print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all) 
+                    print 'Adding dependencies of stack %s'%d
+                    get_depends_all(d, depends_all, options.githubuser, 1)
+                    print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all) 
         
         print 'Dependencies of %s:'%str(options.stack)
         print str(depends_all)
 
         if len(depends_all["private"]) > 0:
             print 'Cloning private github fork(s)'
-            downloaded = False
             for stack in depends_all["private"]:
-                if stack in COB3_INTERN_STACKS:
-                    if not downloaded:
-                        if not stack_forked(options.githubuser, "cob3_intern", "/blob/master/%s/Makefile"%stack):
-                            options.githubuser = "ipa320"
-                        call('git clone git@github.com:%s/cob3_intern.git %s'%(options.githubuser, "/tmp/cob3_intern"), env, 'Clone private stack cob3_intern')
-                        downloaded = True
-                        
-                    call('mv /tmp/cob3_intern/%s %s'%(stack, DEPENDS_DIR), env, 'Move required stack %s to %s'%(stack, DEPENDS_DIR))
-                    
-                else:
-                    if not stack_forked(options.githubuser, stack):
-                        options.githubuser = "ipa320"
-                    call('git clone git@github.com:%s/%s.git %s'%(options.githubuser, stack, DEPENDS_DIR), env, 'Clone private stack [%s] to test'%(stack))
+                if not stack_forked(options.githubuser, stack):
+                    options.githubuser = "ipa320"
+                call('git clone git@github.com:%s/%s.git %s'%(options.githubuser, stack, DEPENDS_DIR), env, 'Clone private stack [%s] to test'%(stack))
                     
 
         if len(depends_all["public"]) > 0:
@@ -158,12 +137,8 @@ def main():
         print "Installing system dependencies of stacks we're testing"
         call('rosmake rosdep', env)
         for stack in options.stack:
-            if stack == "cob3_intern":
-                call('make -f /tmp/install_dir/%s/cob3_intern/Makefile ros-install-%s'%(STACK_DIR, options.rosdistro), env, 'ros-install')
-                call('make -f /tmp/install_dir/%s/cob3_intern/Makefile ros-skip-blacklist'%STACK_DIR, env, 'ros-skip-blacklist')
-            else:
-                call('rosdep install -y %s'%stack, env,
-                     'Install system dependencies of stack %s'%stack)
+            call('rosdep install -y %s'%stack, env,
+                 'Install system dependencies of stack %s'%stack)
                  
         # Run hudson helper for stacks only
         print 'Running Hudson Helper'
