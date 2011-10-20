@@ -53,6 +53,7 @@ def main():
         # Install the stacks to test from source
         print 'Installing the stacks to test from source'
         rosinstall = ''
+        print options.stack
         for stack in options.stack:
             if not stack_forked(options.githubuser, stack):
                 print "Stack %s is not forked for user %s" %(stack, options.githubuser)
