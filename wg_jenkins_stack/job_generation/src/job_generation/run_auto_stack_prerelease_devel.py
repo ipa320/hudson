@@ -55,20 +55,8 @@ def main():
         rosinstall = ''
         print options.stack
         for stack in options.stack:
-            if not stack_forked(options.githubuser, stack):
-                print "Stack %s is not forked for user %s" %(stack, options.githubuser)
-                print "Using 'ipa320' stack instead"
-                options.githubuser = "ipa320"
-            if stack in FHG_STACKS_PUBLIC: # create rosinstall file for public stacks
-                print "Stack %s is a public ipa stack" %(stack)
-                rosinstall += '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack, options.githubuser, stack)
-            elif stack in FHG_STACKS_PRIVATE: # clone private stacks
-                print "Stack %s is a private ipa stack" %(stack)
-                call('git clone git@github.com:%s/%s.git %s/%s'%(options.githubuser, stack, STACK_DIR, stack), env, 'Clone private stack [%s] to test'%(stack))
-            else:
-                print "Stack %s is not a ipa stack, using released version" %(stack)
-                rosinstall += stack_to_rosinstall(rosdistro_obj.stacks[stack], 'devel')
-
+            stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env)
+            
         if rosinstall != '': # call rosinstall command
             rosinstall_file = '%s.rosinstall'%STACK_DIR
             print 'Generating rosinstall file [%s]'%(rosinstall_file)
@@ -83,6 +71,7 @@ def main():
             
         
         # get all stack dependencies of stacks we're testing
+        rosinstall = ''
         depends_all = {"public" : [], "private" : [], "other" : []}
         for stack in options.stack:
 #            stack_xml = '%s/%s/stack.xml'%(STACK_DIR, stack)
@@ -100,19 +89,15 @@ def main():
         print 'Dependencies of %s:'%str(options.stack)
         print str(depends_all)
 
-        if len(depends_all["private"]) > 0:
+        if len(depends_all["private"]) > 0:#TODO released private stack???
             print 'Cloning private github fork(s)'
             for stack in depends_all["private"]:
-                if not stack_forked(options.githubuser, stack):
-                    options.githubuser = "ipa320"
-                call('git clone git@github.com:%s/%s.git %s'%(options.githubuser, stack, DEPENDS_DIR), env, 'Clone private stack [%s] to test'%(stack))
+                stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env)
                     
 
         if len(depends_all["public"]) > 0:
             for stack in depends_all["public"]:
-                if not stack_forked(options.githubuser, stack):
-                    options.githubuser = "ipa320"
-                rosinstall += '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack, options.githubuser, stack)
+                stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env)
             
             print 'Installing stack dependencies from public github fork'
             rosinstall_file = '%s.rosinstall'%DEPENDS_DIR
