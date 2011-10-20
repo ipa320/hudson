@@ -55,7 +55,9 @@ def main():
         rosinstall = ''
         print options.stack
         for stack in options.stack:
-            stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env)
+            stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env) #TODO
+            print "ROSINSTALL"
+            print rosinstall
             
         if rosinstall != '': # call rosinstall command
             rosinstall_file = '%s.rosinstall'%STACK_DIR
@@ -81,7 +83,7 @@ def main():
             depends_one = get_depends_one(stack, options.githubuser)
             #print 'Dependencies of stack %s: %s'%(stack, str(depends_one))
             for d in depends_one:
-                if not d in options.stack and not d in depends_all:
+                if not d in options.stack and not d in depends_all: #TODO depends_all
                     print 'Adding dependencies of stack %s'%d
                     get_depends_all(d, depends_all, options.githubuser, 1)
                     print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all) 
