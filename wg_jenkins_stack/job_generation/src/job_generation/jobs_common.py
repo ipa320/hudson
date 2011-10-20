@@ -202,15 +202,17 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
     fields = urllib.urlencode(post)
     path = "https://github.com/" + githubuser + "/" + stack_name + appendix
     print path
+    print fields
     file1 = StringIO.StringIO()
     c = pycurl.Curl()
     c.setopt(pycurl.URL, path)
     c.setopt(pycurl.POSTFIELDS, fields)
-    c.setopt(pycurl.WRITEFUNCTION, file1.write) # to avoid to show the called page
+    #c.setopt(pycurl.WRITEFUNCTION, file1.write) # to avoid to show the called page
     c.perform()
     c.close
 
     if c.getinfo(pycurl.HTTP_CODE) == 200:
+        print "Stack found"
         return True
     else:
         print "ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE)
