@@ -13,6 +13,7 @@ from apt_parser import parse_apt
 import subprocess
 import os
 import sys
+import traceback
 
 
 def remove(list1, list2):
