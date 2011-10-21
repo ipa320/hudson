@@ -77,13 +77,12 @@ def main():
         for stack in options.stack:
             print '\n==================================================================================='
             print 'Calculating all stack dependencies of %s\n'%stack
-            depends_one = get_depends_one(stack, options.githubuser, 0)
+            depends_one = get_depends_one(stack, options.githubuser)
 
             for d in depends_one:
                 depends_all_list = []
                 [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
                 if not d in options.stack and not d in depends_all_list:
-                    print 'Adding dependencies of stack %s'%d
                     get_depends_all(d, depends_all, options.githubuser, 1)
         
         print '\n==================================================================================='

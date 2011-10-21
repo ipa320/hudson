@@ -129,12 +129,13 @@ def stacks_to_debs(stack_list, rosdistro):
     return ' '.join([stack_to_deb(s, rosdistro) for s in stack_list])
 
 
-def get_depends_one(stack_name, githubuser, spaces):
+def get_depends_one(stack_name, githubuser, spaces=""):
     # get stack.xml from github
     stack_xml = get_stack_xml(stack_name, githubuser)
     # convert to list
     depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
-    print " "*2*spaces, 'Dependencies of stack %s:\n  %s'%(stack_name, str(depends_one))
+    print spaces, 'Dependencies of stack %s:'%stack_name
+    print spaces, str(depends_one)
     return depends_one
 
 
@@ -149,7 +150,7 @@ def get_depends_all(stack_name, depends_all, githubuser, start_depth):
         depends_all[get_stack_membership(stack_name)].append(stack_name)
         # find and append all IPA dependencies
         if stack_name in FHG_STACKS_PRIVATE or stack_name in FHG_STACKS_PUBLIC:
-            for d in get_depends_one(stack_name, githubuser, start_depth):
+            for d in get_depends_one(stack_name, githubuser, " "*2*start_depth):
                 get_depends_all(d, depends_all, githubuser, start_depth+1)
 
 
@@ -204,7 +205,7 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
             githubuser = 'ipa320'
             if stack_name in rosdistro_obj.stacks:  # stack is released
                 print "    Using released version"
-                return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release)
+                return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release_name)
             print "    Using 'ipa320' stack instead"    # stack is not released, using 'ipa320' fork
         return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack_name, githubuser, stack_name)
         
