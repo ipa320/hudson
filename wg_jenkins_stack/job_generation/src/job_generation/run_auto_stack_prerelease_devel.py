@@ -87,7 +87,12 @@ def main():
         
         print '\n==================================================================================='
         print 'Dependencies of %s:'%str(options.stack)
-        print str(depends_all)
+        print "Private IPA stacks:"
+        print "  ", str(depends_all["private"])
+        print "Public IPA stacks:"
+        print "  ", str(depends_all["public"])
+        print "None IPA stacks:"
+        print "  ", str(depends_all["others"])
 
         if len(depends_all["private"]) > 0:#TODO released private stack???
             print '\n==================================================================================='
@@ -97,11 +102,11 @@ def main():
                     
 
         if len(depends_all["public"]) > 0:
+            print '\n==================================================================================='
+            print 'Installing stack dependencies from public github fork'
             for stack in depends_all["public"]:
                 rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
             
-            print '\n==================================================================================='
-            print 'Installing stack dependencies from public github fork'
             rosinstall_file = '%s.rosinstall'%DEPENDS_DIR
             with open(rosinstall_file, 'w') as f:
                 f.write(rosinstall)
