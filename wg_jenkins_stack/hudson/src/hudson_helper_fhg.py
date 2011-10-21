@@ -190,7 +190,7 @@ class HudsonHelper:
         except (CalledProcessError, OSError), e:
             failure = True
             print >> sys.stderr, '[%s] Error in bootstrap build step:%s'%(NAME,e)
-            self.post_build(failure, test_failure, workspace)
+            #self.post_build(failure, test_failure, workspace)
 
 
         ###########################################
@@ -213,7 +213,7 @@ class HudsonHelper:
         except (CalledProcessError, OSError), e:
             failure = True
             print >> sys.stderr, '[%s] Error in build step:%s'%(NAME,e)
-            self.post_build(failure, test_failure, workspace)
+            #self.post_build(failure, test_failure, workspace)
 
         ###########################################
         # rosmake test everything
