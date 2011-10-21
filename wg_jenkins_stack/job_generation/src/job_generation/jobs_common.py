@@ -134,7 +134,7 @@ def get_depends_one(stack_name, githubuser, spaces):
     stack_xml = get_stack_xml(stack_name, githubuser)
     # convert to list
     depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
-    print " "*2*spaces, 'Dependencies of stack %s: %s'%(stack_name, str(depends_one))
+    print " "*2*spaces, 'Dependencies of stack %s:\n  %s'%(stack_name, str(depends_one))
     return depends_one
 
 
@@ -192,7 +192,7 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
     if stack_name in FHG_STACKS_PRIVATE:    # stack is private ipa stack
         print "Stack %s is a private ipa stack" %(stack_name)
         if not stack_forked(githubuser, stack_name):    # check if stack is forked for user or not
-           print "Stack %s is not forked for user %s, using 'ipa320' stack instead" %(stack_name, githubuser)
+           print "  Stack %s is not forked for user %s, using 'ipa320' stack instead" %(stack_name, githubuser)
            githubuser = 'ipa320'
         call('git clone git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone private stack [%s] to test'%(stack_name))
         return ''
@@ -200,12 +200,12 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
     elif stack_name in FHG_STACKS_PUBLIC:   # stack is public ipa stack
         print "Stack %s is a public ipa stack" %(stack_name)
         if not stack_forked(githubuser, stack_name):    # check if stack is forked for user or not
-            print "Stack %s is not forked for user %s" %(stack_name, githubuser)
+            print "  Stack %s is not forked for user %s" %(stack_name, githubuser)
             githubuser = 'ipa320'
             if stack_name in rosdistro_obj.stacks:  # stack is released
-                print "Using released version"
+                print "    Using released version"
                 return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release)
-            print "Using 'ipa320' stack instead"    # stack is not released, using 'ipa320' fork
+            print "    Using 'ipa320' stack instead"    # stack is not released, using 'ipa320' fork
         return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack_name, githubuser, stack_name)
         
     elif stack_name in rosdistro_obj.stacks:    # stack is no ipa stack

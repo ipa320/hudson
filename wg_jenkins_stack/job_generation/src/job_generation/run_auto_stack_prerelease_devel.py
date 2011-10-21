@@ -58,6 +58,7 @@ def main():
             rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env)
             
         if rosinstall != '': # call rosinstall command
+            print '\n==================================================================================='
             rosinstall_file = '%s.rosinstall'%STACK_DIR
             print 'Generating rosinstall file [%s]'%(rosinstall_file)
             print 'Contents:\n\n'+rosinstall+'\n\n'
@@ -84,8 +85,8 @@ def main():
                 if not d in options.stack and not d in depends_all_list:
                     print 'Adding dependencies of stack %s'%d
                     get_depends_all(d, depends_all, options.githubuser, 1)
-                    print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all) 
         
+        print '\n==================================================================================='
         print 'Dependencies of %s:'%str(options.stack)
         print str(depends_all)
 
@@ -111,7 +112,7 @@ def main():
         if len(depends_all["other"]) > 0:
             # Install Debian packages of stack dependencies
             print '\n==================================================================================='
-            print 'Installing debian packages of "%s" dependencies: %s'%(str(options.stack), str(depends_all["other"]))
+            print 'Installing debian packages of "%s" dependencies:\n%s'%(str(options.stack), str(depends_all["other"]))
             call('sudo apt-get update', env)
             call('sudo apt-get install %s --yes'%(stacks_to_debs(depends_all["other"], options.rosdistro)), env)
  
