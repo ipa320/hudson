@@ -92,7 +92,7 @@ def main():
         print "Public IPA stacks:"
         print "  ", str(depends_all["public"])
         print "None IPA stacks:"
-        print "  ", str(depends_all["others"])
+        print "  ", str(depends_all["other"])
 
         if len(depends_all["private"]) > 0:#TODO released private stack???
             print '\n==================================================================================='
