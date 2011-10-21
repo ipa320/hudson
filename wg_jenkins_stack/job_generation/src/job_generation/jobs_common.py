@@ -193,7 +193,7 @@ def stack_released(stack_name, rosdistro, env):
     deb_name = stack_to_deb(stack_name, rosdistro)
     err_msg = call('sudo apt-get -s install %s'%deb_name, env, ignore_fail=True)
     print "ERROR MESSAGE: ", err_msg
-    if err_msg == ""
+    if err_msg == "":
         return True
     else:
         return False
