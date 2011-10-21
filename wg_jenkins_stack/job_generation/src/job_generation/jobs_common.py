@@ -190,13 +190,13 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
 
 
 def stack_released(stack_name, rosdistro, env):
-    deb_name = stack_to_deb(stack_name, rosdistro)
-    err_msg = call('sudo apt-get -s install %s'%deb_name, env, ignore_fail=True)
+    pkg_name = stack_to_deb(stack_name, rosdistro)
+    err_msg = call('apt-get -s install %s'%pkg_name, env, ignore_fail=True)
     print "ERROR MESSAGE: ", err_msg
-    if err_msg == "":
-        return True
-    else:
+    if "E: Unable to locate package %s"%pkg_name in err_msg:
         return False
+    else:
+        return True
 
 def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir, env):
     # check if stack is private, public or other / forked or not / released or not
