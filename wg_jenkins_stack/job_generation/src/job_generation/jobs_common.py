@@ -207,7 +207,7 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
         if not stack_forked(githubuser, stack_name):    # check if stack is forked for user or not
             print "  Stack %s is not forked for user %s" %(stack_name, githubuser)
             githubuser = 'ipa320'
-            if stack_released:  # stack is released
+            if stack_released(stack_name, rosdistro_obj.release_name, env):  # stack is released
                 print "    Using released version"
                 call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
                 return ''
@@ -220,7 +220,7 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
         if not stack_forked(githubuser, stack_name):    # check if stack is forked for user or not
             print "  Stack %s is not forked for user %s" %(stack_name, githubuser)
             githubuser = 'ipa320'
-            if stack_released:  # stack is released
+            if stack_released(stack_name, rosdistro_obj.release_name, env):  # stack is released
                 print "    Using released version"
                 call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
                 return ''
