@@ -191,7 +191,7 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
 
 def stack_released(stack_name, rosdistro, env):
     pkg_name = stack_to_deb(stack_name, rosdistro)
-    err_msg = call('apt-get -s install %s'%pkg_name, env, ignore_fail=True)
+    err_msg = call('sudo apt-get -s install %s'%pkg_name, env, ignore_fail=True)
     print "ERROR MESSAGE: ", err_msg
     if "E: Unable to locate package %s"%pkg_name in err_msg:
         return False
