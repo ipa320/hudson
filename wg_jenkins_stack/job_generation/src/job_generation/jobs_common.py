@@ -206,7 +206,8 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
             githubuser = 'ipa320'
             if stack_name in rosdistro_obj.stacks:  # stack is released
                 print "    Using released version"
-                return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release_name)
+                return '- git: {local-name: %s, uri: "git://github.com/ipa320/%s.git", branch-name: %s}\n'%(stack_name, stack_name, rosdistro_obj.release_name)
+                #return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release_name)
             print "    Using 'ipa320' stack instead"    # stack is not released, using 'ipa320' fork
         return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack_name, githubuser, stack_name)
         
