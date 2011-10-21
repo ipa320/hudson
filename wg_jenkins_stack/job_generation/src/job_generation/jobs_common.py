@@ -141,7 +141,6 @@ def get_depends_one(stack_name, githubuser, spaces=""):
 
 
 def get_depends_all(stack_name, depends_all, githubuser, start_depth):
-    #TODO output
     depends_all_list = []
     print " "*2*start_depth, start_depth, " depends all ", stack_name
     # convert depends_all entries to list
@@ -153,6 +152,8 @@ def get_depends_all(stack_name, depends_all, githubuser, start_depth):
         if stack_name in FHG_STACKS_PRIVATE or stack_name in FHG_STACKS_PUBLIC:
             for d in get_depends_one(stack_name, githubuser, " "*2*start_depth):
                 get_depends_all(d, depends_all, githubuser, start_depth+1)
+    else:
+        print " "*2*start_depth, start_depth, "%s already in included"%stack_name
 
 
 def get_stack_membership(stack_name):
