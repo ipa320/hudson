@@ -530,4 +530,4 @@ def call(command, env=None, message='', ignore_fail=False):
                 generate_email(message, env)
             raise Exception
         else:
-            return err
+            return str(err)
