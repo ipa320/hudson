@@ -27,10 +27,10 @@
       <command>
 BOOTSTRAP_SCRIPT
 echo ""
-echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+echo "'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''"
 echo "RUNNING run_auto_stack_prerelease_devel.py"
 rosrun job_generation run_auto_stack_prerelease_devel.py STACKARGS --rosdistro ROSDISTRO --githubuser GITHUBUSER --email EMAIL --repeat REPEAT SOURCE_ONLY
-echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+echo "'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''"
 echo ""
 SHUTDOWN_SCRIPT
      </command> 
