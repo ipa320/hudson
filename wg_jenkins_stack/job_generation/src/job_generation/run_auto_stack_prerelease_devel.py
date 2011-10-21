@@ -87,23 +87,23 @@ def main():
         
         print '\n==================================================================================='
         print 'Dependencies of %s:'%str(options.stack)
-        print "Private IPA stacks:"
-        print "  ", str(depends_all["private"])
-        print "Public IPA stacks:"
-        print "  ", str(depends_all["public"])
-        print "None IPA stacks:"
-        print "  ", str(depends_all["other"])
+        print "  Private IPA stacks:"
+        print "    ", str(depends_all["private"])
+        print "  Public IPA stacks:"
+        print "    ", str(depends_all["public"])
+        print "  None IPA stacks:"
+        print "    ", str(depends_all["other"])
 
         if len(depends_all["private"]) > 0:#TODO released private stack???
             print '\n==================================================================================='
-            print 'Cloning private github fork(s)'
+            print 'Cloning private github fork(s)\n'
             for stack in depends_all["private"]:
                 rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
                     
 
         if len(depends_all["public"]) > 0:
             print '\n==================================================================================='
-            print 'Installing stack dependencies from public github fork'
+            print 'Installing stack dependencies from public github fork\n'
             for stack in depends_all["public"]:
                 rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
             
@@ -116,7 +116,7 @@ def main():
         if len(depends_all["other"]) > 0:
             # Install Debian packages of stack dependencies
             print '\n==================================================================================='
-            print 'Installing debian packages of "%s" dependencies:\n%s'%(str(options.stack), str(depends_all["other"]))
+            print 'Installing debian packages of "%s" dependencies:\n\n%s'%(str(options.stack), str(depends_all["other"]))
             call('sudo apt-get update', env)
             call('sudo apt-get install %s --yes'%(stacks_to_debs(depends_all["other"], options.rosdistro)), env)
  
@@ -136,7 +136,7 @@ def main():
                  
         # Run hudson helper for stacks only
         print '\n==================================================================================='
-        print 'Running Hudson Helper'
+        print 'Running Hudson Helper\n'
         res = 0
         for r in range(0, int(options.repeat)+1):
             env['ROS_TEST_RESULTS_DIR'] = env['ROS_TEST_RESULTS_DIR'] + '/' + STACK_DIR + '_run_' + str(r)
