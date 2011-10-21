@@ -193,7 +193,7 @@ def stack_released(stack_name, rosdistro, env):
     print '\n***********************************************************************************'
     print 'Checking if stack is released\n'
     pkg_name = stack_to_deb(stack_name, rosdistro)
-    err_msg = call('sudo apt-get -s install %s'%pkg_name, env, ignore_fail=True)
+    err_msg = call('sudo apt-get -s install %s'%pkg_name, env, ignore_fail=True, quiet=True)
     #print "ERROR MESSAGE: ", err_msg
     if "E: Unable to locate package %s"%pkg_name in err_msg:
         return False
@@ -503,15 +503,16 @@ def generate_email(message, env):
     write_file(env['WORKSPACE']+'/build_output/buildfailures-with-context.txt', '')
 
 
-def call(command, env=None, message='', ignore_fail=False):
+def call(command, env=None, message='', ignore_fail=False, quiet=False):
     res = ''
     err = ''
     try:
         print message+'\nExecuting command "%s"'%command
         helper = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
         res, err = helper.communicate()
-        print str(res)
-        print str(err)
+        if not quiet:
+            print str(res)
+            print str(err)
         if helper.returncode != 0:
             raise Exception
         return res

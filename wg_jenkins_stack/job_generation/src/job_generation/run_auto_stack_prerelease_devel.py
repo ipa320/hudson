@@ -57,7 +57,7 @@ def main():
         for stack in options.stack:
             if not stack_forked(options.githubuser, stack):
                 print "  Stack %s is not forked for user %s" %(stack, options.githubuser)
-                raise "  Stack %s is not forked for user %s" %(stack, options.githubuser)
+                raise Exeption('  Stack %s is not forked for user %s')%(stack, options.githubuser)
                 
             rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env)
             
