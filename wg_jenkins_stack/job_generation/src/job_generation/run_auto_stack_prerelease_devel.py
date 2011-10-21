@@ -51,13 +51,11 @@ def main():
 
 
         # Install the stacks to test from source
-        print 'Installing the stacks to test from source'
+        print '\n==================================================================================='
+        print 'Installing %s to test from source\n'%str(options.stack)
         rosinstall = ''
-        print options.stack
         for stack in options.stack:
-            rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env) #TODO
-            print "ROSINSTALL"
-            print rosinstall
+            rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env)
             
         if rosinstall != '': # call rosinstall command
             rosinstall_file = '%s.rosinstall'%STACK_DIR
@@ -73,9 +71,11 @@ def main():
             
         
         # get all stack dependencies of stacks we're testing
-        #rosinstall = ''
+        rosinstall = ''
         depends_all = {"public" : [], "private" : [], "other" : []}
         for stack in options.stack:
+            print '\n==================================================================================='
+            print 'Calculating all stack dependencies of %s'%stack
 #            stack_xml = '%s/%s/stack.xml'%(STACK_DIR, stack)
 #            call('ls %s'%stack_xml, env, 'Checking if stack %s contains "stack.xml" file'%stack)
 #            with open(stack_xml) as stack_file:
@@ -92,6 +92,7 @@ def main():
         print str(depends_all)
 
         if len(depends_all["private"]) > 0:#TODO released private stack???
+            print '\n==================================================================================='
             print 'Cloning private github fork(s)'
             for stack in depends_all["private"]:
                 rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
@@ -101,6 +102,7 @@ def main():
             for stack in depends_all["public"]:
                 rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
             
+            print '\n==================================================================================='
             print 'Installing stack dependencies from public github fork'
             rosinstall_file = '%s.rosinstall'%DEPENDS_DIR
             with open(rosinstall_file, 'w') as f:
@@ -110,6 +112,7 @@ def main():
      
         if len(depends_all["other"]) > 0:
             # Install Debian packages of stack dependencies
+            print '\n==================================================================================='
             print 'Installing debian packages of "%s" dependencies: %s'%(str(options.stack), str(depends_all["other"]))
             call('sudo apt-get update', env)
             call('sudo apt-get install %s --yes'%(stacks_to_debs(depends_all["other"], options.rosdistro)), env)
@@ -121,6 +124,7 @@ def main():
         
       
         # Install system dependencies of stacks we're testing
+        print '\n==================================================================================='
         print "Installing system dependencies of stacks we're testing"
         call('rosmake rosdep', env)
         for stack in options.stack:
@@ -128,6 +132,7 @@ def main():
                  'Install system dependencies of stack %s'%stack)
                  
         # Run hudson helper for stacks only
+        print '\n==================================================================================='
         print 'Running Hudson Helper'
         res = 0
         for r in range(0, int(options.repeat)+1):

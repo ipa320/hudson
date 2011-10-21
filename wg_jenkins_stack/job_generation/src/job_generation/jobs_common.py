@@ -26,9 +26,14 @@ cat &gt; $WORKSPACE/script.sh &lt;&lt;DELIM
 #!/usr/bin/env bash
 set -o errexit
 echo "_________________________________BEGIN SCRIPT______________________________________"
+echo ""
+echo "***********************************************************************************"
+echo "INSTALLING ros distribution, bzr and python-pycurl"
 sudo apt-get install bzr --yes
 sudo apt-get install ros-ROSDISTRO-ros --yes
 sudo apt-get install python-pycurl
+echo "***********************************************************************************"
+echo ""
 source /opt/ros/ROSDISTRO/setup.sh
 
 export INSTALL_DIR=/tmp/install_dir
@@ -48,8 +53,8 @@ sudo chmod 600 ~/.ssh/id_rsa.pub ~/.ssh/id_rsa
 
 sudo mkdir ros_release
 sudo mv -f /tmp/workspace/hudson/wg_jenkins_stack/* ./ros_release
-ls -la
-ls -la ros_release/
+#ls -la
+#ls -la ros_release/
 #cp ros_release/hudson/src/hudson_helper_fhg.py .
 #sudo chmod +x  hudson_helper_fhg.py
 """ 
@@ -126,7 +131,7 @@ def stacks_to_debs(stack_list, rosdistro):
 
 def get_depends_one(stack_name, githubuser):
     # get stack.xml from github
-    stack_xml = get_stack_xml(stack_name, githubuser)#, get_stack_membership(stack_name))
+    stack_xml = get_stack_xml(stack_name, githubuser)
     # convert to list
     depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
     print 'Dependencies of stack %s: %s'%(stack_name, str(depends_one))
@@ -135,19 +140,17 @@ def get_depends_one(stack_name, githubuser):
 
 def get_depends_all(stack_name, depends_all, githubuser, start_depth):
     #TODO output
-    #print depends_all
     depends_all_list = []
-    #start_depth = len(depends_all['private']) + len(depends_all['public']) + len(depends_all['other'])
-    print start_depth, " depends all ", stack_name
+    print " "*2*start_depth, start_depth, " depends all ", stack_name
+    # convert depends_all entries to list
     [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
-    if not stack_name in depends_all_list:
+    if not stack_name in depends_all_list: # new stack and not in depends_all
         # append stack to the right list in depends_all
         depends_all[get_stack_membership(stack_name)].append(stack_name)
         # find and append all IPA dependencies
-        if get_stack_membership(stack_name) == "private" or get_stack_membership(stack_name) == "public":
+        if stack_name in FHG_STACKS_PRIVATE or stack_name in FHG_STACKS_PUBLIC:
             for d in get_depends_one(stack_name, githubuser):
                 get_depends_all(d, depends_all, githubuser, start_depth+1)
-    #print start_depth, " DEPENDS_ALL ", stack_name, " end depth ", (len(depends_all['private']) + len(depends_all['public']) + len(depends_all['other']))
 
 
 def get_stack_membership(stack_name):
@@ -183,30 +186,34 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
 
 
 def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir, env):
-    if stack_name in FHG_STACKS_PRIVATE:
+    # check if stack is private, public or other / forked or not / released or not
+    # gives back rosinstall entry or clones stack in case it is private
+    if stack_name in FHG_STACKS_PRIVATE:    # stack is private ipa stack
         print "Stack %s is a private ipa stack" %(stack_name)
-        if not stack_forked(githubuser, stack_name):
+        if not stack_forked(githubuser, stack_name):    # check if stack is forked for user or not
            print "Stack %s is not forked for user %s, using 'ipa320' stack instead" %(stack_name, githubuser)
            githubuser = 'ipa320'
         call('git clone git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone private stack [%s] to test'%(stack_name))
         return ''
-    elif stack_name in FHG_STACKS_PUBLIC:
+        
+    elif stack_name in FHG_STACKS_PUBLIC:   # stack is public ipa stack
         print "Stack %s is a public ipa stack" %(stack_name)
-        if not stack_forked(githubuser, stack_name):
+        if not stack_forked(githubuser, stack_name):    # check if stack is forked for user or not
             print "Stack %s is not forked for user %s" %(stack_name, githubuser)
             githubuser = 'ipa320'
-            if stack_name in rosdistro_obj.stacks:
+            if stack_name in rosdistro_obj.stacks:  # stack is released
                 print "Using released version"
                 return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release)
-            print "Using 'ipa320' stack instead"
+            print "Using 'ipa320' stack instead"    # stack is not released, using 'ipa320' fork
         return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack_name, githubuser, stack_name)
-    elif stack_name in rosdistro_obj.stacks:
+        
+    elif stack_name in rosdistro_obj.stacks:    # stack is no ipa stack
         print "Stack %s is not a ipa stack, using released version" %(stack_name)
         return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'devel')
-    else:
+        
+    else:   # stack is no known stack
         raise ex, "ERROR: Stack %s not found! This should never happen!"%(stack_name)
         
-
 
 def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
     if not stack_forked(githubuser, stack_name):
