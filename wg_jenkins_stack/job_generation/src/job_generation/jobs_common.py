@@ -13,6 +13,7 @@ import StringIO
 import pycurl
 import subprocess
 import socket
+import yaml
 
 
 
@@ -26,9 +27,14 @@ cat &gt; $WORKSPACE/script.sh &lt;&lt;DELIM
 #!/usr/bin/env bash
 set -o errexit
 echo "_________________________________BEGIN SCRIPT______________________________________"
+echo ""
+echo "***********************************************************************************"
+echo "INSTALLING ros distribution, bzr and python-pycurl"
 sudo apt-get install bzr --yes
 sudo apt-get install ros-ROSDISTRO-ros --yes
 sudo apt-get install python-pycurl
+echo "***********************************************************************************"
+echo ""
 source /opt/ros/ROSDISTRO/setup.sh
 
 export INSTALL_DIR=/tmp/install_dir
@@ -48,8 +54,8 @@ sudo chmod 600 ~/.ssh/id_rsa.pub ~/.ssh/id_rsa
 
 sudo mkdir ros_release
 sudo mv -f /tmp/workspace/hudson/wg_jenkins_stack/* ./ros_release
-ls -la
-ls -la ros_release/
+#ls -la
+#ls -la ros_release/
 #cp ros_release/hudson/src/hudson_helper_fhg.py .
 #sudo chmod +x  hudson_helper_fhg.py
 """ 
@@ -124,30 +130,30 @@ def stacks_to_debs(stack_list, rosdistro):
     return ' '.join([stack_to_deb(s, rosdistro) for s in stack_list])
 
 
-def get_depends_one(stack_name, githubuser):
+def get_depends_one(stack_name, githubuser, spaces=""):
     # get stack.xml from github
-    stack_xml = get_stack_xml(stack_name, githubuser)#, get_stack_membership(stack_name))
+    stack_xml = get_stack_xml(stack_name, githubuser)
     # convert to list
     depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
-    print 'Dependencies of stack %s: %s'%(stack_name, str(depends_one))
+    print spaces, 'Dependencies of stack %s:'%stack_name
+    print spaces, str(depends_one)
     return depends_one
 
 
 def get_depends_all(stack_name, depends_all, githubuser, start_depth):
-    #TODO output
-    #print depends_all
     depends_all_list = []
-    #start_depth = len(depends_all['private']) + len(depends_all['public']) + len(depends_all['other'])
-    print start_depth, " depends all ", stack_name
+    # convert depends_all entries to list
     [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
-    if not stack_name in depends_all_list:
+    if not stack_name in depends_all_list: # new stack and not in depends_all
+        print " "*2*start_depth, start_depth, "+ Included %s to dependencies"%stack_name
         # append stack to the right list in depends_all
         depends_all[get_stack_membership(stack_name)].append(stack_name)
         # find and append all IPA dependencies
-        if get_stack_membership(stack_name) == "private" or get_stack_membership(stack_name) == "public":
-            for d in get_depends_one(stack_name, githubuser):
+        if stack_name in FHG_STACKS_PRIVATE or stack_name in FHG_STACKS_PUBLIC:
+            for d in get_depends_one(stack_name, githubuser, " "*2*start_depth):
                 get_depends_all(d, depends_all, githubuser, start_depth+1)
-    #print start_depth, " DEPENDS_ALL ", stack_name, " end depth ", (len(depends_all['private']) + len(depends_all['public']) + len(depends_all['other']))
+    else:
+        print " "*2*start_depth, start_depth, "- %s already included"%stack_name
 
 
 def get_stack_membership(stack_name):
@@ -164,7 +170,7 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
     post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
     fields = urllib.urlencode(post)
     path = "https://github.com/" + githubuser + "/" + stack_name + appendix
-    print path
+    #print path
     #print fields
     file1 = StringIO.StringIO()
     c = pycurl.Curl()
@@ -175,12 +181,65 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
     c.close
 
     if c.getinfo(pycurl.HTTP_CODE) == 200:
-        print "Stack found"
+        #print "Stack found"
         return True
     else:
+        print "PATH: ", path
         print "ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE)
         return False
 
+
+def stack_released(stack_name, rosdistro, env):
+    print '\n***********************************************************************************'
+    print 'Checking if stack is released'
+    pkg_name = stack_to_deb(stack_name, rosdistro)
+    err_msg = call('sudo apt-get -s install %s'%pkg_name, env, ignore_fail=True, quiet=True)
+    #print "ERROR MESSAGE: ", err_msg
+    if "E: Unable to locate package %s"%pkg_name in err_msg:
+        print '%s is not released'%stack_name
+        return False
+    else:
+        print '%s is released'%stack_name
+        return True
+
+def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir, env):
+    # check if stack is private, public or other / forked or not / released or not
+    # gives back rosinstall entry or clones stack in case it is private
+    
+    if stack_name in FHG_STACKS_PRIVATE:    # stack is private ipa stack
+        print "Stack %s is a private ipa stack" %(stack_name)
+        if not stack_forked(githubuser, stack_name):    # check if stack is forked for user or not
+            print "  Stack %s is not forked for user %s" %(stack_name, githubuser)
+            githubuser = 'ipa320'
+            if stack_released(stack_name, rosdistro_obj.release_name, env):  # stack is released
+                print "    Using released version"
+                call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
+                return ''
+            print "    Using 'ipa320' stack instead"    # stack is not released, using 'ipa320' fork
+        call('git clone git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone private stack [%s] to test'%(stack_name))
+        return ''
+        
+    elif stack_name in FHG_STACKS_PUBLIC:   # stack is public ipa stack
+        print "Stack %s is a public ipa stack" %(stack_name)
+        if not stack_forked(githubuser, stack_name):    # check if stack is forked for user or not
+            print "  Stack %s is not forked for user %s" %(stack_name, githubuser)
+            githubuser = 'ipa320'
+            if stack_released(stack_name, rosdistro_obj.release_name, env):  # stack is released
+                print "    Using released version"
+                call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
+                return ''
+                #return '- git: {local-name: %s, uri: "git://github.com/ipa320/%s.git", branch-name: %s}\n'%(stack_name, stack_name, rosdistro_obj.release_name)
+                #return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release_name)
+            print "    Using 'ipa320' stack instead"    # stack is not released, using 'ipa320' fork
+        return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack_name, githubuser, stack_name)
+        
+    elif stack_name in rosdistro_obj.stacks:    # stack is no ipa stack
+        print "Stack %s is not a ipa stack, using released version" %(stack_name)
+        return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'devel')
+        
+    else:   # stack is no known stack
+        raise Exception("ERROR: Stack %s not found! This should never happen!"%(stack_name))
+        
 
 def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
     if not stack_forked(githubuser, stack_name):
@@ -446,15 +505,16 @@ def generate_email(message, env):
     write_file(env['WORKSPACE']+'/build_output/buildfailures-with-context.txt', '')
 
 
-def call(command, env=None, message='', ignore_fail=False):
+def call(command, env=None, message='', ignore_fail=False, quiet=False):
     res = ''
     err = ''
     try:
         print message+'\nExecuting command "%s"'%command
         helper = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
         res, err = helper.communicate()
-        print str(res)
-        print str(err)
+        if not quiet:
+            print str(res)
+            print str(err)
         if helper.returncode != 0:
             raise Exception
         return res
@@ -474,3 +534,5 @@ def call(command, env=None, message='', ignore_fail=False):
                 message += "\n=========================================\n"
                 generate_email(message, env)
             raise Exception
+        else:
+            return str(err)
