@@ -108,7 +108,7 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
             
             try:
                 if not stack_forked(githubuser, repo):
-                    results = results + "<b>" + repo + "</b>" + ": stack is not forked\n"
+                    results = results + "<b>" + repo + "</b>" + ": stack is not forked<br>"
                     results = results + "If you want to create job for %s, fork it on github.com!"%repo
                     continue
                     #results = results + "<b>" + repo + "</b>" + ": stack is not forked\n"
