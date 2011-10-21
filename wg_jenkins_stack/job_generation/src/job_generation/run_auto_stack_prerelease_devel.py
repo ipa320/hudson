@@ -75,15 +75,13 @@ def main():
         depends_all = {"public" : [], "private" : [], "other" : []}
         for stack in options.stack:
             print '\n==================================================================================='
-            print 'Calculating all stack dependencies of %s'%stack
-#            stack_xml = '%s/%s/stack.xml'%(STACK_DIR, stack)
-#            call('ls %s'%stack_xml, env, 'Checking if stack %s contains "stack.xml" file'%stack)
-#            with open(stack_xml) as stack_file:
-#                depends_one = [str(d) for d in stack_manifest.parse(stack_file.read()).depends]  # convert to list
-            depends_one = get_depends_one(stack, options.githubuser)
-            #print 'Dependencies of stack %s: %s'%(stack, str(depends_one))
+            print 'Calculating all stack dependencies of %s\n'%stack
+            depends_one = get_depends_one(stack, options.githubuser, 0)
+
             for d in depends_one:
-                if not d in options.stack and not d in depends_all: #TODO depends_all
+                depends_all_list = []
+                [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
+                if not d in options.stack and not d in depends_all_list:
                     print 'Adding dependencies of stack %s'%d
                     get_depends_all(d, depends_all, options.githubuser, 1)
                     print 'Resulting total dependencies of all stacks that get tested: %s'%str(depends_all) 

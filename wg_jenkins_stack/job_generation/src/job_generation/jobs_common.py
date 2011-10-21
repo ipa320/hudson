@@ -129,12 +129,12 @@ def stacks_to_debs(stack_list, rosdistro):
     return ' '.join([stack_to_deb(s, rosdistro) for s in stack_list])
 
 
-def get_depends_one(stack_name, githubuser):
+def get_depends_one(stack_name, githubuser, spaces):
     # get stack.xml from github
     stack_xml = get_stack_xml(stack_name, githubuser)
     # convert to list
     depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
-    print 'Dependencies of stack %s: %s'%(stack_name, str(depends_one))
+    print " "*2*spaces, 'Dependencies of stack %s: %s'%(stack_name, str(depends_one))
     return depends_one
 
 
@@ -149,7 +149,7 @@ def get_depends_all(stack_name, depends_all, githubuser, start_depth):
         depends_all[get_stack_membership(stack_name)].append(stack_name)
         # find and append all IPA dependencies
         if stack_name in FHG_STACKS_PRIVATE or stack_name in FHG_STACKS_PUBLIC:
-            for d in get_depends_one(stack_name, githubuser):
+            for d in get_depends_one(stack_name, githubuser, start_depth):
                 get_depends_all(d, depends_all, githubuser, start_depth+1)
 
 
@@ -167,7 +167,7 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
     post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
     fields = urllib.urlencode(post)
     path = "https://github.com/" + githubuser + "/" + stack_name + appendix
-    print path
+    #print path
     #print fields
     file1 = StringIO.StringIO()
     c = pycurl.Curl()
@@ -178,9 +178,10 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
     c.close
 
     if c.getinfo(pycurl.HTTP_CODE) == 200:
-        print "Stack found"
+        #print "Stack found"
         return True
     else:
+        print "PATH: ", path
         print "ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE)
         return False
 
