@@ -142,10 +142,10 @@ def get_depends_one(stack_name, githubuser, spaces=""):
 
 def get_depends_all(stack_name, depends_all, githubuser, start_depth):
     depends_all_list = []
-    print " "*2*start_depth, start_depth, " depends all ", stack_name
     # convert depends_all entries to list
     [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
     if not stack_name in depends_all_list: # new stack and not in depends_all
+        print " "*2*start_depth, start_depth, "+ Included %s to dependencies"stack_name
         # append stack to the right list in depends_all
         depends_all[get_stack_membership(stack_name)].append(stack_name)
         # find and append all IPA dependencies
@@ -153,7 +153,7 @@ def get_depends_all(stack_name, depends_all, githubuser, start_depth):
             for d in get_depends_one(stack_name, githubuser, " "*2*start_depth):
                 get_depends_all(d, depends_all, githubuser, start_depth+1)
     else:
-        print " "*2*start_depth, start_depth, "%s already in included"%stack_name
+        print " "*2*start_depth, start_depth, "- %s already included"%stack_name
 
 
 def get_stack_membership(stack_name):
