@@ -92,7 +92,7 @@ else:
     HOME_FOLDER = '/home-local/jenkins'
 
 # list of public and private IPA Fraunhofer stacks
-FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_driver', 'cob_robots', 'cob_simulation', 'cob_apps', 'cob_manipulation', 'cob_navigation', 'cob_environment_perception', 'cob_people_perception', 'cob_object_perception', 'cob_scenarios', 'cob_web', 'cob_command_tools', 'schunk_modular_robotics', 'schunk_robots']
+FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_driver', 'cob_robots', 'cob_simulation', 'cob_apps', 'cob_manipulation', 'cob_manipulation_sandbox', 'cob_navigation', 'cob_environment_perception', 'cob_people_perception', 'cob_object_perception', 'cob_scenarios', 'cob_web', 'cob_command_tools', 'schunk_modular_robotics', 'schunk_robots']
 FHG_STACKS_PRIVATE = ['cob_manipulation_intern', 'cob_navigation_intern', 'cob_environment_perception_intern', 'cob_object_perception_intern', 'cob_scenarios_intern', 'interaid', 'srs', 'r3cop']
 
 PRIO_ARCH = "i386"
