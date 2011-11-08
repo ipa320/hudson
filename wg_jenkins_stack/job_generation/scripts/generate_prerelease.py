@@ -33,7 +33,7 @@ def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubunt
     hudson_config = hudson_config.replace('GITHUBUSER', githubuser)
     hudson_config = hudson_config.replace('REPEAT', str(repeat))
     hudson_config = hudson_config.replace('LABEL', job_type)
-    hudson_config = hudson_config.replace('RAMDISK', '--ramdisk --ramdisk-size 6000M')
+    hudson_config = hudson_config.replace('RAMDISK', '--ramdisk --ramdisk-size 20000M')
 
     if post_jobs != []:
         hudson_config = hudson_config.replace('POSTJOBS', ', '.join(str(n) for n in post_jobs))
