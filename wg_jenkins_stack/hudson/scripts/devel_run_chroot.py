@@ -287,6 +287,9 @@ class ChrootInstance:
                 tf.write("deb %s %s main restricted universe multiverse\n" % (deboot_url, self.distro))
                 tf.write("deb %s %s-updates main restricted universe multiverse\n" %  (deboot_url, self.distro))
                 tf.write("deb %s %s-security main restricted universe multiverse\n" %  (deboot_url, self.distro))
+                tf.write("deb %s %s main restricted universe multiverse\n" % ('http://ftp-stud.hs-esslingen.de/ubuntu/', self.distro))
+                tf.write("deb %s %s-updates main restricted universe multiverse\n" %  ('http://ftp-stud.hs-esslingen.de/ubuntu/', self.distro))
+                tf.write("deb %s %s-security main restricted universe multiverse\n" %  ('http://ftp-stud.hs-esslingen.de/ubuntu/', self.distro))
 
                 tf.flush()
                 cmd = ['sudo', 'cp', tf.name, sources]
@@ -391,9 +394,10 @@ grub-pc grub-pc/install_devices_empty boolean true
         ros_source=os.path.join(self.chroot_path, 'etc', 'apt', 'sources.list.d', 'ros-latest.list')
         with tempfile.NamedTemporaryFile() as tf:
             print "Adding packages.ros.org as source"
-            #tf.write("deb http://code.ros.org/packages/ros/ubuntu %s main\n" % self.distro)
             #tf.write("deb http://packages.ros.org/ros-shadow-fixed/ubuntu %s main\n" % self.distro)
             tf.write("deb http://cob-kitchen-server:3142/packages.ros.org/ros/ubuntu %s main\n" % self.distro)
+            tf.write("deb http://ros.informatik.uni-freiburg.de/packages/ros/ubuntu/ %s main\n" % self.distro)
+            tf.write("deb http://code.ros.org/packages/ros/ubuntu %s main\n" % self.distro)
             tf.flush()
             cmd = ['sudo', 'cp', tf.name, ros_source]
             print "Runing cmd", cmd
