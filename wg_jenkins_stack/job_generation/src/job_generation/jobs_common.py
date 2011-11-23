@@ -98,6 +98,9 @@ FHG_STACKS_PRIVATE = ['cob_manipulation_intern', 'cob_navigation_intern', 'cob_e
 PRIO_ARCH = "i386"
 PRIO_UBUNTUDISTRO = "natty"
 
+#email addresses of administrators
+ADMIN_EMAIL = "fmw@ipa.fhg.de"
+
 EMAIL_TRIGGER="""
         <hudson.plugins.emailext.plugins.trigger.WHENTrigger> 
           <email> 

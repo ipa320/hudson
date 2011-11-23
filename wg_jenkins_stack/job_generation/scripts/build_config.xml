@@ -154,7 +154,7 @@ SHUTDOWN_SCRIPT
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.emailext.ExtendedEmailPublisher> 
-      <recipientList>fmw@ipa.fhg.de,EMAIL</recipientList> 
+      <recipientList>ADMIN_EMAIL</recipientList> 
       <configuredTriggers> 
         EMAIL_TRIGGERS
       </configuredTriggers> 
