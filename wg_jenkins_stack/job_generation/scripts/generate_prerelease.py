@@ -53,7 +53,7 @@ def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubunt
     return hudson_config
 
 
-def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, source_only, hudson_obj, arches=None, ubuntudistros=None, not_forked=False):
+def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, source_only, hudson_obj, arches=None, ubuntudistros=None, not_forked=False, delete=False):
     stack_list.sort()
 
     if not arches:
@@ -81,11 +81,12 @@ def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, 
     configs[name] = replace_param(HUDSON_CONFIG, rosdistro, githubuser, "build_prio", PRIO_ARCH, PRIO_UBUNTUDISTRO, stack_list, email, repeat, source_only, post_jobs)
 
     # create 'all' job
-    name = get_job_name(rosdistro, githubuser, jobtype="all")
-    pipe_job_names = hudson_obj.get_pipe_jobs(rosdistro, githubuser)
-    if not name_pipe in pipe_job_names:
-        pipe_job_names.append(name_pipe)
-    configs[name] = replace_param(HUDSON_ALL_CONFIG, rosdistro, githubuser, "all", post_jobs=pipe_job_names)
+    if not delete: # avoid 'all' job to be deleted
+      name = get_job_name(rosdistro, githubuser, jobtype="all")
+      pipe_job_names = hudson_obj.get_pipe_jobs(rosdistro, githubuser)
+      if not name_pipe in pipe_job_names:
+          pipe_job_names.append(name_pipe)
+      configs[name] = replace_param(HUDSON_ALL_CONFIG, rosdistro, githubuser, "all", post_jobs=pipe_job_names)
 
     return configs
 
@@ -103,7 +104,7 @@ def main():
             info = get_auth_keys('jenkins', HOME_FOLDER)
             hudson_instance = hudson.Hudson(SERVER, info.group(1), info.group(2))
 
-        prerelease_configs = create_prerelease_configs(options.rosdistro, options.stack, options.githubuser, options.email, options.repeat, options.source_only, hudson_instance, options.arch, options.ubuntu, options.not_forked)
+        prerelease_configs = create_prerelease_configs(options.rosdistro, options.stack, options.githubuser, options.email, options.repeat, options.source_only, hudson_instance, options.arch, options.ubuntu, options.not_forked, options.delete)
 
         # send prerelease tests to Hudson
         print 'Creating pre-release Hudson jobs:<br>'
