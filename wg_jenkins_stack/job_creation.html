@@ -46,22 +46,6 @@ addLoadEvent(function() {
   setupClickHandler();
 });
 
-function enableBox() {
-  document.form.boxApps.removeAttribute('disabled', 'false');
-  document.form.boxCommon.removeAttribute('disabled', 'false');
-  document.form.boxDriver.removeAttribute('disabled', 'false');
-  document.form.boxExtern.removeAttribute('disabled', 'false');
-  document.form.boxSimulation.removeAttribute('disabled', 'false');
-}
-
-function disableBox() {
-  document.form.boxApps.setAttribute('disabled', 'true');
-  document.form.boxCommon.setAttribute('disabled', 'true');
-  document.form.boxDriver.setAttribute('disabled', 'true');
-  document.form.boxExtern.setAttribute('disabled', 'true');
-  document.form.boxSimulation.setAttribute('disabled', 'true');
-}
-
 </script>
 </head>
 
@@ -87,27 +71,29 @@ In the case of any problems while building your code, Jenkins will inform you vi
 <input type="checkbox" name="release" value="electric" > electric<br>
 
 <h3>STACKS:</h3>
-<table border="1" cellpadding="10" rules="cols">
-    <colgroup width=50% span="2"></colgroup>
-    <tr>
-        <th><font size="3"><b>Select the stacks you want to test</b></font><br> </th>
-        <th><p>If you want to create a job for another stack, you can fill in below</th>
-    </tr>
-    <tr></tr>
-    <tr>
-        <td align="left" valign="top"><input type="radio" name="stacks" value="All" checked onclick="disableBox()" > All <tt>(cob_apps, cob_common, cob_driver, cob_extern and cob_simulation)</tt><br>
-        <input type="radio" name="stacks" value="Selection" onclick="enableBox()" > Choose one or more stacks<br>
-        <ul><input id="boxApps" type="checkbox" name="stack" value="cob_apps" disabled > cob_apps<br>
-        <input id="boxCommon" type="checkbox" name="stack" value="cob_common" disabled > cob_common<br>
-        <input id="boxDriver" type="checkbox" name="stack" value="cob_driver" disabled > cob_driver<br>
-        <input id="boxExtern" type="checkbox" name="stack" value="cob_extern" disabled > cob_extern<br>
-        <input id="boxSimulation" type="checkbox" name="stack" value="cob_simulation" disabled > cob_simulation</ul>
-        <input type="radio" name="stacks" value="Additional" onclick="disableBox()" > Only other stacks<br></td>
-        <td align="left" valign="top"><div id="otherstack"></div>
-        <a href="#" id="add_stack"><input type="button" value="Add another stack"></a>
-        <br></td>
-    </tr>
-</table>
+<ul><table border="1" cellpadding="10" rules="none">
+    <colgroup width=33% span="3"></colgroup>
+
+        <font size="3"><b>Select or fill in the stacks you want to test</b></font><br>
+
+        <td align="left" valign="top">
+        <input id="boxCalibration" type="checkbox" name="stack" value="cob_calibration" > cob_calibration<br>	
+        <input id="boxCommon" type="checkbox" name="stack" value="cob_common" > cob_common<br>
+        <input id="boxDriver" type="checkbox" name="stack" value="cob_driver" > cob_driver<br></td>
+        <td align="left" valign="top">
+        <input id="boxDriver_sandbox" type="checkbox" name="stack" value="cob_driver_sandbox" > cob_driver_sandbox<br>
+        <input id="boxEnvironments" type="checkbox" name="stack" value="cob_environments" > cob_environments<br>
+        <input id="boxExtern" type="checkbox" name="stack" value="cob_extern" > cob_extern<br></td>
+        <td align="left" valign="top">
+        <input id="boxManipulation" type="checkbox" name="stack" value="cob_manipulation" > cob_manipulation<br>
+        <input id="boxSimulation" type="checkbox" name="stack" value="cob_simulation" > cob_simulation<br>
+        <input id="boxRobots" type="checkbox" name="stack" value="cob_robots" > cob_robots<br></td><br>
+
+</table></ul>
+
+<ul><div id="otherstack"></div>
+<a href="#" id="add_stack"><input type="button" value="Add another stack"></a>
+<br></ul>
 
 <h3>DELETE:</h3>
 <input type="checkbox" name="delete" value="del_stacks"> Check if you want to delete the jobs of the selected stacks<br><br>

@@ -55,21 +55,18 @@ def main():
             rosrelease = rosrelease[:] + [release]
     
     # check chosen stacks
+    stacks = form.getlist('stack')
     otherstacks = form.getlist('otherstack')
-    if form['stacks'].value == 'All':
-        repositories = ['cob_apps', 'cob_common', 'cob_driver', 'cob_extern', 'cob_simulation']
-    else:
-        stacks = form.getlist('stack')
-        if stacks == [] and otherstacks == []:
-            print "<H1>ERROR<H1>"
-            print "You have to select at least one stack! <br>"
-            print '<input type=button value="Back" onClick="history.back()">'
-            return
-        else:
-            for stack in stacks:
-                repositories = repositories[:] + [stack]
+    
+    if stacks == [] and otherstacks == []:
+        print "<H1>ERROR<H1>"
+        print "You have to select at least one stack! <br>"
+        print '<input type=button value="Back" onClick="history.back()">'
+        return
+    else:    
+        for stack in stacks:
+            repositories = repositories[:] + [stack]
 
-    if otherstacks != []:
         for stack in otherstacks:
             if valid_stack(form["username"].value, stack):
                 repositories = repositories[:] + [stack]
