@@ -190,7 +190,6 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
 
 
 def stack_released(stack_name, rosdistro, env):
-    print '\n***********************************************************************************'
     print 'Checking if stack is released'
     pkg_name = stack_to_deb(stack_name, rosdistro)
     err_msg = call('sudo apt-get -s install %s'%pkg_name, env, ignore_fail=True, quiet=True)
@@ -215,7 +214,7 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
                 print "    Using released version"
                 call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
                 return ''
-            print "    Using 'ipa320' stack instead"    # stack is not released, using 'ipa320' fork
+            print "    Using 'ipa320' stack instead\n"    # stack is not released, using 'ipa320' fork
         call('git clone git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone private stack [%s] to test'%(stack_name))
         return ''
         
@@ -230,7 +229,7 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
                 return ''
                 #return '- git: {local-name: %s, uri: "git://github.com/ipa320/%s.git", branch-name: %s}\n'%(stack_name, stack_name, rosdistro_obj.release_name)
                 #return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release_name)
-            print "    Using 'ipa320' stack instead"    # stack is not released, using 'ipa320' fork
+            print "    Using 'ipa320' stack instead\n"    # stack is not released, using 'ipa320' fork
         return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack_name, githubuser, stack_name)
         
     elif stack_name in rosdistro_obj.stacks:    # stack is no ipa stack
