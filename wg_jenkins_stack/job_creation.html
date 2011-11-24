@@ -8,11 +8,11 @@ Created by: Jeroen Haan | http://www.haan.net */
 
 function addStackInput(i) {
   var div = document.createElement("div");
-  div.innerHTML='&rarr; Stack name : <input type="text" name="otherstack"/>';
+  div.innerHTML='&rarr; Stack name : <input type="text" name="stack"/> ';
 
-  div.setAttribute("id", 'otherstack_');
-  var otherstack = document.getElementById('otherstack');
-  otherstack.appendChild(div);
+  div.setAttribute("id", 'stack_');
+  var stack = document.getElementById('stack');
+  stack.appendChild(div);
 }
 
 function setupClickHandler() {
@@ -71,27 +71,9 @@ In the case of any problems while building your code, Jenkins will inform you vi
 <input type="checkbox" name="release" value="electric" > electric<br>
 
 <h3>STACKS:</h3>
-<ul><table border="1" cellpadding="10" rules="none">
-    <colgroup width=33% span="3"></colgroup>
+<font size="3"><b>Fill in the stacks you want to test</b></font><br>
 
-        <font size="3"><b>Select or fill in the stacks you want to test</b></font><br>
-
-        <td align="left" valign="top">
-        <input id="boxCalibration" type="checkbox" name="stack" value="cob_calibration" > cob_calibration<br>	
-        <input id="boxCommon" type="checkbox" name="stack" value="cob_common" > cob_common<br>
-        <input id="boxDriver" type="checkbox" name="stack" value="cob_driver" > cob_driver<br></td>
-        <td align="left" valign="top">
-        <input id="boxDriver_sandbox" type="checkbox" name="stack" value="cob_driver_sandbox" > cob_driver_sandbox<br>
-        <input id="boxEnvironments" type="checkbox" name="stack" value="cob_environments" > cob_environments<br>
-        <input id="boxExtern" type="checkbox" name="stack" value="cob_extern" > cob_extern<br></td>
-        <td align="left" valign="top">
-        <input id="boxManipulation" type="checkbox" name="stack" value="cob_manipulation" > cob_manipulation<br>
-        <input id="boxSimulation" type="checkbox" name="stack" value="cob_simulation" > cob_simulation<br>
-        <input id="boxRobots" type="checkbox" name="stack" value="cob_robots" > cob_robots<br></td><br>
-
-</table></ul>
-
-<ul><div id="otherstack"></div>
+<ul><div id="stack"></div>
 <a href="#" id="add_stack"><input type="button" value="Add another stack"></a>
 <br></ul>
 

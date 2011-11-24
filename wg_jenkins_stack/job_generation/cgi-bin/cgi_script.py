@@ -56,18 +56,14 @@ def main():
     
     # check chosen stacks
     stacks = form.getlist('stack')
-    otherstacks = form.getlist('otherstack')
     
-    if stacks == [] and otherstacks == []:
+    if stacks == []:
         print "<H1>ERROR<H1>"
         print "You have to select at least one stack! <br>"
         print '<input type=button value="Back" onClick="history.back()">'
         return
     else:    
         for stack in stacks:
-            repositories = repositories[:] + [stack]
-
-        for stack in otherstacks:
             if valid_stack(form["username"].value, stack):
                 repositories = repositories[:] + [stack]
     
