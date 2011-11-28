@@ -190,7 +190,7 @@ class HudsonHelper:
 
         ###########################################
         # bootstrap build in ROS_ROOT
-        build_cmd = [self.rosmake_path, '--rosdep-install', '--rosdep-yes'] + self.extra_rosmake_args ['rospack'] + self.rosmake_args_threads
+        build_cmd = [self.rosmake_path, '--rosdep-install', '--rosdep-yes'] + self.extra_rosmake_args + ['rospack'] + self.rosmake_args_threads
         try:
             print >> sys.stderr, '[%s] %s'%(NAME,build_cmd)
             check_call(build_cmd, cwd=ros_root, env=env_vars, stdout=sys.stdout, stdin=sys.stdin, stderr=sys.stderr)
