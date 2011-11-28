@@ -27,22 +27,15 @@ rm -rf $WORKSPACE/hudson
 #check whether someone else is logged in
 echo "Checking if someone is logged in"
 THREADS=""
-who -q > $WORKSPACE/who.txt
-cat who.txt
-sed '$d' -i who.txt
-cat who.txt
-for user in "$(sed 's/\ /\n/g' who.txt)"
-  do
-    if [ "$user" != "jenkins" ]
-      then
-        echo $user
-        COUNT=$(cat /proc/cpuinfo | grep 'processor' | wc -l)
-        COUNT=$(echo "$COUNT/2" | bc)
-        THREADS="--threads="$COUNT
-        echo "Because someone else is logged in, only half of the cores will be used"
-    fi
-done
-rm who.txt
+
+USERCOUNT=$(who -q | grep 'users')
+if [ ${USERCOUNT: -1} != 0 ]
+  then
+    COUNT=$(cat /proc/cpuinfo | grep 'processor' | wc -l)
+    COUNT=$(echo "$COUNT/2" | bc)
+    THREADS="--threads="$COUNT
+    echo "Because someone else is logged in, only half of the cores will be used"
+fi 
 
 
 cat &gt; $WORKSPACE/script.sh &lt;&lt;DELIM
