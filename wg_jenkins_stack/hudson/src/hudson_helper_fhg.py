@@ -77,7 +77,7 @@ class HudsonHelper:
             parser.error("nothing to do; must specify --dir-test")
         
         self.rosmake_args_threads = []
-        if otions.threads != 0:
+        if options.threads != 0:
             self.rosmake_args_threads.append('--threads=%s'%options.threads)
 
         self.email = options.email
