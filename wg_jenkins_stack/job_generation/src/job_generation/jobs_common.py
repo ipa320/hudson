@@ -23,6 +23,28 @@ rm -rf $WORKSPACE/test_results
 rm -rf $WORKSPACE/test_output
 rm -rf $WORKSPACE/hudson
 
+
+#check whether someone else is logged in
+echo "Checking if someone is logged in"
+THREADS=""
+who -q > $WORKSPACE/who.txt
+cat who.txt
+sed '$d' -i who.txt
+cat who.txt
+for user in "$(sed 's/\ /\n/g' who.txt)"
+  do
+    if [ "$user" != "jenkins" ]
+      then
+        echo $user
+        COUNT=$(cat /proc/cpuinfo | grep 'processor' | wc -l)
+        COUNT=$(echo "$COUNT/2" | bc)
+        THREADS="--threads="$COUNT
+        echo "Because someone else is logged in, only half of the cores will be used"
+    fi
+done
+rm who.txt
+
+
 cat &gt; $WORKSPACE/script.sh &lt;&lt;DELIM
 #!/usr/bin/env bash
 set -o errexit
@@ -351,6 +373,9 @@ def get_options(required, optional):
     if 'not-forked' in ops:
         parser.add_option('--not-forked', dest = 'not_forked', default=False, action='store_true',
                           help="Stack is not forked for given githubuser")
+    if 'threads' in ops:
+        parser.add_option('--threads', dest = 'threads', default=0, action='store',
+                          help="Build up to N packages in parallel")
 
     (options, args) = parser.parse_args()
     
@@ -358,6 +383,10 @@ def get_options(required, optional):
     # make repeat an int
     if 'repeat' in ops:
         options.repeat = int(options.repeat)
+    
+    # make threads an int
+    if 'threads' in ops:
+        options.threads = int(options.threads)
 
     # check if required arguments are there
     for r in required:

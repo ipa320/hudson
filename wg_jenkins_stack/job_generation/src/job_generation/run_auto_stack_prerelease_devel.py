@@ -26,7 +26,7 @@ def main():
     # global try
     try:
         # parse command line options
-        (options, args) = get_options(['stack', 'rosdistro', 'githubuser', 'email'], ['repeat', 'source-only'])
+        (options, args) = get_options(['stack', 'rosdistro', 'githubuser', 'email'], ['repeat', 'source-only', 'threads'])
         if not options:
             return -1
 
@@ -144,7 +144,7 @@ def main():
         res = 0
         for r in range(0, int(options.repeat)+1):
             env['ROS_TEST_RESULTS_DIR'] = env['ROS_TEST_RESULTS_DIR'] + '/' + STACK_DIR + '_run_' + str(r)
-            helper = subprocess.Popen(('./ros_release/hudson/src/hudson_helper_fhg.py --dir-test %s --email %s build'%(STACK_DIR, options.email)).split(' '), env=env)
+            helper = subprocess.Popen(('./ros_release/hudson/src/hudson_helper_fhg.py --dir-test %s --email %s --threads %s build'%(STACK_DIR, options.email, options.threads)).split(' '), env=env)
             helper.communicate()
             if helper.returncode != 0:
                 res = helper.returncode

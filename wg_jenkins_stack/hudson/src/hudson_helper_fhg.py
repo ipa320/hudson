@@ -64,6 +64,9 @@ class HudsonHelper:
         parser.add_option("--email", action="store",
                           dest="email", default=None,
                           help="email address to send results to")
+        parser.add_option("--threads", action="store",
+                          dest="threads", default=0,
+                          help="Build up to N packages in parallel")
         (options, args) = parser.parse_args(argv)
     
         if len(args) < 2:
@@ -72,6 +75,10 @@ class HudsonHelper:
     
         if len(options.dirs_test) == 0:
             parser.error("nothing to do; must specify --dir-test")
+        
+        self.rosmake_args_threads = []
+        if otions.threads != 0:
+            self.rosmake_args_threads.append('--threads=%s'%options.threads)
 
         self.email = options.email
         # NOTE: the following addition puts directories specified by --dir-test
@@ -183,7 +190,7 @@ class HudsonHelper:
 
         ###########################################
         # bootstrap build in ROS_ROOT
-        build_cmd = [self.rosmake_path, '--rosdep-install', '--rosdep-yes'] + self.extra_rosmake_args + ['rospack']
+        build_cmd = [self.rosmake_path, '--rosdep-install', '--rosdep-yes'] + self.extra_rosmake_args ['rospack'] + self.rosmake_args_threads
         try:
             print >> sys.stderr, '[%s] %s'%(NAME,build_cmd)
             check_call(build_cmd, cwd=ros_root, env=env_vars, stdout=sys.stdout, stdin=sys.stdin, stderr=sys.stderr)
@@ -205,7 +212,7 @@ class HudsonHelper:
         open(os.path.join(output_dir, 'buildfailures.txt'), 'w')
         open(os.path.join(output_dir, 'buildfailures-with-context.txt'), 'w')
 
-        build_cmd = [self.rosmake_path, '-Vr', '--rosdep-install', '--rosdep-yes', '--profile', '--skip-blacklist', '--output=%s'%output_dir] + self.extra_rosmake_args + ['-a']
+        build_cmd = [self.rosmake_path, '-Vr', '--rosdep-install', '--rosdep-yes', '--profile', '--skip-blacklist', '--output=%s'%output_dir] + self.extra_rosmake_args + ['-a'] + self.rosmake_args_threads
 
         try:
             print >> sys.stderr, '[%s] %s'%(NAME,build_cmd)
@@ -238,7 +245,7 @@ class HudsonHelper:
         os.makedirs(output_dir)
         open(os.path.join(output_dir, 'testfailures.txt'), 'w')
 
-        build_cmd = [self.rosmake_path, '-Vr', '--profile', '--test-only', '--skip-blacklist', '--output=%s'%output_dir] + self.extra_rosmake_args
+        build_cmd = [self.rosmake_path, '-Vr', '--profile', '--test-only', '--skip-blacklist', '--output=%s'%output_dir] + self.extra_rosmake_args + self.rosmake_args_threads
 
         local_test_paths = []
         for d in self.dirs_test:
