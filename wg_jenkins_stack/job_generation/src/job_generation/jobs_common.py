@@ -28,11 +28,11 @@ rm -rf $WORKSPACE/hudson
 
 #check whether someone else is logged in
 echo "Checking if someone is logged in"
-THREADS=""
+COUNT=$(cat /proc/cpuinfo | grep 'processor' | wc -l)
+THREADS="--threads="$COUNT
 USERCOUNT=$(who -q | grep 'users')
 if [ ${USERCOUNT: -1} != 0 ]
   then
-    COUNT=$(cat /proc/cpuinfo | grep 'processor' | wc -l)
     COUNT=$(echo "$COUNT/2" | bc)
     THREADS="--threads="$COUNT
     echo "Because someone else is logged in, only half of the cores will be used for building the stacks"
