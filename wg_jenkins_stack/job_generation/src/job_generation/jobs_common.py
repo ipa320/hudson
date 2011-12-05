@@ -31,7 +31,8 @@ echo "Checking if someone is logged in"
 COUNT=$(cat /proc/cpuinfo | grep 'processor' | wc -l)
 THREADS="--threads="$COUNT
 USERCOUNT=$(who -q | grep 'users')
-if [ ${USERCOUNT: -1} != 0 ]
+USERCOUNT=${USERCOUNT: -1}
+if [ $USERCOUNT != 0 ]
   then
     COUNT=$(echo "$COUNT/2" | bc)
     THREADS="--threads="$COUNT
