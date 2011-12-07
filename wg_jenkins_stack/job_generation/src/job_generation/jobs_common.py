@@ -17,8 +17,7 @@ import yaml
 
 
 
-BOOTSTRAP_SCRIPT = """
-#!/bin/bash
+BOOTSTRAP_SCRIPT = """#!/bin/bash
 
 sudo chown -R jenkins:jenkins $WORKSPACE
 rm -rf $WORKSPACE/test_results
