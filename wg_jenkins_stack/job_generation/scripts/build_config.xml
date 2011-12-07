@@ -24,8 +24,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders> 
     <hudson.tasks.Shell> 
-      <command>
-BOOTSTRAP_SCRIPT
+      <command>BOOTSTRAP_SCRIPT
 echo ""
 echo "-----------------------------------------------------------------------------------"
 echo "RUNNING run_auto_stack_prerelease_devel.py"
