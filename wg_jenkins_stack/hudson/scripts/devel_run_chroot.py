@@ -389,7 +389,7 @@ grub-pc grub-pc/install_devices_empty boolean true
 
     def add_ros_sources(self):
         """
-        Add code.ros.org sources to the apt sources
+        Add packages.ros.org sources to the apt sources
         """
         ros_source=os.path.join(self.chroot_path, 'etc', 'apt', 'sources.list.d', 'ros-latest.list')
         with tempfile.NamedTemporaryFile() as tf:
@@ -397,17 +397,17 @@ grub-pc grub-pc/install_devices_empty boolean true
             #tf.write("deb http://packages.ros.org/ros-shadow-fixed/ubuntu %s main\n" % self.distro)
             tf.write("deb http://cob-kitchen-server:3142/packages.ros.org/ros/ubuntu %s main\n" % self.distro)
             tf.write("deb http://ros.informatik.uni-freiburg.de/packages/ros/ubuntu/ %s main\n" % self.distro)
-            tf.write("deb http://code.ros.org/packages/ros/ubuntu %s main\n" % self.distro)
+            tf.write("deb http://packages.ros.org/ros/ubuntu %s main\n" % self.distro)
             tf.flush()
             cmd = ['sudo', 'cp', tf.name, ros_source]
             print "Runing cmd", cmd
             self.check_call(cmd)
 
             
-        print "adding code.ros.org gpg key"
+        print "adding packages.ros.org gpg key"
         key_file = 'tmp/ros.key'
         abs_key_file =os.path.join(self.chroot_path, key_file)
-        urllib.urlretrieve('http://code.ros.org/packages/ros.key', abs_key_file)
+        urllib.urlretrieve('http://packages.ros.org/ros.key', abs_key_file)
         #with open(abs_key_file) as f:
         #    print "key file:", f.read()
         cmd = ['apt-key', 'add', os.path.join('/', key_file)]
@@ -419,7 +419,7 @@ grub-pc grub-pc/install_devices_empty boolean true
         """
         nvidia_source=os.path.join(self.chroot_path, 'etc', 'apt', 'sources.list.d', 'wg.list')
         with tempfile.NamedTemporaryFile() as tf:
-            print "Adding code.ros.org as source"
+            print "Adding packages.ros.org as source"
             tf.write("deb http://wgs1.willowgarage.com/wg-packages/ %s-wg main\n" % self.distro)
             tf.flush()
             cmd = ['sudo', 'cp', tf.name, nvidia_source]
