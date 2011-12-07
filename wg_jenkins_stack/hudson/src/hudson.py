@@ -206,7 +206,7 @@ class Hudson(object):
         """
         pipe_jobs = []
         for job in self.get_jobs():
-            if rosdistro in job['name'] and githubuser in job['name'] and "pipe" in job['name']:
+            if (rosdistro + "__") in job['name'] and (githubuser + "__") in job['name'] and "__pipe" in job['name']:
                 pipe_jobs.append(job['name'])
         return pipe_jobs
 
