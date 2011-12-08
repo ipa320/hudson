@@ -105,7 +105,15 @@ RECONFIG_XML = """<?xml version='1.0' encoding='UTF-8'?>
   <disabled>false</disabled>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector"/>
-  <concurrentBuild>false</concurrentBuild>
+  <concurrentBuild>false</concurrentBuild>"""
+        Test if a job is running
+        @param name The job name
+        """
+        info = self.get_job_info(name)
+        if 'color' in info:
+            if string.find(info['color'], "_anime") > 0:
+                return True
+        return False
 <builders> 
     <hudson.tasks.Shell> 
       <command>export FOO=bar</command> 
@@ -209,6 +217,18 @@ class Hudson(object):
             if (rosdistro + "__") in job['name'] and (githubuser + "__") in job['name'] and "__pipe" in job['name']:
                 pipe_jobs.append(job['name'])
         return pipe_jobs
+        
+    def get_broken_jobs(self):
+        """
+        Get a list of all broken jobs
+        
+        @return: list of broken jobs
+        """
+        broken_jobs = []
+        for job in self.get_jobs():
+            if job_is_broken(job['name']):
+                broken_jobs.append(job['name'])
+        return broken_jobs
 
     def copy_job(self, from_name, to_name):
         """
@@ -356,6 +376,17 @@ class Hudson(object):
         info = self.get_job_info(name)
         if 'color' in info:
             if string.find(info['color'], "_anime") > 0:
+                return True
+        return False
+        
+    def job_is_broken(self, name):
+        """
+        Test if a job is broken
+        @param name The job name
+        """
+        info = self.get_job_info(name)
+        if 'color' in info:
+            if info['color'] == 'red':
                 return True
         return False
     
