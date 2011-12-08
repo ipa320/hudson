@@ -218,7 +218,7 @@ class Hudson(object):
         """
         broken_jobs = []
         for job in self.get_jobs():
-            if job_is_broken(job['name']):
+            if self.job_is_broken(job['name']):
                 broken_jobs.append(job['name'])
         return broken_jobs
 
