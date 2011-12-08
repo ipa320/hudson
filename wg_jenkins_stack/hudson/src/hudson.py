@@ -105,15 +105,7 @@ RECONFIG_XML = """<?xml version='1.0' encoding='UTF-8'?>
   <disabled>false</disabled>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector"/>
-  <concurrentBuild>false</concurrentBuild>"""
-        Test if a job is running
-        @param name The job name
-        """
-        info = self.get_job_info(name)
-        if 'color' in info:
-            if string.find(info['color'], "_anime") > 0:
-                return True
-        return False
+  <concurrentBuild>false</concurrentBuild>
 <builders> 
     <hudson.tasks.Shell> 
       <command>export FOO=bar</command> 
@@ -381,7 +373,7 @@ class Hudson(object):
         
     def job_is_broken(self, name):
         """
-        Test if a job is broken
+        Test if The job is broken
         @param name The job name
         """
         info = self.get_job_info(name)
