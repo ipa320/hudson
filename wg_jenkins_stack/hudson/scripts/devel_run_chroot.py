@@ -290,7 +290,9 @@ class ChrootInstance:
                 tf.write("deb %s %s main restricted universe multiverse\n" % ('http://ftp-stud.hs-esslingen.de/ubuntu/', self.distro))
                 tf.write("deb %s %s-updates main restricted universe multiverse\n" %  ('http://ftp-stud.hs-esslingen.de/ubuntu/', self.distro))
                 tf.write("deb %s %s-security main restricted universe multiverse\n" %  ('http://ftp-stud.hs-esslingen.de/ubuntu/', self.distro))
-
+                tf.write("deb %s %s main restricted universe multiverse\n" % ('http://ppa.launchpad.net/v-launchpad-jochen-sprickerhof-de/pcl/ubuntu/', self.distro))
+                tf.write("deb %s %s-updates main restricted universe multiverse\n" %  ('http://ppa.launchpad.net/v-launchpad-jochen-sprickerhof-de/pcl/ubuntu/', self.distro))
+                tf.write("deb %s %s-security main restricted universe multiverse\n" %  ('http://ppa.launchpad.net/v-launchpad-jochen-sprickerhof-de/pcl/ubuntu/', self.distro))
                 tf.flush()
                 cmd = ['sudo', 'cp', tf.name, sources]
                 print "Runing cmd", cmd
