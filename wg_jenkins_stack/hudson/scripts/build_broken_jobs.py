@@ -7,11 +7,11 @@ import hudson
 def main():
     try:
         # create hudson instance
-        if len(args) == 2:
-            hudson_instance = hudson.Hudson(SERVER, args[0], args[1])
-        else:
-            info = get_auth_keys('jenkins', HOME_FOLDER)
-            hudson_instance = hudson.Hudson(SERVER, info.group(1), info.group(2))
+        #if len(args) == 2:
+        #    hudson_instance = hudson.Hudson(SERVER, args[0], args[1])
+        #else:
+        info = get_auth_keys('jenkins', HOME_FOLDER)
+        hudson_instance = hudson.Hudson(SERVER, info.group(1), info.group(2))
         
         broken_jobs = hudson_instance.get_broken_jobs()
         if broken_jobs == []:
@@ -25,6 +25,7 @@ def main():
     # catch all exceptions
     except Exception, e:
         print 'ERROR: Failed to communicate with Hudson server. Try again later.'
+        raise
 
 if __name__ == '__main__':
     main()
