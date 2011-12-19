@@ -43,6 +43,7 @@ def main():
             env['ROS_ROOT'] = '/opt/ros/%s/ros'%options.rosdistro
         env['PYTHONPATH'] = env['ROS_ROOT']+'/core/roslib/src'
         env['PATH'] = '/opt/ros/%s/ros/bin:%s'%(options.rosdistro, os.environ['PATH'])
+        env['ROS_PARALLEL_JOBS'] = '-j4'
         print "HOME: %s"%(env['HOME'])
 
 
