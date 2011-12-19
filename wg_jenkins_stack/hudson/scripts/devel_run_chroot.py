@@ -290,15 +290,15 @@ class ChrootInstance:
                 tf.write("deb %s %s main restricted universe multiverse\n" % ('http://ftp-stud.hs-esslingen.de/ubuntu/', self.distro))
                 tf.write("deb %s %s-updates main restricted universe multiverse\n" %  ('http://ftp-stud.hs-esslingen.de/ubuntu/', self.distro))
                 tf.write("deb %s %s-security main restricted universe multiverse\n" %  ('http://ftp-stud.hs-esslingen.de/ubuntu/', self.distro))
-                tf.write("deb %s %s main\n" % ('http://ppa.launchpad.net/v-launchpad-jochen-sprickerhof-de/pcl/ubuntu/', self.distro))
+                #tf.write("deb %s %s main\n" % ('http://ppa.launchpad.net/v-launchpad-jochen-sprickerhof-de/pcl/ubuntu/', self.distro))
                 tf.flush()
                 cmd = ['sudo', 'cp', tf.name, sources]
                 print "Runing cmd", cmd
                 self.check_call(cmd)
 
-            print "adding v-launchpad-jochen-sprickerhof-de/pcl gpg key"
-            cmd = ['apt-key', 'adv', '--keyserver', 'keyserver.ubuntu.com', '--recv-key', '19274DEF']
-            self.execute(cmd) 
+            #print "adding v-launchpad-jochen-sprickerhof-de/pcl gpg key"
+            #cmd = ['apt-key', 'adv', '--keyserver', 'keyserver.ubuntu.com', '--recv-key', '19274DEF']
+            #self.execute(cmd) 
 
             self.add_ros_sources()
 
