@@ -95,7 +95,7 @@ cd $WORKSPACE &amp;&amp; $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel
 ARCHES = ['amd64', 'i386']
 
 # ubuntu distro mapping to ros distro
-UBUNTU_DISTRO_MAP = ['lucid', 'maverick', 'natty'] #, 'oneiric']
+UBUNTU_DISTRO_MAP = ['lucid', 'maverick', 'natty', 'oneiric']
 
 
 # Path to hudson server
