@@ -6,10 +6,6 @@ import hudson
 
 def main():
     try:
-        # create hudson instance
-        #if len(args) == 2:
-        #    hudson_instance = hudson.Hudson(SERVER, args[0], args[1])
-        #else:
         info = get_auth_keys('jenkins', HOME_FOLDER)
         hudson_instance = hudson.Hudson(SERVER, info.group(1), info.group(2))
         
@@ -19,8 +15,10 @@ def main():
         else:
             print 'Restarting broken jobs:'
             for broken_job in broken_jobs:
-                hudson_instance.build_job(broken_job)
-                print '- %s'%str(broken_job)
+                if not ( 'restart_' in broken_job or '__all' in broken_job):
+                    if not (hudson_instance.job_in_queue(broken_job) or hudson_instance.job_is_running(broken_job)):
+                        hudson_instance.build_job(broken_job)
+                        print '- %s'%str(broken_job)
 
     # catch all exceptions
     except Exception, e:
