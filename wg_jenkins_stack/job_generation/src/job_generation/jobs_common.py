@@ -24,21 +24,6 @@ rm -rf $WORKSPACE/test_results
 rm -rf $WORKSPACE/test_output
 rm -rf $WORKSPACE/hudson
 
-
-#check whether someone else is logged in
-#echo "Checking if someone is logged in"
-#COUNT=$(cat /proc/cpuinfo | grep 'processor' | wc -l)
-#THREADS="--threads="$COUNT
-#USERCOUNT=$(who -q | grep 'users')
-#USERCOUNT=${USERCOUNT: -1}
-#if [ $USERCOUNT != 0 ]
-#  then
-#    COUNT=$(echo "$COUNT/2" | bc)
-#    THREADS="--threads="$COUNT
-#    echo "Because someone else is logged in, only half of the cores will be used for building the stacks"
-#fi 
-
-
 cat &gt; $WORKSPACE/script.sh &lt;&lt;DELIM
 #!/usr/bin/env bash
 set -o errexit
@@ -70,10 +55,6 @@ sudo chmod 600 ~/.ssh/id_rsa.pub ~/.ssh/id_rsa
 
 sudo mkdir ros_release
 sudo mv -f /tmp/workspace/hudson/wg_jenkins_stack/* ./ros_release
-#ls -la
-#ls -la ros_release/
-#cp ros_release/hudson/src/hudson_helper_fhg.py .
-#sudo chmod +x  hudson_helper_fhg.py
 """ 
 
 
@@ -367,9 +348,6 @@ def get_options(required, optional):
     if 'not-forked' in ops:
         parser.add_option('--not-forked', dest = 'not_forked', default=False, action='store_true',
                           help="Stack is not forked for given githubuser")
-    #if 'threads' in ops:
-    #    parser.add_option('--threads', dest = 'threads', default=0, action='store',
-    #                      help="Build up to N packages in parallel")
 
     (options, args) = parser.parse_args()
     
@@ -378,10 +356,6 @@ def get_options(required, optional):
     if 'repeat' in ops:
         options.repeat = int(options.repeat)
     
-    # make threads an int
-    #if 'threads' in ops:
-    #    options.threads = int(options.threads)
-
     # check if required arguments are there
     for r in required:
         if not eval('options.%s'%r):
