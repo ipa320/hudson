@@ -115,7 +115,7 @@ PRIO_ARCH = "i386"
 PRIO_UBUNTUDISTRO = "natty"
 
 #email addresses of administrators
-ADMIN_EMAIL = "fmw@ipa.fhg.de"
+ADMIN_EMAIL = "hudson@ipa.fhg.de"
 
 EMAIL_TRIGGER="""
         <hudson.plugins.emailext.plugins.trigger.WHENTrigger> 
