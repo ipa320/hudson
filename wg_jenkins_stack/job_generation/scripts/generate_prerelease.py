@@ -4,6 +4,8 @@ import roslib; roslib.load_manifest("job_generation")
 from job_generation.jobs_common import *
 import hudson
 
+from ast import literal_eval #string to dict
+
 
 # template to create pre-release hudson configuration file
 #TODO file location
@@ -115,6 +117,21 @@ def main():
         else:
             print '<br><b>%s</b> will receive %d emails on <b>%s</b>, one for each job<br>'%(options.githubuser, len(prerelease_configs), options.email)
             print 'You can follow the progress of these jobs on the <b> <a href="%s"> Jenkins Server</a> </b> <br>'%(SERVER)
+
+        # storing user data
+        user_database = os.path.join(HOME_FOLDER, "jenkins_users")
+        with open(user_database, "r+") as f:
+            user_dict = literal_eval(f.read())
+            if options.githubuser in user_dict:
+                print 'User %s is already in database'%options.githubuser
+                if user_dict.get(options.githubuser) != options.email:
+                    print 'Email of user %s was changed from %s to %s!'%(options.githubuser, user_dict.get(options.githubuser), options.email)
+                    user_dict[options.githubuser] = options.email
+            else:
+                print 'User %s is not in database and will be added'%options.githubuser
+                user_dict[options.githubuser] = options.email
+            f.write(str(user_dict))
+
 
     # catch all exceptions
     except Exception, e:
