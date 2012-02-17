@@ -4,6 +4,7 @@ import roslib; roslib.load_manifest("job_generation")
 from job_generation.jobs_common import *
 import hudson
 from ast import literal_eval #to convert string to dict
+import os
 
 def main():
     try:
@@ -12,9 +13,11 @@ def main():
         
         all_jobs = hudson_instance.get_jobs()
         for job in all_jobs:
+            repo_list = []
+            post_jobs = []
             if "__all" in job['name'] or "restart_" in job['name'] or "update_" in job['name']:
                 # those jobs should not be updated with this script
-                pass
+                continue 
             elif "__pipe" in job['name']:
                 #====================================================
                 # get rosrelease, githubusername and repo from jobname
@@ -30,8 +33,9 @@ def main():
                     post_jobs.append(post_job['name'])
 
                 # setup config.xml for reconfiguration
-                with open("../../job_generation/scripts/pipe_config.xml", "r") as f:
-                    HUDSON_CONFIG_PIPE = f.read()
+                config_file = os.path.join(HOME_FOLDER, "git/hudson/wg_jenkins_stack/job_generation/scripts/pipe_config.xml")
+                with open(config_file, "r") as f:
+                    HUDSON_PIPE_CONFIG = f.read()
                 config = replace_param(HUDSON_PIPE_CONFIG, rosrelease, githubuser, "pipe", stack_list=repo_list, post_jobs=post_jobs)
                 
                 
@@ -47,9 +51,9 @@ def main():
                 arch = param_list[4]
                 # LABEL
                 if ubuntudistro == PRIO_UBUNTUDISTRO and arch == PRIO_ARCH:
-                    label == "build_prio"
+                    label = "build_prio"
                 else:
-                    label == "build"
+                    label = "build"
 
 
                 #====================================================
@@ -80,9 +84,11 @@ def main():
 
                 #====================================================
                 # setup config.xml for reconfiguration
-                with open("../../job_generation/scripts/build_config.xml", "r") as f:
+                config_file = os.path.join(HOME_FOLDER, "git/hudson/wg_jenkins_stack/job_generation/scripts/build_config.xml")
+                with open(config_file, "r") as f:
                     HUDSON_CONFIG = f.read()
                 config = replace_param(HUDSON_CONFIG, rosrelease, githubuser, label, arch, ubuntudistro, repo_list, email, repeat, source_only, post_jobs)
+
 
             #====================================================
             # reconfigure job 
@@ -92,6 +98,8 @@ def main():
                 print 'ERROR: Could not reconfigure job!'
                 raise
         
+            print 'reconfigured: %s'%job['name']
+
     # catch all exceptions
     except Exception, e:
         print 'ERROR: Failed to communicate with Hudson server. Try again later.'
