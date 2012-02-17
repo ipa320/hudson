@@ -98,7 +98,9 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
             
             script = "generate_prerelease.py "
             parameters = "--stack %s --rosdistro %s --githubuser %s --email %s"%(repo, release, githubuser, email)
-            
+
+            # !!!if you want to allow creating jobs for unforked stacks:!!!
+            #    change update_all_jobs.py script, because there the jobowner has to be the stackowner! 
             try:
                 if not stack_forked(githubuser, repo):
                     results = results + "<b>" + repo + "</b>" + ": stack is not forked<br>"
