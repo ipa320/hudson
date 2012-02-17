@@ -21,7 +21,7 @@ def prerelease_job_name(jobtype, rosdistro, stack_list, githubuser, ubuntu, arch
     return get_job_name(jobtype, rosdistro, githubuser, ubuntu, arch, stack_name='_'.join(stack_list))
 
 
-def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubuntudistro="", stack_list=[], email="", repeat=0, source_only="", post_jobs=[], not_forked=False):
+def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubuntudistro="", stack_list=[], email="", repeat=0, source_only=False, post_jobs=[], not_forked=False):
 
     hudson_config = hudson_config.replace('BOOTSTRAP_SCRIPT', BOOTSTRAP_SCRIPT)
     hudson_config = hudson_config.replace('SHUTDOWN_SCRIPT', SHUTDOWN_SCRIPT)
@@ -36,7 +36,6 @@ def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubunt
     hudson_config = hudson_config.replace('GITHUBUSER', githubuser)
     hudson_config = hudson_config.replace('REPEAT', str(repeat))
     hudson_config = hudson_config.replace('LABEL', job_type)
-    hudson_config = hudson_config.replace('RAMDISK', '--ramdisk --ramdisk-size 20000M')
 
     if post_jobs != []:
         hudson_config = hudson_config.replace('POSTJOBS', ', '.join(str(n) for n in post_jobs))

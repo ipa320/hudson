@@ -69,7 +69,7 @@ scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.
 
 git clone git://github.com/fmw-jk/hudson.git $WORKSPACE/hudson
 
-cd $WORKSPACE &amp;&amp; nice -n 19 $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu RAMDISK
+cd $WORKSPACE &amp;&amp; nice -n 19 $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu --ramdisk --ramdisk-size 20000M
 """
 
 # the supported Ubuntu distro's for each ros distro
