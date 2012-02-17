@@ -112,6 +112,7 @@ def main():
             for stack in depends_all["public"]:
                 rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
             
+        if rosinstall != '':
             rosinstall_file = '%s.rosinstall'%DEPENDS_DIR
             with open(rosinstall_file, 'w') as f:
                 f.write(rosinstall)
