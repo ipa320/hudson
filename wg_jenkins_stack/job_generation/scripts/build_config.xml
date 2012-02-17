@@ -155,7 +155,28 @@ SHUTDOWN_SCRIPT
     <hudson.plugins.emailext.ExtendedEmailPublisher> 
       <recipientList>ADMIN_EMAIL</recipientList> 
       <configuredTriggers> 
-        EMAIL_TRIGGERS
+        <hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+          <email>
+            <recipientList></recipientList>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>false</sendToDevelopers>
+            <sendToRequester>false</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>true</sendToRecipientList>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+        <hudson.plugins.emailext.plugins.trigger.StillFailingTrigger>
+          <email>
+            <recipientList></recipientList>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>false</sendToDevelopers>
+            <sendToRequester>false</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>true</sendToRecipientList>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.StillFailingTrigger>
       </configuredTriggers> 
       <defaultSubject>$DEFAULT_SUBJECT</defaultSubject> 
       <defaultContent>$DEFAULT_CONTENT&#xd;
