@@ -21,40 +21,6 @@ def prerelease_job_name(jobtype, rosdistro, stack_list, githubuser, ubuntu, arch
     return get_job_name(jobtype, rosdistro, githubuser, ubuntu, arch, stack_name='_'.join(stack_list))
 
 
-def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubuntudistro="", stack_list=[], email="", repeat=0, source_only=False, post_jobs=[], not_forked=False):
-
-    hudson_config = hudson_config.replace('BOOTSTRAP_SCRIPT', BOOTSTRAP_SCRIPT)
-    hudson_config = hudson_config.replace('SHUTDOWN_SCRIPT', SHUTDOWN_SCRIPT)
-    hudson_config = hudson_config.replace('UBUNTUDISTRO', ubuntudistro)
-    hudson_config = hudson_config.replace('ARCH', arch)
-    hudson_config = hudson_config.replace('ROSDISTRO', rosdistro)
-    hudson_config = hudson_config.replace('STACKNAME', '---'.join(stack_list))
-    hudson_config = hudson_config.replace('STACKARGS', ' '.join(['--stack %s'%s for s in stack_list]))
-    #hudson_config = hudson_config.replace('EMAIL_TRIGGERS', get_email_triggers(['Failure', 'StillFailing'], False)) #'Unstable', 'StillUnstable', 'Fixed'
-    hudson_config = hudson_config.replace('ADMIN_EMAIL', ADMIN_EMAIL)
-    hudson_config = hudson_config.replace('EMAIL', email)
-    hudson_config = hudson_config.replace('GITHUBUSER', githubuser)
-    hudson_config = hudson_config.replace('REPEAT', str(repeat))
-    hudson_config = hudson_config.replace('LABEL', job_type)
-
-    if post_jobs != []:
-        hudson_config = hudson_config.replace('POSTJOBS', ', '.join(str(n) for n in post_jobs))
-    else:
-        hudson_config = hudson_config.replace('POSTJOBS', '')
-    
-    if source_only:
-        hudson_config = hudson_config.replace('SOURCE_ONLY', '--source-only')
-    else:
-        hudson_config = hudson_config.replace('SOURCE_ONLY', '')
-    
-    if not_forked:
-        hudson_config = hudson_config.replace('STACKOWNER', 'ipa320')
-    else:
-        hudson_config = hudson_config.replace('STACKOWNER', githubuser)
-
-    return hudson_config
-
-
 def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, source_only, hudson_obj, arches=None, ubuntudistros=None, not_forked=False, delete=False):
     stack_list.sort()
 
