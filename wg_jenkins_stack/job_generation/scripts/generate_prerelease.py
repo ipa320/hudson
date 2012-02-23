@@ -87,6 +87,7 @@ def main():
         user_database = os.path.join(HOME_FOLDER, "jenkins_users")
         with open(user_database, "r") as f:
             user_dict = literal_eval(f.read())
+        const_dict = user_dict.copy()
         if options.githubuser in user_dict:
             #print 'User %s is already in database'%options.githubuser
             if user_dict.get(options.githubuser) != options.email:
@@ -95,8 +96,10 @@ def main():
         else:
             print 'User %s is not in database and will be added! <br>'%options.githubuser
             user_dict[options.githubuser] = options.email
-        with open(user_database, "w") as f:
-            f.write(str(user_dict))
+        if user_dict != const_dict:
+            with open(user_database, "w") as f:
+                print 'Write changes to file'
+                f.write(str(user_dict))
 
 
     # catch all exceptions
