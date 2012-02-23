@@ -89,14 +89,14 @@ else:
     HOME_FOLDER = '/home-local/jenkins'
 
 # list of public and private IPA Fraunhofer stacks
-FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_calibration', 'cob_driver', 'cob_driver_sandbox', 'cob_robots', 'cob_environments', 'cob_simulation', 'cob_apps', 'cob_manipulation', 'cob_manipulation_sandbox', 'cob_object_manipulation', 'cob_navigation', 'cob_environment_perception', 'cob_people_perception', 'cob_object_perception', 'cob_scenarios', 'cob_web', 'cob_command_tools', 'schunk_modular_robotics', 'schunk_robots']
-FHG_STACKS_PRIVATE = ['cob_manipulation_intern', 'cob_navigation_intern', 'cob_environment_perception_intern', 'cob_object_perception_intern', 'cob_scenarios_intern', 'cob_sandbox_intern', 'interaid', 'srs', 'r3cop', 'autopnp']
+FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_calibration', 'cob_driver', 'cob_driver_sandbox', 'cob_robots', 'cob_environments', 'cob_simulation', 'cob_apps', 'cob_manipulation', 'cob_manipulation_sandbox', 'cob_object_manipulation', 'cob_navigation', 'cob_environment_perception', 'cob_people_perception', 'cob_object_perception', 'cob_scenarios', 'cob_web', 'cob_command_tools', 'schunk_modular_robotics', 'schunk_robots', 'schunk_simulation']
+FHG_STACKS_PRIVATE = ['cob_manipulation_intern', 'cob_navigation_intern', 'cob_environment_perception_intern', 'cob_object_perception_intern', 'cob_scenarios_intern', 'cob_sandbox_intern', 'cob_bringup_sandbox_intern', 'interaid', 'srs', 'r3cop', 'autopnp']
 
 PRIO_ARCH = "i386"
 PRIO_UBUNTUDISTRO = "natty"
 
 #email addresses of administrators
-ADMIN_EMAIL = "fmw@ipa.fhg.de"
+ADMIN_EMAIL = "hudson@ipa.fhg.de"
 
 EMAIL_TRIGGER="""
         <hudson.plugins.emailext.plugins.trigger.WHENTrigger> 
