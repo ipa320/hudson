@@ -31,9 +31,9 @@ echo "_________________________________BEGIN SCRIPT_____________________________
 echo ""
 echo "***********************************************************************************"
 echo "INSTALLING ros distribution, bzr and python-pycurl"
-nice -n 19 sudo apt-get install bzr --yes
-nice -n 19 sudo apt-get install ros-ROSDISTRO-ros --yes
-nice -n 19 sudo apt-get install python-pycurl
+nice -n19 ionice -c2 -n7 sudo apt-get install bzr --yes
+nice -n19 ionice -c2 -n7 sudo apt-get install ros-ROSDISTRO-ros --yes
+nice -n19 ionice -c2 -n7 sudo apt-get install python-pycurl
 echo "***********************************************************************************"
 echo ""
 source /opt/ros/ROSDISTRO/setup.sh
@@ -69,7 +69,7 @@ scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.
 
 git clone git://github.com/fmw-jk/hudson.git $WORKSPACE/hudson
 
-cd $WORKSPACE &amp;&amp; nice -n 19 $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu --ramdisk --ramdisk-size 20000M
+cd $WORKSPACE &amp;&amp; nice -n19 ionice -c2 -n7  $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu --ramdisk --ramdisk-size 20000M
 """
 
 # the supported Ubuntu distro's for each ros distro
