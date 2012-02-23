@@ -4,6 +4,8 @@ import roslib; roslib.load_manifest("job_generation")
 from job_generation.jobs_common import *
 import hudson
 
+from ast import literal_eval #string to dict
+
 
 # template to create pre-release hudson configuration file
 #TODO file location
@@ -17,41 +19,6 @@ with open("all_config.xml", "r") as f3:
 
 def prerelease_job_name(jobtype, rosdistro, stack_list, githubuser, ubuntu, arch):
     return get_job_name(jobtype, rosdistro, githubuser, ubuntu, arch, stack_name='_'.join(stack_list))
-
-
-def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubuntudistro="", stack_list=[], email="", repeat=0, source_only="", post_jobs=[], not_forked=False):
-
-    hudson_config = hudson_config.replace('BOOTSTRAP_SCRIPT', BOOTSTRAP_SCRIPT)
-    hudson_config = hudson_config.replace('SHUTDOWN_SCRIPT', SHUTDOWN_SCRIPT)
-    hudson_config = hudson_config.replace('UBUNTUDISTRO', ubuntudistro)
-    hudson_config = hudson_config.replace('ARCH', arch)
-    hudson_config = hudson_config.replace('ROSDISTRO', rosdistro)
-    hudson_config = hudson_config.replace('STACKNAME', '---'.join(stack_list))
-    hudson_config = hudson_config.replace('STACKARGS', ' '.join(['--stack %s'%s for s in stack_list]))
-    hudson_config = hudson_config.replace('EMAIL_TRIGGERS', get_email_triggers(['Failure', 'StillFailing'], False)) #'Unstable', 'StillUnstable', 'Fixed'
-    hudson_config = hudson_config.replace('ADMIN_EMAIL', ADMIN_EMAIL)
-    hudson_config = hudson_config.replace('EMAIL', email)
-    hudson_config = hudson_config.replace('GITHUBUSER', githubuser)
-    hudson_config = hudson_config.replace('REPEAT', str(repeat))
-    hudson_config = hudson_config.replace('LABEL', job_type)
-    hudson_config = hudson_config.replace('RAMDISK', '--ramdisk --ramdisk-size 20000M')
-
-    if post_jobs != []:
-        hudson_config = hudson_config.replace('POSTJOBS', ', '.join(str(n) for n in post_jobs))
-    else:
-        hudson_config = hudson_config.replace('POSTJOBS', '')
-    
-    if source_only:
-        hudson_config = hudson_config.replace('SOURCE_ONLY', '--source-only')
-    else:
-        hudson_config = hudson_config.replace('SOURCE_ONLY', '')
-    
-    if not_forked:
-        hudson_config = hudson_config.replace('STACKOWNER', 'ipa320')
-    else:
-        hudson_config = hudson_config.replace('STACKOWNER', githubuser)
-
-    return hudson_config
 
 
 def create_prerelease_configs(rosdistro, stack_list, githubuser, email, repeat, source_only, hudson_obj, arches=None, ubuntudistros=None, not_forked=False, delete=False):
@@ -115,6 +82,22 @@ def main():
         else:
             print '<br><b>%s</b> will receive %d emails on <b>%s</b>, one for each job<br>'%(options.githubuser, len(prerelease_configs), options.email)
             print 'You can follow the progress of these jobs on the <b> <a href="%s"> Jenkins Server</a> </b> <br>'%(SERVER)
+
+        # storing user data
+        user_database = os.path.join(HOME_FOLDER, "jenkins_users")
+        with open(user_database, "r") as f:
+            user_dict = literal_eval(f.read())
+        if options.githubuser in user_dict:
+            #print 'User %s is already in database'%options.githubuser
+            if user_dict.get(options.githubuser) != options.email:
+                 print 'Email of user %s was changed from %s to %s! <br>'%(options.githubuser, user_dict.get(options.githubuser), options.email)
+                 user_dict[options.githubuser] = options.email
+        else:
+            print 'User %s is not in database and will be added! <br>'%options.githubuser
+            user_dict[options.githubuser] = options.email
+        with open(user_database, "w") as f:
+            f.write(str(user_dict))
+
 
     # catch all exceptions
     except Exception, e:

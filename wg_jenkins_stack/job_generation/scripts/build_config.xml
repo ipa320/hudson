@@ -28,7 +28,7 @@
 echo ""
 echo "-----------------------------------------------------------------------------------"
 echo "RUNNING run_auto_stack_prerelease_devel.py"
-rosrun job_generation run_auto_stack_prerelease_devel.py STACKARGS --rosdistro ROSDISTRO --githubuser GITHUBUSER --email EMAIL --repeat REPEAT SOURCE_ONLY $THREADS
+nice -n 19 rosrun job_generation run_auto_stack_prerelease_devel.py STACKARGS --rosdistro ROSDISTRO --githubuser GITHUBUSER --email EMAIL --repeat REPEAT SOURCE_ONLY 
 echo "-----------------------------------------------------------------------------------"
 echo ""
 SHUTDOWN_SCRIPT
@@ -155,7 +155,28 @@ SHUTDOWN_SCRIPT
     <hudson.plugins.emailext.ExtendedEmailPublisher> 
       <recipientList>ADMIN_EMAIL</recipientList> 
       <configuredTriggers> 
-        EMAIL_TRIGGERS
+        <hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+          <email>
+            <recipientList></recipientList>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>false</sendToDevelopers>
+            <sendToRequester>false</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>true</sendToRecipientList>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+        <hudson.plugins.emailext.plugins.trigger.StillFailingTrigger>
+          <email>
+            <recipientList></recipientList>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>false</sendToDevelopers>
+            <sendToRequester>false</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>true</sendToRecipientList>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.StillFailingTrigger>
       </configuredTriggers> 
       <defaultSubject>$DEFAULT_SUBJECT</defaultSubject> 
       <defaultContent>$DEFAULT_CONTENT&#xd;

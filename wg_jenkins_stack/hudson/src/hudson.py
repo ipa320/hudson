@@ -73,6 +73,7 @@ COPY_JOB     = 'createItem?name=%(to_name)s&mode=copy&from=%(from_name)s'
 BUILD_JOB    = 'job/%(name)s/build'
 BUILD_WITH_PARAMS_JOB = 'job/%(name)s/buildWithParameters'
 INFO = 'api/json'
+LAST_BUILD_DATE = 'job/%(name)s/lastBuild/api/python?depth=0'
 
 SLAVE_STATUS    = 'computer/%(name)s/api/json'
 SLAVE_CONFIGURE = 'computer/%(name)s/configSubmit'
@@ -186,7 +187,20 @@ class Hudson(object):
             return json.loads(self.hudson_open(urllib2.Request(self.server + INFO, '')))
         except:
             raise HudsonException("could not retrieve JSON info")
-
+    
+    def get_last_build_date(self, name):
+        """
+        Get a the date of the last build
+        
+        @return: string of the date
+        @rtype: string
+        """
+        try:
+            return eval(urllib2.urlopen(self.server + LAST_BUILD_DATE%locals()).read())['id']
+        except:
+            print '%s was not build yet. Start it now!'%name
+            return "0001-01-01_00-00-00"
+        
     def get_jobs(self):
         """
         Get list of jobs running.  Each job is a dictionary with

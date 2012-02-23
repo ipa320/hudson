@@ -24,21 +24,6 @@ rm -rf $WORKSPACE/test_results
 rm -rf $WORKSPACE/test_output
 rm -rf $WORKSPACE/hudson
 
-
-#check whether someone else is logged in
-echo "Checking if someone is logged in"
-COUNT=$(cat /proc/cpuinfo | grep 'processor' | wc -l)
-THREADS="--threads="$COUNT
-USERCOUNT=$(who -q | grep 'users')
-USERCOUNT=${USERCOUNT: -1}
-if [ $USERCOUNT != 0 ]
-  then
-    COUNT=$(echo "$COUNT/2" | bc)
-    THREADS="--threads="$COUNT
-    echo "Because someone else is logged in, only half of the cores will be used for building the stacks"
-fi 
-
-
 cat &gt; $WORKSPACE/script.sh &lt;&lt;DELIM
 #!/usr/bin/env bash
 set -o errexit
@@ -46,9 +31,9 @@ echo "_________________________________BEGIN SCRIPT_____________________________
 echo ""
 echo "***********************************************************************************"
 echo "INSTALLING ros distribution, bzr and python-pycurl"
-sudo apt-get install bzr --yes
-sudo apt-get install ros-ROSDISTRO-ros --yes
-sudo apt-get install python-pycurl
+nice -n 19 sudo apt-get install bzr --yes
+nice -n 19 sudo apt-get install ros-ROSDISTRO-ros --yes
+nice -n 19 sudo apt-get install python-pycurl
 echo "***********************************************************************************"
 echo ""
 source /opt/ros/ROSDISTRO/setup.sh
@@ -70,10 +55,6 @@ sudo chmod 600 ~/.ssh/id_rsa.pub ~/.ssh/id_rsa
 
 sudo mkdir ros_release
 sudo mv -f /tmp/workspace/hudson/wg_jenkins_stack/* ./ros_release
-#ls -la
-#ls -la ros_release/
-#cp ros_release/hudson/src/hudson_helper_fhg.py .
-#sudo chmod +x  hudson_helper_fhg.py
 """ 
 
 
@@ -86,9 +67,9 @@ set -o errexit
 scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
 scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.ssh
 
-git clone git://github.com/ipa320/hudson.git $WORKSPACE/hudson
+git clone git://github.com/fmw-jk/hudson.git $WORKSPACE/hudson
 
-cd $WORKSPACE &amp;&amp; $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu RAMDISK
+cd $WORKSPACE &amp;&amp; nice -n 19 $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu --ramdisk --ramdisk-size 20000M
 """
 
 # the supported Ubuntu distro's for each ros distro
@@ -367,9 +348,6 @@ def get_options(required, optional):
     if 'not-forked' in ops:
         parser.add_option('--not-forked', dest = 'not_forked', default=False, action='store_true',
                           help="Stack is not forked for given githubuser")
-    if 'threads' in ops:
-        parser.add_option('--threads', dest = 'threads', default=0, action='store',
-                          help="Build up to N packages in parallel")
 
     (options, args) = parser.parse_args()
     
@@ -378,10 +356,6 @@ def get_options(required, optional):
     if 'repeat' in ops:
         options.repeat = int(options.repeat)
     
-    # make threads an int
-    if 'threads' in ops:
-        options.threads = int(options.threads)
-
     # check if required arguments are there
     for r in required:
         if not eval('options.%s'%r):
@@ -561,3 +535,38 @@ def call(command, env=None, message='', ignore_fail=False, quiet=False):
             raise Exception
         else:
             return str(err)
+
+
+def replace_param(hudson_config, rosdistro, githubuser, job_type, arch="", ubuntudistro="", stack_list=[], email="", repeat=0, source_only=False, post_jobs=[], not_forked=False):
+
+    hudson_config = hudson_config.replace('BOOTSTRAP_SCRIPT', BOOTSTRAP_SCRIPT)
+    hudson_config = hudson_config.replace('SHUTDOWN_SCRIPT', SHUTDOWN_SCRIPT)
+    hudson_config = hudson_config.replace('UBUNTUDISTRO', ubuntudistro)
+    hudson_config = hudson_config.replace('ARCH', arch)
+    hudson_config = hudson_config.replace('ROSDISTRO', rosdistro)
+    hudson_config = hudson_config.replace('STACKNAME', '---'.join(stack_list))
+    hudson_config = hudson_config.replace('STACKARGS', ' '.join(['--stack %s'%s for s in stack_list]))
+    #hudson_config = hudson_config.replace('EMAIL_TRIGGERS', get_email_triggers(['Failure', 'StillFailing'], False)) #'Unstable', 'StillUnstable', 'Fixed'
+    hudson_config = hudson_config.replace('ADMIN_EMAIL', ADMIN_EMAIL)
+    hudson_config = hudson_config.replace('EMAIL', email)
+    hudson_config = hudson_config.replace('GITHUBUSER', githubuser)
+    hudson_config = hudson_config.replace('REPEAT', str(repeat))
+    hudson_config = hudson_config.replace('LABEL', job_type)
+
+    if post_jobs != []:
+        hudson_config = hudson_config.replace('POSTJOBS', ', '.join(str(n) for n in post_jobs))
+    else:
+        hudson_config = hudson_config.replace('POSTJOBS', '')
+
+    if source_only:
+        hudson_config = hudson_config.replace('SOURCE_ONLY', '--source-only')
+    else:
+        hudson_config = hudson_config.replace('SOURCE_ONLY', '')
+
+    if not_forked:
+        hudson_config = hudson_config.replace('STACKOWNER', 'ipa320')
+    else:
+        hudson_config = hudson_config.replace('STACKOWNER', githubuser)
+
+    return hudson_config
+
