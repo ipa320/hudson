@@ -22,7 +22,7 @@ def main():
             if not ( 'a_restart' in job['name'] or 'a_update' in job['name'] or '__all' in job['name']):
                 if not (hudson_instance.job_in_queue(job['name']) or hudson_instance.job_is_running(job['name'])):
                     date_string = hudson_instance.get_last_build_date(job['name'])
-                    if data_string != '0001-01-01_00-00-00':
+                    if date_string != '0001-01-01_00-00-00':
 			    date_list = re.findall(regex, date_string)
 			    build_year = int(date_list[0])
 			    build_month = int(date_list[1])
