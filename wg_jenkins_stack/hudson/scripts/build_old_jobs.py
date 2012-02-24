@@ -19,18 +19,19 @@ def main():
         
         all_jobs = hudson_instance.get_jobs()
         for job in all_jobs:
-            if not ( 'restart_' in job['name'] or '__all' in job['name']):
+            if not ( 'a_restart' in job['name'] or 'a_update' in jobs['name'] or '__all' in job['name']):
                 if not (hudson_instance.job_in_queue(job['name']) or hudson_instance.job_is_running(job['name'])):
                     date_string = hudson_instance.get_last_build_date(job['name'])
-                    date_list = re.findall(regex, date_string)
-                    build_year = int(date_list[0])
-                    build_month = int(date_list[1])
-                    build_day = int(date_list[2])
-                    build_date = date(build_year, build_month, build_day)
-                    build_date += offset
-                    
-                    if build_date <= today:
-                        old_jobs.append(job['name'])
+                    if data_string != '0001-01-01_00-00-00':
+			    date_list = re.findall(regex, date_string)
+			    build_year = int(date_list[0])
+			    build_month = int(date_list[1])
+			    build_day = int(date_list[2])
+			    build_date = date(build_year, build_month, build_day)
+			    build_date += offset
+			    
+			    if build_date <= today:
+				old_jobs.append(job['name'])
             
         if old_jobs == []:
             print 'No jobs older than 2 months!'
