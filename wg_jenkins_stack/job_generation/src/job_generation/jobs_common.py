@@ -227,10 +227,10 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
                 print "    Using released version"
                 call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
                 return ''
-                #return '- git: {local-name: %s, uri: "git://github.com/ipa320/%s.git", branch-name: %s}\n'%(stack_name, stack_name, rosdistro_obj.release_name)
+                #return '- git: {local-name: %s, uri: "git://github.com/ipa320/%s.git", version: %s}\n'%(stack_name, stack_name, rosdistro_obj.release_name)
                 #return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release_name)
             print "    Using 'ipa320' stack instead\n"    # stack is not released, using 'ipa320' fork
-        return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack_name, githubuser, stack_name)
+        return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", version: master}\n'%(stack_name, githubuser, stack_name)
         
     elif stack_name in rosdistro_obj.stacks:    # stack is no ipa stack
         print "Stack %s is not a ipa stack, using released version" %(stack_name)
