@@ -236,7 +236,7 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
         print "Stack %s is not a ipa stack, using released version" %(stack_name)
         return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'devel')
         
-    else:   # stack is no known stack
+    else:   # stack is not known stack
         raise Exception("ERROR: Stack %s not found! This should never happen!"%(stack_name))
         
 
