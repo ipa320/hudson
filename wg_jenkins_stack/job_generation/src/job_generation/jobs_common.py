@@ -133,6 +133,7 @@ def stacks_to_debs(stack_list, rosdistro):
 def get_depends_one(stack_name, githubuser, spaces=""):
     # get stack.xml from github
     stack_xml = get_stack_xml(stack_name, githubuser)
+    print str(stack_xml)
     # convert to list
     depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
     print spaces, 'Dependencies of stack %s:'%stack_name
