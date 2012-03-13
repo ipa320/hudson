@@ -247,14 +247,15 @@ def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
 
     try:
         git_auth = get_auth_keys('github', '/tmp/workspace')
-        post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
-        fields = urllib.urlencode(post)
+        #post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
+        #fields = urllib.urlencode(post)
         path = "https://raw.github.com/" + githubuser + "/" + stack_name + appendix
         tmpfile = StringIO.StringIO()
 
         c = pycurl.Curl()
         c.setopt(pycurl.URL, path)
-        c.setopt(pycurl.POSTFIELDS, fields)
+        c.setopt(pycurl.HTTPHEADER, ["Authorization: token %s"%git_auth.group(2)]
+        #c.setopt(pycurl.POSTFIELDS, fields)
         c.setopt(pycurl.WRITEFUNCTION, tmpfile.write)
         c.perform()
         stack_xml = tmpfile.getvalue()
