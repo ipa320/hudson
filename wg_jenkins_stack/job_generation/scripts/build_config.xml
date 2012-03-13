@@ -28,7 +28,7 @@
 echo ""
 echo "-----------------------------------------------------------------------------------"
 echo "RUNNING run_auto_stack_prerelease_devel.py"
-nice -n 19 rosrun job_generation run_auto_stack_prerelease_devel.py STACKARGS --rosdistro ROSDISTRO --githubuser GITHUBUSER --email EMAIL --repeat REPEAT SOURCE_ONLY 
+nice -n19 ionice -c2 -n7 rosrun job_generation run_auto_stack_prerelease_devel.py STACKARGS --rosdistro ROSDISTRO --githubuser GITHUBUSER --email EMAIL --repeat REPEAT SOURCE_ONLY 
 echo "-----------------------------------------------------------------------------------"
 echo ""
 SHUTDOWN_SCRIPT

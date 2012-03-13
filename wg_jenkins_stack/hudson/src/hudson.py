@@ -198,7 +198,7 @@ class Hudson(object):
         try:
             return eval(urllib2.urlopen(self.server + LAST_BUILD_DATE%locals()).read())['id']
         except:
-            print '%s was not build yet. Start it now!'%name
+            print '- %s was not build yet!'%name
             return "0001-01-01_00-00-00"
         
     def get_jobs(self):

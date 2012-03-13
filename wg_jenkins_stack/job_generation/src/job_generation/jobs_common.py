@@ -31,9 +31,9 @@ echo "_________________________________BEGIN SCRIPT_____________________________
 echo ""
 echo "***********************************************************************************"
 echo "INSTALLING ros distribution, bzr and python-pycurl"
-nice -n 19 sudo apt-get install bzr --yes
-nice -n 19 sudo apt-get install ros-ROSDISTRO-ros --yes
-nice -n 19 sudo apt-get install python-pycurl
+nice -n19 ionice -c2 -n7 sudo apt-get install bzr --yes
+nice -n19 ionice -c2 -n7 sudo apt-get install ros-ROSDISTRO-ros --yes
+nice -n19 ionice -c2 -n7 sudo apt-get install python-pycurl
 echo "***********************************************************************************"
 echo ""
 source /opt/ros/ROSDISTRO/setup.sh
@@ -69,7 +69,7 @@ scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.
 
 git clone git://github.com/fmw-jk/hudson.git $WORKSPACE/hudson
 
-cd $WORKSPACE &amp;&amp; nice -n 19 $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu --ramdisk --ramdisk-size 20000M
+cd $WORKSPACE &amp;&amp; nice -n19 ionice -c2 -n7  $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu --ramdisk --ramdisk-size 20000M
 """
 
 # the supported Ubuntu distro's for each ros distro
@@ -89,7 +89,7 @@ else:
     HOME_FOLDER = '/home-local/jenkins'
 
 # list of public and private IPA Fraunhofer stacks
-FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_calibration', 'cob_driver', 'cob_driver_sandbox', 'cob_robots', 'cob_environments', 'cob_simulation', 'cob_apps', 'cob_manipulation', 'cob_manipulation_sandbox', 'cob_object_manipulation', 'cob_navigation', 'cob_environment_perception', 'cob_people_perception', 'cob_object_perception', 'cob_scenarios', 'cob_web', 'cob_command_tools', 'schunk_modular_robotics', 'schunk_robots', 'schunk_simulation']
+FHG_STACKS_PUBLIC = ['cob_extern', 'cob_common', 'cob_calibration', 'cob_driver', 'cob_driver_sandbox', 'cob_robots', 'cob_environments', 'cob_simulation', 'cob_apps', 'cob_manipulation', 'cob_manipulation_sandbox', 'cob_object_manipulation', 'cob_navigation', 'cob_environment_perception', 'cob_people_perception', 'cob_object_perception', 'cob_scenarios', 'cob_web', 'cob_command_tools', 'schunk_modular_robotics', 'schunk_robots', 'schunk_simulation', 'srs_common']
 FHG_STACKS_PRIVATE = ['cob_manipulation_intern', 'cob_navigation_intern', 'cob_environment_perception_intern', 'cob_object_perception_intern', 'cob_scenarios_intern', 'cob_sandbox_intern', 'cob_bringup_sandbox_intern', 'interaid', 'srs', 'r3cop', 'autopnp']
 
 PRIO_ARCH = "i386"
@@ -227,16 +227,16 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
                 print "    Using released version"
                 call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
                 return ''
-                #return '- git: {local-name: %s, uri: "git://github.com/ipa320/%s.git", branch-name: %s}\n'%(stack_name, stack_name, rosdistro_obj.release_name)
+                #return '- git: {local-name: %s, uri: "git://github.com/ipa320/%s.git", version: %s}\n'%(stack_name, stack_name, rosdistro_obj.release_name)
                 #return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release_name)
             print "    Using 'ipa320' stack instead\n"    # stack is not released, using 'ipa320' fork
-        return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", branch-name: master}\n'%(stack_name, githubuser, stack_name)
+        return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", version: master}\n'%(stack_name, githubuser, stack_name)
         
     elif stack_name in rosdistro_obj.stacks:    # stack is no ipa stack
         print "Stack %s is not a ipa stack, using released version" %(stack_name)
         return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'devel')
         
-    else:   # stack is no known stack
+    else:   # stack is not known stack
         raise Exception("ERROR: Stack %s not found! This should never happen!"%(stack_name))
         
 
