@@ -67,7 +67,7 @@ set -o errexit
 scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
 scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.ssh
 
-git clone git://github.com/fmw-jk/hudson.git $WORKSPACE/hudson
+git clone git://github.com/ipa320/hudson.git $WORKSPACE/hudson
 
 cd $WORKSPACE &amp;&amp; nice -n19 ionice -c2 -n7  $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu --ramdisk --ramdisk-size 20000M
 """
@@ -133,6 +133,7 @@ def stacks_to_debs(stack_list, rosdistro):
 def get_depends_one(stack_name, githubuser, spaces=""):
     # get stack.xml from github
     stack_xml = get_stack_xml(stack_name, githubuser)
+    #print str(stack_xml)
     # convert to list
     depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
     print spaces, 'Dependencies of stack %s:'%stack_name
@@ -246,14 +247,15 @@ def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
 
     try:
         git_auth = get_auth_keys('github', '/tmp/workspace')
-        post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
-        fields = urllib.urlencode(post)
+        #post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
+        #fields = urllib.urlencode(post)
         path = "https://raw.github.com/" + githubuser + "/" + stack_name + appendix
         tmpfile = StringIO.StringIO()
 
         c = pycurl.Curl()
         c.setopt(pycurl.URL, path)
-        c.setopt(pycurl.POSTFIELDS, fields)
+        c.setopt(pycurl.HTTPHEADER, ["Authorization: token %s"%git_auth.group(2)])
+        #c.setopt(pycurl.POSTFIELDS, fields)
         c.setopt(pycurl.WRITEFUNCTION, tmpfile.write)
         c.perform()
         stack_xml = tmpfile.getvalue()
