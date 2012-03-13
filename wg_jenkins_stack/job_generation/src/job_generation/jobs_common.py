@@ -170,13 +170,13 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
     git_auth = get_auth_keys('github', "/tmp/workspace")
     post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
     fields = urllib.urlencode(post)
-    path = "https://github.com/" + githubuser + "/" + stack_name + appendix
+    path = "https://github.com/" + githubuser + "/" + stack_name + appendix + '?' + fields
     #print path
     #print fields
     file1 = StringIO.StringIO()
     c = pycurl.Curl()
     c.setopt(pycurl.URL, path)
-    c.setopt(pycurl.POSTFIELDS, fields)
+    #c.setopt(pycurl.POSTFIELDS, fields)
     c.setopt(pycurl.WRITEFUNCTION, file1.write) # to avoid to show the called page
     c.perform()
     c.close
