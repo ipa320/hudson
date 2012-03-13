@@ -254,7 +254,7 @@ def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
 
         c = pycurl.Curl()
         c.setopt(pycurl.URL, path)
-        c.setopt(pycurl.HTTPHEADER, ["Authorization: token %s"%git_auth.group(2)]
+        c.setopt(pycurl.HTTPHEADER, ["Authorization: token %s"%git_auth.group(2)])
         #c.setopt(pycurl.POSTFIELDS, fields)
         c.setopt(pycurl.WRITEFUNCTION, tmpfile.write)
         c.perform()
