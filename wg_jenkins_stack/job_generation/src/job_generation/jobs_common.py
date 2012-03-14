@@ -185,7 +185,7 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
         #print "Stack found"
         return True
     else:
-        print "PATH: ", path
+        print "stack.xml of %s not found"%stack_name#"PATH: ", path
         print "ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE)
         return False
 
