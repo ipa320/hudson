@@ -170,7 +170,7 @@ def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
     git_auth = get_auth_keys('github', "/tmp/workspace")
     post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
     fields = urllib.urlencode(post)
-    path = "https://github.com/" + githubuser + "/" + stack_name + appendix + '?' + fields
+    path = "https://github.com/" + githubuser + "/" + stack_name + appendix + '?' + str(fields)
     #print path
     #print fields
     file1 = StringIO.StringIO()
