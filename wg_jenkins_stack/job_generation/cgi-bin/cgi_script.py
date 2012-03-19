@@ -182,7 +182,7 @@ def stack_forked(githubuser, stack):
     try:
         c = pycurl.Curl()
         c.setopt(pycurl.URL, path)
-        c.setopt(pycurl.POSTFIELDS, fields)
+        #c.setopt(pycurl.POSTFIELDS, fields)
         c.setopt(pycurl.WRITEFUNCTION, file1.write) # to avoid to show the called page
         c.perform()
         c.close
