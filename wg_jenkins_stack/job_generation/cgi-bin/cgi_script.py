@@ -175,7 +175,8 @@ def stack_forked(githubuser, stack):
     post = {'login' : gitinfo.group(1), 'token' : gitinfo.group(2)}
     fields = urllib.urlencode(post)
     
-    path = "https://github.com/" + githubuser + "/" + stack + "/blob/master/Makefile"
+    path = "https://github.com/" + githubuser + "/" + stack + "/blob/master/Makefile" + '?' + str(fields)
+
     file1 = StringIO.StringIO()
     
     try:
