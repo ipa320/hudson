@@ -36,6 +36,7 @@ nice -n19 ionice -c2 -n7 sudo apt-get install ros-ROSDISTRO-ros --yes
 nice -n19 ionice -c2 -n7 sudo apt-get install python-pycurl
 echo "***********************************************************************************"
 echo ""
+
 source /opt/ros/ROSDISTRO/setup.sh
 
 export INSTALL_DIR=/tmp/install_dir
@@ -45,6 +46,12 @@ export JOB_NAME=$JOB_NAME
 export BUILD_NUMBER=$BUILD_NUMBER
 export HUDSON_URL=$HUDSON_URL
 export ROS_PACKAGE_PATH=\$INSTALL_DIR/ros_release:/opt/ros/ROSDISTRO/stacks
+
+#######################
+# HACK
+sudo mkdir -p /opt/ros/ROSDISTRO/stacks/ros_comm/tools/rostest/scripts
+sudo ln -s /opt/ros/ROSDISTRO/stacks/ros_comm/tools/rostest/bin/roslaunch-check.py /opt/ros/ROSDISTRO/stacks/ros_comm/tools/rostest/scripts/roslaunch-check.py
+#######################
 
 mkdir -p \$INSTALL_DIR
 cd \$INSTALL_DIR
