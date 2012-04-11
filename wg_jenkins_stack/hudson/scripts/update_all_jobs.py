@@ -126,10 +126,15 @@ def main():
             print 'reconfigured: %s'%job['name']
 
         # restart stopped jobs
-        for job_name in running_jobs:
-            hudson_instance.build_job(job_name)
-        for job_name in pending_jobs:
-            hudson_instance.build_job(job_name)
+        if running_jobs != [] or pending_jobs != []:
+            print "Restart %d jobs"%(len(running_jobs)+len(pending_jobs))
+            for job_name in running_jobs:
+                print "- " + job_name
+                hudson_instance.build_job(job_name)
+            print "---------------------------"
+            for job_name in pending_jobs:
+                print "- " + job_name
+                hudson_instance.build_job(job_name)
 
 
     # catch all exceptions
