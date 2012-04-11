@@ -25,16 +25,10 @@ def main():
         all_jobs_counter = len(all_jobs)
         for job in all_jobs:
             # cancel pending jobs in queue and restart after update
-            queue = hudson_instance.get_queue_info():
-            while queue != []:
-                pending_jobs.append(queue[0]['task']['name'])
-                hudson_instance.cancel_pending_job(0)
-                queue = hudson_instance.get_queue_info():
-
-            # stop job if it is running and restart after update
-            if hudson_instance.job_is_running(job['name']):
-                running_jobs.append(job['name'])
-                hudson_instance.stop_running_job(job['name'])
+            for item in hudson_instance.get_queue_info():
+                print "Cancel pending job %s"%(item['task']['name'])
+                pending_jobs.append(item['task']['name'])
+                hudson_instance.cancel_pending_job(item['id'])
 
             repo_list = []
             post_jobs = []
@@ -42,7 +36,14 @@ def main():
                 # those jobs should not be updated with this script
                 ignored_jobs_counter += 1
                 continue 
-            elif "__pipe" in job['name']:
+
+            # stop job if it is running and restart after update
+            if hudson_instance.job_is_running(job['name']):
+                print "Stop running job %s"%(job['name'])
+                running_jobs.append(job['name'])
+                hudson_instance.stop_running_job(job['name'])
+
+            if "__pipe" in job['name']:
                 pipe_jobs_counter += 1
                 #====================================================
                 # get rosrelease, githubusername and repo from jobname
