@@ -21,14 +21,15 @@ def main():
         info = get_auth_keys('jenkins', HOME_FOLDER)
         hudson_instance = hudson.Hudson(SERVER, info.group(1), info.group(2))
         
+        # cancel pending jobs in queue and restart after update
+        for item in hudson_instance.get_queue_info():
+            print "Cancel pending job %s"%(item['task']['name'])
+            pending_jobs.append(item['task']['name'])
+            hudson_instance.cancel_pending_job(item['id'])
+
         all_jobs = hudson_instance.get_jobs()
         all_jobs_counter = len(all_jobs)
         for job in all_jobs:
-            # cancel pending jobs in queue and restart after update
-            for item in hudson_instance.get_queue_info():
-                print "Cancel pending job %s"%(item['task']['name'])
-                pending_jobs.append(item['task']['name'])
-                hudson_instance.cancel_pending_job(item['id'])
 
             repo_list = []
             post_jobs = []
