@@ -13,6 +13,10 @@ def main():
     pipe_jobs_counter = 0;
     build_jobs_counter = 0;
     ignored_jobs_counter = 0; #update and restart job(s)
+
+    running_jobs = []
+    pending_jobs = []
+
     try:
         info = get_auth_keys('jenkins', HOME_FOLDER)
         hudson_instance = hudson.Hudson(SERVER, info.group(1), info.group(2))
@@ -20,6 +24,18 @@ def main():
         all_jobs = hudson_instance.get_jobs()
         all_jobs_counter = len(all_jobs)
         for job in all_jobs:
+            # cancel pending jobs in queue and restart after update
+            queue = hudson_instance.get_queue_info():
+            while queue != []:
+                pending_jobs.append(queue[0]['task']['name'])
+                hudson_instance.cancel_pending_job(0)
+                queue = hudson_instance.get_queue_info():
+
+            # stop job if it is running and restart after update
+            if hudson_instance.job_is_running(job['name']):
+                running_jobs.append(job['name'])
+                hudson_instance.stop_running_job(job['name'])
+
             repo_list = []
             post_jobs = []
             if "__all" in job['name'] or "a_restart_" in job['name'] or "a_update_" in job['name']:
@@ -108,6 +124,13 @@ def main():
                 continue
         
             print 'reconfigured: %s'%job['name']
+
+        # restart stopped jobs
+        for job_name in running_jobs:
+            hudson_instance.build_job(job_name)
+        for job_name in pending_jobs:
+            hudson_instance.build_job(job_name)
+
 
     # catch all exceptions
     except Exception, e:
