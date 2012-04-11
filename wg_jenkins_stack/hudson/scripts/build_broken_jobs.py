@@ -15,7 +15,7 @@ def main():
         else:
             print 'Restarting broken jobs:'
             for broken_job in broken_jobs:
-                if not ( 'restart_' in broken_job or '__all' in broken_job):
+                if not ( 'a_restart_' in broken_job or 'a_update_' in broken_job or '__all' in broken_job):
                     if not (hudson_instance.job_in_queue(broken_job) or hudson_instance.job_is_running(broken_job)):
                         hudson_instance.build_job(broken_job)
                         print '- %s'%str(broken_job)
