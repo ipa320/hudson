@@ -364,6 +364,16 @@ class Hudson(object):
         """
         self.hudson_open(urllib2.Request(self.server + CANCEL_PENDING_JOB%locals(), ''))
 
+    def cancel_pending_job_by_name(self, name):
+        """
+        Cancel job in build queue
+        @param name The job name
+        """
+        for item in self.get_queue_info():
+            if item['task']['name'] == name:
+                self.cancel_pending_job(item['id'])
+                return
+
     def job_in_queue(self, name):
         """
         Test if job is in build queue
