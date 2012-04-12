@@ -435,7 +435,7 @@ def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
 
             # delete pending job from queue
             elif exists and hudson_obj.job_in_queue(job_name):
-                hudson_obj.cancel_pending_job(job_name)
+                hudson_obj.cancel_pending_job_by_name(job_name)
                 jobs_todo[job_name] = jobs[job_name]
                 print "Job %s is in build queue! Cancel pending build <br>"%job_name
 
