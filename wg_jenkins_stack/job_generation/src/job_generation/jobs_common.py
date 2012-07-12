@@ -181,7 +181,10 @@ def stack_forked(githubuser, stack):
     github_user = git_auth.group(1)
     github_pw = git_auth.group(2)
     s = 'curl -u "' + github_user + ':' + github_pw + '" -X GET https://api.github.com/repos/ipa320/' + stack + '/forks'
+    print s
     answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+    print "ANSWER:"
+    print answer
 
     m = re.search('"message": "Not Found"', answer)
     if m:
