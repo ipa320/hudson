@@ -14,6 +14,8 @@ import pycurl
 import subprocess
 import socket
 import yaml
+import base64
+import ast
 
 
 
@@ -173,28 +175,27 @@ def get_stack_membership(stack_name):
         return "other"
 
 
-def stack_forked(githubuser, stack_name, appendix="/blob/master/Makefile"):
-    git_auth = get_auth_keys('github', "/tmp/workspace")
-    post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
-    fields = urllib.urlencode(post)
-    path = "https://github.com/" + githubuser + "/" + stack_name + appendix + '?' + str(fields)
-    #print path
-    #print fields
-    file1 = StringIO.StringIO()
-    c = pycurl.Curl()
-    c.setopt(pycurl.URL, path)
-    #c.setopt(pycurl.POSTFIELDS, fields)
-    c.setopt(pycurl.WRITEFUNCTION, file1.write) # to avoid to show the called page
-    c.perform()
-    c.close
+def stack_forked(githubuser, stack):
+    git_auth = get_auth_keys('jenkins', "/tmp/workspace")
+    # try authentication on github
+    github_user = git_auth.group(1)
+    github_pw = git_auth.group(2)
+    s = 'curl -u "' + github_user + ':' + github_pw + '" -X GET https://api.github.com/repos/ipa320/' + stack + '/forks'
+    answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
 
-    if c.getinfo(pycurl.HTTP_CODE) == 200:
-        #print "Stack found"
-        return True
-    else:
-        print "stack.xml of %s not found"%stack_name#"PATH: ", path
-        print "ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE)
+    m = re.search('"message": "Not Found"', answer)
+    if m:
+        print "Stack %s not found!"%stack
         return False
+    else:
+        m = re.search("/"+githubuser+"/", answer)
+        if not m:
+            print "Stack " + stack + " is not fork for user " + githubuser +  "!"
+            return False
+        else:
+            return True
+    
+    
 
 
 def stack_released(stack_name, rosdistro, env):
@@ -253,21 +254,17 @@ def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
         githubuser = "ipa320"
 
     try:
-        git_auth = get_auth_keys('github', '/tmp/workspace')
-        post = {'login' : git_auth.group(1), 'token' : git_auth.group(2)}
-        fields = urllib.urlencode(post)
-        path = "https://raw.github.com/" + githubuser + "/" + stack_name + appendix + '?' + str(fields)
-        tmpfile = StringIO.StringIO()
+        git_auth = get_auth_keys('jenkins', '/tmp/workspace')
+        # try authentication on github
+        github_user = git_auth.group(1)
+        github_pw = git_auth.group(2)
+        s = 'curl -u "' + github_user + ':' + github_pw + '" -X GET https://api.github.com/repos/' + githubuser + '/' + stack + 'contents/stack.xml'
+        answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+        
+        ans_dict = ast.literal_eval(answer.replace("\n ", ""))
 
-        c = pycurl.Curl()
-        c.setopt(pycurl.URL, path)
-        #c.setopt(pycurl.HTTPHEADER, ["Authorization: token %s"%git_auth.group(2)])
-        #c.setopt(pycurl.POSTFIELDS, fields)
-        c.setopt(pycurl.WRITEFUNCTION, tmpfile.write)
-        c.perform()
-        stack_xml = tmpfile.getvalue()
+        stack_xml = base64.decodestring(ans_dict['content'])
 
-        c.close
     except :
         #TODO
         pass

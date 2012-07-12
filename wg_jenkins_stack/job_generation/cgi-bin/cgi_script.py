@@ -6,7 +6,8 @@ import pycurl
 import re
 import StringIO
 import urllib
-from subprocess import Popen, PIPE, STDOUT
+import subprocess
+#from subprocess import Popen, PIPE, STDOUT
 import shlex
 import os
 import stat
@@ -125,7 +126,7 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
                 ./%s %s
                 """%(HOME_FOLDER, HOME_FOLDER, script, parameters))
                 os.chmod(bash_script, stat.S_IRWXU)
-            p = Popen(bash_script, stdout=PIPE, stderr=STDOUT)
+            p = subprocess.Popen(bash_script, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             out, err = p.communicate()
             results = results + "<br>" + out + "<br>"
             if err != None:
@@ -143,11 +144,11 @@ def valid_stack(githubuser, stack):
     try:
         if stack_forked(githubuser, stack):
             return True
-        elif stack_forked("ipa320", stack):
-            return True
+        #elif stack_forked("ipa320", stack):
+        #    return False
         else:
-            print "<p><font color='#FF0000'>ERROR:"
-            print "Stack <b>" + stack + " </b>could not be found. Please check spelling!</font>"
+            #print "<p><font color='#FF0000'>ERROR:"
+            #print "Stack <b>" + stack + " </b>could not be found. Please check spelling!</font>"
             return False
     except:
         print "<p><font color='#FF0000'>ERROR:"
@@ -167,34 +168,30 @@ def stack_forked(githubuser, stack):
         return False
     
     # extract necessary data
-    regex = ".*\[github]\s*user\s*=\s*([^\s]*)\s*token\s*=\s*([^\s]*).*"
-    gitinfo = re.match(regex, gitconfig, re.DOTALL)
-    if gitinfo == None:
+    regex = ".*\[jenkins]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
+    git_auth = re.match(regex, gitconfig, re.DOTALL)
+    if git_auth == None:
         print "<b>ERROR: No match found in 'gitconfig'</b>"
         raise
-    post = {'login' : gitinfo.group(1), 'token' : gitinfo.group(2)}
-    fields = urllib.urlencode(post)
     
-    path = "https://github.com/" + githubuser + "/" + stack + "/blob/master/Makefile" + '?' + str(fields)
-
-    file1 = StringIO.StringIO()
+    # try authentication on github
+    github_user = git_auth.group(1)
+    github_pw = git_auth.group(2)
+    s = 'curl -u "' + github_user + ':' + github_pw + '" -X GET https://api.github.com/repos/ipa320/' + stack + '/forks'
+    answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
     
-    try:
-        c = pycurl.Curl()
-        c.setopt(pycurl.URL, path)
-        #c.setopt(pycurl.POSTFIELDS, fields)
-        c.setopt(pycurl.WRITEFUNCTION, file1.write) # to avoid to show the called page
-        c.perform()
-        c.close
-    except:
-        print "<b>ERROR: Problem occured while checking for 'Makefile'</b>"
-        raise
-        
-    if c.getinfo(pycurl.HTTP_CODE) == 200:
-        return True
+    m = re.search('"message": "Not Found"', answer)
+    if m:
+        print "<p><font color='#FF0000'>ERROR:"
+        print "Stack <b>" + stack + " </b>could not be found. Please check spelling!</font>"
+        return False  
     else:
-        #print "<b>ERRORCODE: ", c.getinfo(pycurl.HTTP_CODE), "</b>"
-        return False
-
+        m = re.search("/"+githubuser+"/", answer)
+        if not m:
+            print "<p><font color='#FF0000'>ERROR:"
+            print "Stack <b>" + stack + " </b>is not fork for user " + githubuser +  "! Please fork it first on github.com</font>"
+            return False
+        else:
+            return True
 
 main()
