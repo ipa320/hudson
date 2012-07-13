@@ -176,7 +176,7 @@ def get_stack_membership(stack_name):
 
 
 def stack_forked(githubuser, stack):
-    git_auth = get_auth_keys('jenkins', "/tmp/workspace")
+    git_auth = get_auth_keys('github', "/tmp/workspace")
     # try authentication on github
     github_user = git_auth.group(1)
     github_pw = git_auth.group(2)
@@ -257,7 +257,7 @@ def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
         githubuser = "ipa320"
 
     try:
-        git_auth = get_auth_keys('jenkins', '/tmp/workspace')
+        git_auth = get_auth_keys('github', '/tmp/workspace')
         # try authentication on github
         github_user = git_auth.group(1)
         github_pw = git_auth.group(2)
@@ -280,7 +280,8 @@ def get_auth_keys(server, location):
         gitconfig = f.read()
         # extract necessary data
         if server == "github":
-            regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*token\s*=\s*([^\s]*).*"
+            regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
+            #regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*token\s*=\s*([^\s]*).*"
             
         elif server == "jenkins":
             regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
