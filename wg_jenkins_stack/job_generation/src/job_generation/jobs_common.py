@@ -182,13 +182,12 @@ def stack_forked(githubuser, stack):
     github_pw = git_auth.group(2)
     #s = "curl -u '" + github_user + ':' + github_pw + "' -X GET https://api.github.com/repos/ipa320/" + stack + '/forks'
     s = "curl -X GET https://" + github_user + ':' + github_pw + "@api.github.com/repos/ipa320/" + stack + '/forks'
-    print s
-    c = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    answer = c.communicate()[0]
-    print "Returncode: ", c.returncode
-    #answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    print "ANSWER:"
-    print answer
+    #print s
+    #c = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    #answer = c.communicate()[0]
+    #print "Returncode: ", c.returncode
+    answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+    #print answer
 
     m = re.search('"message": "Not Found"', answer)
     if m:
@@ -197,7 +196,7 @@ def stack_forked(githubuser, stack):
     else:
         m = re.search("/"+githubuser+"/", answer)
         if not m:
-            print "Stack " + stack + " is not fork for user " + githubuser +  "!"
+            print "Stack " + stack + " is not forked for user " + githubuser +  "!"
             return False
         else:
             return True
@@ -265,7 +264,8 @@ def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
         # try authentication on github
         github_user = git_auth.group(1)
         github_pw = git_auth.group(2)
-        s = "curl -u '" + github_user + ':' + github_pw + "' -X GET https://api.github.com/repos/" + githubuser + '/' + stack + 'contents/stack.xml'
+        #s = "curl -u '" + github_user + ':' + github_pw + "' -X GET https://api.github.com/repos/" + githubuser + '/' + stack + 'contents/stack.xml'
+        s = "curl -X GET https://" + github_user + ':' + github_pw + "@api.github.com/repos/" + githubuser + '/' + stack + '/contents/stack.xml'
         answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
         
         ans_dict = ast.literal_eval(answer.replace("\n ", ""))
