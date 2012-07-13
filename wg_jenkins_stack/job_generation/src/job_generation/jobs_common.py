@@ -182,7 +182,10 @@ def stack_forked(githubuser, stack):
     github_pw = git_auth.group(2)
     s = "curl -u '" + github_user + ':' + github_pw + "' -X GET https://api.github.com/repos/ipa320/" + stack + '/forks'
     print s
-    answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+    c = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    answer = c.communicate()[0]
+    print "Returncode: ", c.returncode
+    #answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
     print "ANSWER:"
     print answer
 
@@ -261,7 +264,7 @@ def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
         # try authentication on github
         github_user = git_auth.group(1)
         github_pw = git_auth.group(2)
-        s = 'curl -u "' + github_user + ':' + github_pw + '" -X GET https://api.github.com/repos/' + githubuser + '/' + stack + 'contents/stack.xml'
+        s = "curl -u '" + github_user + ':' + github_pw + "' -X GET https://api.github.com/repos/" + githubuser + '/' + stack + 'contents/stack.xml'
         answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
         
         ans_dict = ast.literal_eval(answer.replace("\n ", ""))
