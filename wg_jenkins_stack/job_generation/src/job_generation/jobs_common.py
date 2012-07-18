@@ -139,14 +139,16 @@ def stacks_to_debs(stack_list, rosdistro):
     return ' '.join([stack_to_deb(s, rosdistro) for s in stack_list])
 
 
-def get_depends_one(stack_name, githubuser, spaces=""):
+###def get_depends_one(stack_name, githubuser, spaces=""):
+def get_depends_one(stack_name, overlay_dir, spaces=""):
     # get stack.xml from github
-    stack_xml = get_stack_xml(stack_name, githubuser)
+    stack_xml = get_stack_xml(stack_name, overlay_dir)
     #print str(stack_xml)
     # convert to list
     depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
     print spaces, 'Dependencies of stack %s:'%stack_name
-    print spaces, str(depends_one)
+    for dep in depends_one:
+        print spaces, str(dep)
     return depends_one
 
 
@@ -216,6 +218,7 @@ def stack_released(stack_name, rosdistro, env):
         print '%s is released'%stack_name
         return True
 
+
 def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir, env):
     # check if stack is private, public or other / forked or not / released or not
     # gives back rosinstall entry or clones stack in case it is private
@@ -255,27 +258,38 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
         raise Exception("ERROR: Stack %s not found! This should never happen!"%(stack_name))
         
 
-def get_stack_xml(stack_name, githubuser, appendix="/master/stack.xml"):
-    if not stack_forked(githubuser, stack_name):
-        githubuser = "ipa320"
-
+def get_stack_xml(stack_name, overlay_dir):
+    #if os.path.exists(os.path.join(overlay_dir, stack_name, "stack.xml")):
     try:
-        git_auth = get_auth_keys('github', '/tmp/workspace')
-        # try authentication on github
-        github_user = git_auth.group(1)
-        github_pw = git_auth.group(2)
-        #s = "curl -u '" + github_user + ':' + github_pw + "' -X GET https://api.github.com/repos/" + githubuser + '/' + stack + 'contents/stack.xml'
-        s = "curl -X GET https://" + github_user + ':' + github_pw + "@api.github.com/repos/" + githubuser + '/' + stack + '/contents/stack.xml'
-        answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-        
-        ans_dict = ast.literal_eval(answer.replace("\n ", ""))
+        with open(os.path.join(overlay_dir, stack_name, "stack.xml"), 'r') as f:
+            stack_xml = f.read() 
+    except EnvironmentError:   
+        raise Exception("ERROR: stack.xml of stack %s not found! This should never happen!"%(stack_name))
 
-        stack_xml = base64.decodestring(ans_dict['content'])
-
-    except :
-        #TODO
-        pass
     return stack_xml
+    
+
+    ###if not stack_forked(githubuser, stack_name):
+    ###    githubuser = "ipa320"
+
+    ####try:
+    ###git_auth = get_auth_keys('github', '/tmp/workspace')
+    #### try authentication on github
+    ###github_user = git_auth.group(1)
+    ###github_pw = git_auth.group(2)
+    ####s = "curl -u '" + github_user + ':' + github_pw + "' -X GET https://api.github.com/repos/" + githubuser + '/' + stack + 'contents/stack.xml'
+    ###s = "curl -X GET https://" + github_user + ':' + github_pw + "@api.github.com/repos/ipa320/" + stack + '/forks'
+    ###s = "curl -X GET https://" + github_user + ':' + github_pw + "@api.github.com/repos/" + githubuser + '/' + stack + '/contents/stack.xml'
+    ###answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+    ###
+    ###ans_dict = ast.literal_eval(answer.replace("\n ", ""))
+
+    ###stack_xml = base64.decodestring(ans_dict['content'])
+
+    ####except :
+    ####    #TODO
+    ####    pass
+    ###return stack_xml
     
         
 def get_auth_keys(server, location):
