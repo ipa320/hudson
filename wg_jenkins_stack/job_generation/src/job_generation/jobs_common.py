@@ -148,7 +148,7 @@ def get_depends_one(stack_name, overlay_dir, spaces=""):
     depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
     print spaces, 'Dependencies of stack %s:'%stack_name
     for dep in depends_one:
-        print spaces, str(dep)
+        print spaces+"  ", str(dep)
     return depends_one
 
 def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_obj, env, start_depth=1):
@@ -166,7 +166,8 @@ def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_
             #for ipa stack: get all depends of stack
             if get_stack_membership(stack) == "public" or get_stack_membership(stack) == "private":
                 return "\n" + " "*2*start_depth + str(start_depth) + " + Included %s to dependencies"%stack + \
-                       get_depends_all(get_depends_one(stack, overlay_dir), depends_all, githubuser, overlay_dir, rosdistro_obj, env, start_depth+1)
+                       get_depends_all(get_depends_one(stack, overlay_dir), depends_all, githubuser, overlay_dir,
+                                       rosdistro_obj, env, start_depth+1)
             else:
                 return "\n" + " "*2*start_depth + str(start_depth) + " + Included %s to dependencies"%stack
     

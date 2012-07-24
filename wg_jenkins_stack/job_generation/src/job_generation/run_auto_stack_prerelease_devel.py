@@ -89,6 +89,8 @@ def main():
 
             #get all depends recursivly and clone or install it
             print get_depends_all(depends_one, depends_all, options.githubuser, DEPENDS_DIR, rosdistro_obj, env) 
+            sys.stdout.flush()
+
 
             ###for dep in depends_one:
                 #clone if ipa stack or install if external stack
@@ -108,6 +110,8 @@ def main():
         print "    ", str(depends_all["public"])
         print "  None IPA stacks:"
         print "    ", str(depends_all["other"])
+        sys.stdout.flush()
+
 
         ###if len(depends_all["private"]) > 0:#TODO released private stack???
         ###    print '\n==================================================================================='
