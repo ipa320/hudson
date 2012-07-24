@@ -190,7 +190,7 @@ def stack_forked(githubuser, stack):
     else:
         m = re.search("/"+githubuser+"/", answer)
         if not m:
-            s = 'curl -u "' + github_user + ':' + github_pw + '" -X GET https://api.github.com/repos/ipa320/' + stack 
+            s = 'curl -u "' + github_user + ':' + github_pw + '" -X GET https://api.github.com/repos/' + githubuser + '/' + stack 
             answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
             m = re.search('"message": "Not Found"', answer)
             if m:
