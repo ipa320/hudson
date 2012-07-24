@@ -88,7 +88,7 @@ def main():
             depends_one = get_depends_one(stack, STACK_DIR)
 
             #get all depends recursivly and clone or install it
-            print get_depends_all(depends_one, depends_all, options.githubuser, DEPENDS_DIR, rosdistro_obj ) 
+            print get_depends_all(depends_one, depends_all, options.githubuser, DEPENDS_DIR, rosdistro_obj, env) 
 
             ###for dep in depends_one:
                 #clone if ipa stack or install if external stack
