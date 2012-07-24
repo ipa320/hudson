@@ -151,21 +151,43 @@ def get_depends_one(stack_name, overlay_dir, spaces=""):
         print spaces, str(dep)
     return depends_one
 
-
-def get_depends_all(stack_name, depends_all, githubuser, start_depth):
+def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_obj, start_depth=1, return_str):#, depends_all, start_depth):
     depends_all_list = []
     # convert depends_all entries to list
     [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
-    if not stack_name in depends_all_list: # new stack and not in depends_all
-        print " "*2*start_depth, start_depth, "+ Included %s to dependencies"%stack_name
-        # append stack to the right list in depends_all
-        depends_all[get_stack_membership(stack_name)].append(stack_name)
-        # find and append all IPA dependencies
-        if stack_name in FHG_STACKS_PRIVATE or stack_name in FHG_STACKS_PUBLIC:
-            for d in get_depends_one(stack_name, githubuser, " "*2*start_depth):
-                get_depends_all(d, depends_all, githubuser, start_depth+1)
+    for stack in stack_list:
+        if not stack in depends_all_list: # new stack and not in depends_all
+            #add stack to resolved depends
+            #append stack to the right list in depends_all
+            depends_all[get_stack_membership(stack_name)].append(stack_name)
+            #clone or install stack
+            get_stack(rosdistro_obj, dep, githubuser, overlay_dir, env)
+            
+            #for ipa stack: get all depends of stack
+            if get_stack_membership(stack) == "public" or get_stack_membership(stack) == "private":
+                return "\n" + " "*2*start_depth + str(start_depth) + " + Included %s to dependencies"%stack_name +
+                       get_depends_all(get_depends_one(stack, overlay_dir), depends_all, githubuser, overlay_dir, rosdistro_obj, start_depth+1)
+            else
+                return "\n" + " "*2*start_depth + str(start_depth) + " + Included %s to dependencies"%stack_name
+    
     else:
-        print " "*2*start_depth, start_depth, "- %s already included"%stack_name
+        return "\n" + " "*2*start_depth + str(start_depth) + " - %s already included"%stack_name
+
+
+###def get_depends_all(stack_name, depends_all, githubuser, start_depth):
+###    depends_all_list = []
+###    # convert depends_all entries to list
+###    [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
+###    if not stack_name in depends_all_list: # new stack and not in depends_all
+###        print " "*2*start_depth, start_depth, "+ Included %s to dependencies"%stack_name
+###        # append stack to the right list in depends_all
+###        depends_all[get_stack_membership(stack_name)].append(stack_name)
+###        # find and append all IPA dependencies
+###        if stack_name in FHG_STACKS_PRIVATE or stack_name in FHG_STACKS_PUBLIC:
+###            for d in get_depends_one(stack_name, githubuser, " "*2*start_depth):
+###                get_depends_all(d, depends_all, githubuser, start_depth+1)
+###    else:
+###        print " "*2*start_depth, start_depth, "- %s already included"%stack_name
 
 
 def get_stack_membership(stack_name):
@@ -219,9 +241,9 @@ def stack_released(stack_name, rosdistro, env):
         return True
 
 
-def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir, env):
+def get_stack(rosdistro_obj, stack_name, githubuser, overlay_dir, env):
     # check if stack is private, public or other / forked or not / released or not
-    # gives back rosinstall entry or clones stack in case it is private
+    # clones stack in case it is private or public ipa stack and installs external stack via apt-get
     
     if stack_name in FHG_STACKS_PRIVATE:    # stack is private ipa stack
         print "Stack %s is a private ipa stack" %(stack_name)
@@ -231,10 +253,12 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
             if stack_released(stack_name, rosdistro_obj.release_name, env):  # stack is released
                 print "    Using released version"
                 call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
-                return ''
+                return
+                ###return ''
             print "    Using 'ipa320' stack instead\n"    # stack is not released, using 'ipa320' fork
-        call('git clone git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone private stack [%s] to test'%(stack_name))
-        return ''
+        call('git clone git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone private stack [%s]'%(stack_name))
+        return
+        ###return ''
         
     elif stack_name in FHG_STACKS_PUBLIC:   # stack is public ipa stack
         print "Stack %s is a public ipa stack" %(stack_name)
@@ -244,15 +268,20 @@ def stack_origin(rosdistro_obj, rosinstall, stack_name, githubuser, overlay_dir,
             if stack_released(stack_name, rosdistro_obj.release_name, env):  # stack is released
                 print "    Using released version"
                 call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
-                return ''
+                return
+                ###return ''
                 #return '- git: {local-name: %s, uri: "git://github.com/ipa320/%s.git", version: %s}\n'%(stack_name, stack_name, rosdistro_obj.release_name)
                 #return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release_name)
             print "    Using 'ipa320' stack instead\n"    # stack is not released, using 'ipa320' fork
-        return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", version: master}\n'%(stack_name, githubuser, stack_name)
+        call('git clone git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone public stack [%s]'%(stack_name))
+        return
+        ###return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", version: master}\n'%(stack_name, githubuser, stack_name)
         
     elif stack_name in rosdistro_obj.stacks:    # stack is no ipa stack
         print "Stack %s is not a ipa stack, using released version" %(stack_name)
-        return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'devel')
+        call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
+        return 
+        ###return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'devel')
         
     else:   # stack is not known stack
         raise Exception("ERROR: Stack %s not found! This should never happen!"%(stack_name))
