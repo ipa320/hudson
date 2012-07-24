@@ -162,10 +162,11 @@ def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_
             #append stack to the right list in depends_all
             depends_all[get_stack_membership(stack)].append(stack)
             #clone or install stack
-            get_stack(rosdistro_obj, stack, githubuser, overlay_dir, env)
+            #get_stack(rosdistro_obj, stack, githubuser, overlay_dir, env)
             
             #for ipa stack: get all depends of stack
-            if get_stack_membership(stack) == "public" or get_stack_membership(stack) == "private":
+            #if get_stack_membership(stack) == "public" or get_stack_membership(stack) == "private":
+            if get_stack(rosdistro_obj, stack, githubuser, overlay_dir, env) != "released":
                 return_str += "\n" + " "*2*start_depth + str(start_depth) + " + Included %s to dependencies"%stack + \
                        get_depends_all(get_depends_one(stack, overlay_dir), depends_all, githubuser, overlay_dir,
                                        rosdistro_obj, env, start_depth+1)
@@ -256,11 +257,11 @@ def get_stack(rosdistro_obj, stack_name, githubuser, overlay_dir, env):
             if stack_released(stack_name, rosdistro_obj.release_name, env):  # stack is released
                 print "    Using released version"
                 call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
-                return
+                return "released"
                 ###return ''
             print "    Using 'ipa320' stack instead\n"    # stack is not released, using 'ipa320' fork
         call('git clone git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone private stack [%s]'%(stack_name))
-        return
+        return ""
         ###return ''
         
     elif stack_name in FHG_STACKS_PUBLIC:   # stack is public ipa stack
@@ -271,19 +272,19 @@ def get_stack(rosdistro_obj, stack_name, githubuser, overlay_dir, env):
             if stack_released(stack_name, rosdistro_obj.release_name, env):  # stack is released
                 print "    Using released version"
                 call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
-                return
+                return "released"
                 ###return ''
                 #return '- git: {local-name: %s, uri: "git://github.com/ipa320/%s.git", version: %s}\n'%(stack_name, stack_name, rosdistro_obj.release_name)
                 #return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release_name)
             print "    Using 'ipa320' stack instead\n"    # stack is not released, using 'ipa320' fork
         call('git clone git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone public stack [%s]'%(stack_name))
-        return
+        return ""
         ###return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", version: master}\n'%(stack_name, githubuser, stack_name)
         
     elif stack_name in rosdistro_obj.stacks:    # stack is no ipa stack
         print "Stack %s is not a ipa stack, using released version" %(stack_name)
         call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
-        return 
+        return "released"
         ###return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'devel')
         
     else:   # stack is not known stack
