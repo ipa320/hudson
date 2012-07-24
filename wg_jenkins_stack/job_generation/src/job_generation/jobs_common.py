@@ -151,7 +151,7 @@ def get_depends_one(stack_name, overlay_dir, spaces=""):
         print spaces, str(dep)
     return depends_one
 
-def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_obj, start_depth=1, return_str):#, depends_all, start_depth):
+def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_obj, start_depth=1):
     depends_all_list = []
     # convert depends_all entries to list
     [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
