@@ -170,8 +170,8 @@ def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_
             else:
                 return "\n" + " "*2*start_depth + str(start_depth) + " + Included %s to dependencies"%stack
     
-    else:
-        return "\n" + " "*2*start_depth + str(start_depth) + " - %s already included"%stack
+        else:
+            return "\n" + " "*2*start_depth + str(start_depth) + " - %s already included"%stack
 
 
 ###def get_depends_all(stack_name, depends_all, githubuser, start_depth):
