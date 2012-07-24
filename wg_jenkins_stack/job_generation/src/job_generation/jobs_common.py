@@ -167,7 +167,7 @@ def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_
             if get_stack_membership(stack) == "public" or get_stack_membership(stack) == "private":
                 return "\n" + " "*2*start_depth + str(start_depth) + " + Included %s to dependencies"%stack_name + \
                        get_depends_all(get_depends_one(stack, overlay_dir), depends_all, githubuser, overlay_dir, rosdistro_obj, start_depth+1)
-            else
+            else:
                 return "\n" + " "*2*start_depth + str(start_depth) + " + Included %s to dependencies"%stack_name
     
     else:
