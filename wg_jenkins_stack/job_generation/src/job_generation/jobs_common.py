@@ -161,7 +161,7 @@ def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_
             #append stack to the right list in depends_all
             depends_all[get_stack_membership(stack)].append(stack)
             #clone or install stack
-            get_stack(rosdistro_obj, dep, githubuser, overlay_dir, env)
+            get_stack(rosdistro_obj, stack, githubuser, overlay_dir, env)
             
             #for ipa stack: get all depends of stack
             if get_stack_membership(stack) == "public" or get_stack_membership(stack) == "private":
