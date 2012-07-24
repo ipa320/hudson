@@ -110,6 +110,7 @@ def main():
         print "    ", str(depends_all["public"])
         print "  None IPA stacks:"
         print "    ", str(depends_all["other"])
+        print '==================================================================================='
         sys.stdout.flush()
 
 
@@ -144,6 +145,7 @@ def main():
         for i in iter(depends_all): depends_no += len(depends_all[i])
         if depends_no == 0:
             print 'Stack(s) %s do(es) not have any dependencies, not installing anything now'%str(options.stack)
+        sys.stdout.flush()
         
       
         # Install system dependencies of stacks we're testing
@@ -153,10 +155,12 @@ def main():
         for stack in options.stack:
             call('rosdep install -y %s'%stack, env,
                  'Install system dependencies of stack %s'%stack)
+        sys.stdout.flush()
                  
         # Run hudson helper for stacks only
         print '\n==================================================================================='
         print 'Running Hudson Helper\n'
+        sys.stdout.flush()
         res = 0
         for r in range(0, int(options.repeat)+1):
             env['ROS_TEST_RESULTS_DIR'] = env['ROS_TEST_RESULTS_DIR'] + '/' + STACK_DIR + '_run_' + str(r)
@@ -186,6 +190,7 @@ def main():
         print "******************************************************************\n"
         print body
         print "******************************************************************"
+        sys.stdout.flush()
         
 #no need to test debian package dependencies as long as no debian package exist
 #        # parse debian repository configuration file to get stack dependencies
