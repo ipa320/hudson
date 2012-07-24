@@ -185,7 +185,7 @@ def stack_forked(githubuser, stack):
         print "<p><font color='#FF0000'>ERROR:"
         print "Stack <b>" + stack + " </b>could not be found. Please check spelling!</font>"
         return False  
-    elif githubuser = "ipa320":
+    elif githubuser == "ipa320":
         return True
     else:
         m = re.search("/"+githubuser+"/", answer)
