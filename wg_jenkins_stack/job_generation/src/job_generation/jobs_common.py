@@ -152,11 +152,11 @@ def get_depends_one(stack_name, overlay_dir, spaces=""):
     return depends_one
 
 def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_obj, env, start_depth=1):
-    depends_all_list = []
     return_str = ""
     # convert depends_all entries to list
-    [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
     for stack in stack_list:
+        depends_all_list = []
+        [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
         if not stack in depends_all_list: # new stack and not in depends_all
             #add stack to resolved depends
             #append stack to the right list in depends_all
