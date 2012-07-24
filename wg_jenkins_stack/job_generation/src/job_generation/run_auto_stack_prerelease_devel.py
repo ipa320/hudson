@@ -51,44 +51,54 @@ def main():
         rosdistro_obj = rosdistro.Distro(get_rosdistro_file(options.rosdistro))
         print 'Operating on ROS distro %s'%rosdistro_obj.release_name
 
+        call('sudo apt-get update', env)
 
         # Install the stacks to test from source
         print '\n==================================================================================='
         print 'Installing %s to test from source\n'%str(options.stack)
-        rosinstall = ''
+        ###rosinstall = ''
         for stack in options.stack:
             if not stack_forked(options.githubuser, stack):
                 raise Exception('  Stack %s is not forked for user %s! Fork stack on github.com to run job'%(stack, options.githubuser))
-                
-            rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env)
+             
+            #Clone stack from github
+            ###rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env)
+            call('git clone git@github.com:%s/%s.git %s/%s'%(options.githubuser, stack, STACK_DIR, stack), env, 'Clone stack [%s] for testing'%(stack))
             
-        if rosinstall != '': # call rosinstall command
-            print '\n==================================================================================='
-            rosinstall_file = '%s.rosinstall'%STACK_DIR
-            print 'Generating rosinstall file [%s]'%(rosinstall_file)
-            print 'Contents:\n\n'+rosinstall+'\n\n'
-            with open(rosinstall_file, 'w') as f:
-                f.write(rosinstall)
-            print 'rosinstall file [%s] generated'%(rosinstall_file)
-            print STACK_DIR
-            print options.rosdistro
-            call('rosinstall --rosdep-yes %s /opt/ros/%s %s'%(STACK_DIR, options.rosdistro, rosinstall_file), env,
-                 'Install the stacks to test from source.')
+        ###if rosinstall != '': # call rosinstall command
+        ###    print '\n==================================================================================='
+        ###    rosinstall_file = '%s.rosinstall'%STACK_DIR
+        ###    print 'Generating rosinstall file [%s]'%(rosinstall_file)
+        ###    print 'Contents:\n\n'+rosinstall+'\n\n'
+        ###    with open(rosinstall_file, 'w') as f:
+        ###        f.write(rosinstall)
+        ###    print 'rosinstall file [%s] generated'%(rosinstall_file)
+        ###    print STACK_DIR
+        ###    print options.rosdistro
+        ###    call('rosinstall --rosdep-yes %s /opt/ros/%s %s'%(STACK_DIR, options.rosdistro, rosinstall_file), env,
+        ###         'Install the stacks to test from source.')
             
         
         # get all stack dependencies of stacks we're testing
-        rosinstall = ''
+        ###rosinstall = ''
         depends_all = {"public" : [], "private" : [], "other" : []}
         for stack in options.stack:
             print '\n==================================================================================='
-            print 'Calculating all stack dependencies of %s\n'%stack
-            depends_one = get_depends_one(stack, options.githubuser)
+            print 'Calculating and getting all stack dependencies of %s\n'%stack
+            depends_one = get_depends_one(stack, STACK_DIR)
 
-            for d in depends_one:
-                depends_all_list = []
-                [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
-                if not d in options.stack and not d in depends_all_list:
-                    get_depends_all(d, depends_all, options.githubuser, 1)
+            #get all depends recursivly and clone or install it
+            print get_depends_all(depends_one, depends_all, options.githubuser, DEPENDS_DIR, rosdistro_obj ) 
+
+            ###for dep in depends_one:
+                #clone if ipa stack or install if external stack
+                #get_stack(rosdistro_obj, dep, options.githubuser, DEPENDS_DIR, env)
+
+
+                ###depends_all_list = []
+                ###[[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
+                ###if not d in options.stack and not d in depends_all_list:
+                ###    get_depends_all(d, depends_all, options.githubuser, 1)
         
         print '\n==================================================================================='
         print 'Dependencies of %s:'%str(options.stack)
@@ -99,32 +109,32 @@ def main():
         print "  None IPA stacks:"
         print "    ", str(depends_all["other"])
 
-        if len(depends_all["private"]) > 0:#TODO released private stack???
-            print '\n==================================================================================='
-            print 'Cloning private github fork(s)\n'
-            for stack in depends_all["private"]:
-                rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
-                    
+        ###if len(depends_all["private"]) > 0:#TODO released private stack???
+        ###    print '\n==================================================================================='
+        ###    print 'Cloning private github fork(s)\n'
+        ###    for stack in depends_all["private"]:
+        ###        rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
+        ###            
 
-        if len(depends_all["public"]) > 0:
-            print '\n==================================================================================='
-            print 'Installing stack dependencies from public github fork\n'
-            for stack in depends_all["public"]:
-                rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
-            
-        if rosinstall != '':
-            rosinstall_file = '%s.rosinstall'%DEPENDS_DIR
-            with open(rosinstall_file, 'w') as f:
-                f.write(rosinstall)
-            call('rosinstall --rosdep-yes %s /opt/ros/%s %s'%(DEPENDS_DIR, options.rosdistro, rosinstall_file), env,
-                 'Install the stack dependencies from source.')
+        ###if len(depends_all["public"]) > 0:
+        ###    print '\n==================================================================================='
+        ###    print 'Installing stack dependencies from public github fork\n'
+        ###    for stack in depends_all["public"]:
+        ###        rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, DEPENDS_DIR, env)
+        ###    
+        ###if rosinstall != '':
+        ###    rosinstall_file = '%s.rosinstall'%DEPENDS_DIR
+        ###    with open(rosinstall_file, 'w') as f:
+        ###        f.write(rosinstall)
+        ###    call('rosinstall --rosdep-yes %s /opt/ros/%s %s'%(DEPENDS_DIR, options.rosdistro, rosinstall_file), env,
+        ###         'Install the stack dependencies from source.')
      
-        if len(depends_all["other"]) > 0:
-            # Install Debian packages of stack dependencies
-            print '\n==================================================================================='
-            print 'Installing debian packages of "%s" dependencies:\n\n%s'%(str(options.stack), str(depends_all["other"]))
-            call('sudo apt-get update', env)
-            call('sudo apt-get install %s --yes'%(stacks_to_debs(depends_all["other"], options.rosdistro)), env)
+        ###if len(depends_all["other"]) > 0:
+        ###    # Install Debian packages of stack dependencies
+        ###    print '\n==================================================================================='
+        ###    print 'Installing debian packages of "%s" dependencies:\n\n%s'%(str(options.stack), str(depends_all["other"]))
+        ###    call('sudo apt-get update', env)
+        ###    call('sudo apt-get install %s --yes'%(stacks_to_debs(depends_all["other"], options.rosdistro)), env)
  
         depends_no = 0
         for i in iter(depends_all): depends_no += len(depends_all[i])
