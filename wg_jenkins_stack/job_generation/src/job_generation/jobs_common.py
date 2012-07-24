@@ -221,6 +221,8 @@ def stack_forked(githubuser, stack):
     if m:
         print "Stack %s not found!"%stack
         return False
+    elif githubuser == "ipa320":
+        return True
     else:
         m = re.search("/"+githubuser+"/", answer)
         if not m:
