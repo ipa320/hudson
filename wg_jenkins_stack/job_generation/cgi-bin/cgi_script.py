@@ -190,9 +190,15 @@ def stack_forked(githubuser, stack):
     else:
         m = re.search("/"+githubuser+"/", answer)
         if not m:
-            print "<p><font color='#FF0000'>ERROR:"
-            print "Stack <b>" + stack + " </b>is not fork for user " + githubuser +  "! Please fork it first on github.com</font>"
-            return False
+            s = 'curl -u "' + github_user + ':' + github_pw + '" -X GET https://api.github.com/repos/ipa320/' + stack + '/forks'
+            answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+            m = re.search('"message": "Not Found"', answer)
+            if m:
+                print "<p><font color='#FF0000'>ERROR:"
+                print "Stack <b>" + stack + " </b>is not fork for user " + githubuser +  "! Please fork it first on github.com</font>"
+                return False
+            else:
+                return True
         else:
             return True
 
