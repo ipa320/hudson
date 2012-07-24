@@ -35,7 +35,7 @@ echo "**************************************************************************
 echo "INSTALLING ros distribution, bzr and python-pycurl"
 nice -n19 ionice -c2 -n7 sudo apt-get install bzr --yes
 nice -n19 ionice -c2 -n7 sudo apt-get install ros-ROSDISTRO-ros --yes
-nice -n19 ionice -c2 -n7 sudo apt-get install python-pycurl
+nice -n19 ionice -c2 -n7 sudo apt-get install python-pycurl curl
 echo "***********************************************************************************"
 echo ""
 
@@ -149,6 +149,8 @@ def get_depends_one(stack_name, overlay_dir, spaces=""):
     print spaces, 'Dependencies of stack %s:'%stack_name
     for dep in depends_one:
         print spaces+"  ", str(dep)
+    print "\n"
+
     return depends_one
 
 def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_obj, env, start_depth=1):
