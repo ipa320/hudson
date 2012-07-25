@@ -35,7 +35,7 @@ echo "**************************************************************************
 echo "INSTALLING ros distribution, bzr and python-pycurl"
 nice -n19 ionice -c2 -n7 sudo apt-get install bzr --yes
 nice -n19 ionice -c2 -n7 sudo apt-get install ros-ROSDISTRO-ros --yes
-nice -n19 ionice -c2 -n7 sudo apt-get install python-pycurl curl
+nice -n19 ionice -c2 -n7 sudo apt-get install python-pycurl curl --yes
 echo "***********************************************************************************"
 echo ""
 
