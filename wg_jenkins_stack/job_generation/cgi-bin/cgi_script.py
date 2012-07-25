@@ -178,6 +178,7 @@ def stack_forked(githubuser, stack):
     github_user = git_auth.group(1)
     github_pw = git_auth.group(2)
     s = 'curl -u "' + github_user + ':' + github_pw + '" -X GET https://api.github.com/repos/ipa320/' + stack + '/forks?per_page=999'
+    #s = 'curl -X GET https://' + github_user + ':' + github_pw + '@api.github.com/repos/ipa320/' + stack + '/forks?per_page=999'
     answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
     
     m = re.search('"message": "Not Found"', answer)
@@ -189,7 +190,7 @@ def stack_forked(githubuser, stack):
         return True
     else:
         m = re.search("/"+githubuser+"/", answer)
-        if m:
+        if not m:
             print "<p><font color='#FF0000'>ERROR:"
             print "Stack <b>" + stack + " </b>is not fork for user " + githubuser +  "! Please fork it first on github.com</font>"
             return False
