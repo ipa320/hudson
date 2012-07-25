@@ -33,7 +33,8 @@ def main():
 
             repo_list = []
             post_jobs = []
-            if "__all" in job['name'] or "a_restart_" in job['name'] or "a_update_" in job['name']:
+            if "__all" in job['name'] or "a_restart_" in job['name'] \
+               or "a_update_" in job['name'] or "vnc__" in job['name']:
                 # those jobs should not be updated with this script
                 ignored_jobs_counter += 1
                 continue 
