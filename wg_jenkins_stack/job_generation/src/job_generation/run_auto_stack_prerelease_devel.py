@@ -56,6 +56,7 @@ def main():
         # Install the stacks to test from source
         print '\n==================================================================================='
         print 'Installing %s to test from source\n'%str(options.stack)
+        sys.stdout.flush()
         ###rosinstall = ''
         for stack in options.stack:
             if not stack_forked(options.githubuser, stack):
