@@ -211,7 +211,7 @@ def stack_forked(githubuser, stack):
     github_user = git_auth.group(1)
     github_pw = git_auth.group(2)
     #s = "curl -u '" + github_user + ':' + github_pw + "' -X GET https://api.github.com/repos/ipa320/" + stack + '/forks'
-    s = "curl -X GET https://" + github_user + ':' + github_pw + "@api.github.com/repos/ipa320/" + stack + '/forks'
+    s = "curl -X GET https://" + github_user + ':' + github_pw + "@api.github.com/repos/ipa320/" + stack + '/forks?per_page=999'
     #print s
     #c = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     #answer = c.communicate()[0]
