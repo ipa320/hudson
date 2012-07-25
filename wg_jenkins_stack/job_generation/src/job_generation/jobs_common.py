@@ -266,7 +266,7 @@ def get_stack(rosdistro_obj, stack_name, githubuser, overlay_dir, env):
                 return "released"
                 ###return ''
             print "    Using 'ipa320' stack instead\n"    # stack is not released, using 'ipa320' fork
-        call('git clone -v -v -v git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone private stack [%s]'%(stack_name))
+        call('git clone -v -v -v git://github.com/%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone private stack [%s]'%(stack_name))
         return ""
         ###return ''
         
@@ -283,7 +283,7 @@ def get_stack(rosdistro_obj, stack_name, githubuser, overlay_dir, env):
                 #return '- git: {local-name: %s, uri: "git://github.com/ipa320/%s.git", version: %s}\n'%(stack_name, stack_name, rosdistro_obj.release_name)
                 #return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release_name)
             print "    Using 'ipa320' stack instead\n"    # stack is not released, using 'ipa320' fork
-        call('git clone -v -v -v git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone public stack [%s]'%(stack_name))
+        call('git clone -v -v -v git://github.com/%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone public stack [%s]'%(stack_name))
         return ""
         ###return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", version: master}\n'%(stack_name, githubuser, stack_name)
         
