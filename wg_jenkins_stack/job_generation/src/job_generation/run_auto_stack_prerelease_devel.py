@@ -64,7 +64,10 @@ def main():
              
             #Clone stack from github
             ###rosinstall += stack_origin(rosdistro_obj, rosinstall, stack, options.githubuser, STACK_DIR, env)
-            call('git clone git://github.com/%s/%s.git %s/%s'%(options.githubuser, stack, STACK_DIR, stack), env, 'Clone stack [%s] for testing'%(stack))
+            if get_stack_membership(stack) == "private":
+                call('git clone git@github.com:%s/%s.git %s/%s'%(options.githubuser, stack, STACK_DIR, stack), env, 'Clone stack [%s] for testing'%(stack))
+            else:
+                call('git clone git://github.com/%s/%s.git %s/%s'%(options.githubuser, stack, STACK_DIR, stack), env, 'Clone stack [%s] for testing'%(stack))
             
         ###if rosinstall != '': # call rosinstall command
         ###    print '\n==================================================================================='

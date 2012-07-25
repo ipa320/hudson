@@ -266,7 +266,7 @@ def get_stack(rosdistro_obj, stack_name, githubuser, overlay_dir, env):
                 return "released"
                 ###return ''
             print "    Using 'ipa320' stack instead\n"    # stack is not released, using 'ipa320' fork
-        call('git clone -v -v -v git://github.com/%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone private stack [%s]'%(stack_name))
+        call('git clone -v -v -v git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone private stack [%s]'%(stack_name))
         return ""
         ###return ''
         
