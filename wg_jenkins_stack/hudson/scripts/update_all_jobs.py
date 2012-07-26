@@ -25,7 +25,9 @@ def main():
         for item in hudson_instance.get_queue_info():
             print "Cancel pending job %s"%(item['task']['name'])
             pending_jobs.append(item['task']['name'])
-            hudson_instance.cancel_pending_job(item['id'])
+            if 'id' in item: #TODO for jobs without id
+                hudson_instance.cancel_pending_job(item['id'])
+
 
         all_jobs = hudson_instance.get_jobs()
         all_jobs_counter = len(all_jobs)
