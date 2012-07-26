@@ -141,13 +141,12 @@ def stacks_to_debs(stack_list, rosdistro):
     return ' '.join([stack_to_deb(s, rosdistro) for s in stack_list])
 
 
-###def get_depends_one(stack_name, githubuser, spaces=""):
 def get_depends_one(stack_name, overlay_dir, spaces=""):
-    # get stack.xml from github
+    # get stack.xml from local stack clone
     stack_xml = get_stack_xml(stack_name, overlay_dir)
-    #print str(stack_xml)
-    # convert to list
+    # convert dependencies to list
     depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
+    
     print spaces, 'Dependencies of stack %s:'%stack_name
     for dep in depends_one:
         print spaces+"  ", str(dep)
@@ -157,45 +156,30 @@ def get_depends_one(stack_name, overlay_dir, spaces=""):
 
 def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_obj, env, start_depth=1):
     return_str = ""
+
     # convert depends_all entries to list
     for stack in stack_list:
         depends_all_list = []
         [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
         if not stack in depends_all_list: # new stack and not in depends_all
-            #add stack to resolved depends
-            #append stack to the right list in depends_all
+
+            #add stack to resolved depends by appending stack to the right list in depends_all
             depends_all[get_stack_membership(stack)].append(stack)
-            #clone or install stack
-            #get_stack(rosdistro_obj, stack, githubuser, overlay_dir, env)
             
-            #for ipa stack: get all depends of stack
-            #if get_stack_membership(stack) == "public" or get_stack_membership(stack) == "private":
-            if get_stack(rosdistro_obj, stack, githubuser, overlay_dir, env) != "released":
+            # clone or install stack & get all depends for not released stacks
+            if get_stack(rosdistro_obj, stack, githubuser, overlay_dir, env) != "released": 
+                # resolve dependencies for cloned stack
                 return_str += "\n" + " "*2*start_depth + str(start_depth) + " + Included %s to dependencies"%stack + \
                        get_depends_all(get_depends_one(stack, overlay_dir), depends_all, githubuser, overlay_dir,
                                        rosdistro_obj, env, start_depth+1)
             else:
+                # apt-get resolves dependencies of released stacks
                 return_str += "\n" + " "*2*start_depth + str(start_depth) + " + Included %s to dependencies"%stack
     
-        else:
+        else: # stack already cloned/installed
             return_str += "\n" + " "*2*start_depth + str(start_depth) + " - %s already included"%stack
+    
     return return_str
-
-
-###def get_depends_all(stack_name, depends_all, githubuser, start_depth):
-###    depends_all_list = []
-###    # convert depends_all entries to list
-###    [[depends_all_list.append(value) for value in valuelist] for valuelist in depends_all.itervalues()]
-###    if not stack_name in depends_all_list: # new stack and not in depends_all
-###        print " "*2*start_depth, start_depth, "+ Included %s to dependencies"%stack_name
-###        # append stack to the right list in depends_all
-###        depends_all[get_stack_membership(stack_name)].append(stack_name)
-###        # find and append all IPA dependencies
-###        if stack_name in FHG_STACKS_PRIVATE or stack_name in FHG_STACKS_PUBLIC:
-###            for d in get_depends_one(stack_name, githubuser, " "*2*start_depth):
-###                get_depends_all(d, depends_all, githubuser, start_depth+1)
-###    else:
-###        print " "*2*start_depth, start_depth, "- %s already included"%stack_name
 
 
 def get_stack_membership(stack_name):
@@ -208,44 +192,55 @@ def get_stack_membership(stack_name):
 
 
 def stack_forked(githubuser, stack):
+    # get github auth keys
     git_auth = get_auth_keys('github', "/tmp/workspace")
-    # try authentication on github
     github_user = git_auth.group(1)
     github_pw = git_auth.group(2)
-    #s = "curl -u '" + github_user + ':' + github_pw + "' -X GET https://api.github.com/repos/ipa320/" + stack + '/forks'
-    s = "curl -X GET https://" + github_user + ':' + github_pw + "@api.github.com/repos/ipa320/" + stack + '/forks?per_page=999'
-    #print s
-    #c = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    #answer = c.communicate()[0]
-    #print "Returncode: ", c.returncode
+
+    # get fork list of stack from githubuser ipa320 with authentication
+    #s = "curl -u '" + github_user + ':' + github_pw + "' -X GET \
+    #        https://api.github.com/repos/ipa320/" + stack + '/forks'
+    s = "curl -X GET https://" + github_user + ':' + github_pw + \
+            "@api.github.com/repos/ipa320/" + stack + '/forks?per_page=999'
     answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    #print answer
 
     m = re.search('"message": "Not Found"', answer)
     if m:
+        # stack doen't exist for ipa320
         print "Stack %s not found!"%stack
         return False
+
     elif githubuser == "ipa320":
+        # stack exist 
         return True
+
     else:
+        # look for github username in fork list
         m = re.search("/"+githubuser+"/", answer)
+        
         if not m:
+            # github username not found
             print "Stack " + stack + " is not forked for user " + githubuser +  "!"
             return False
+        
         else:
+            # github username found -> stack forked
             return True
     
-    
-
 
 def stack_released(stack_name, rosdistro, env):
+
     print 'Checking if stack is released'
     pkg_name = stack_to_deb(stack_name, rosdistro)
+
+    # simulate installation via apt-get
     err_msg = call('sudo apt-get -s install %s'%pkg_name, env, ignore_fail=True, quiet=True)
-    #print "ERROR MESSAGE: ", err_msg
+    
+    # look for phrase in err_msg
     if "E: Unable to locate package %s"%pkg_name in err_msg:
         print '%s is not released'%stack_name
         return False
+    
     else:
         print '%s is released'%stack_name
         return True
@@ -255,50 +250,71 @@ def get_stack(rosdistro_obj, stack_name, githubuser, overlay_dir, env):
     # check if stack is private, public or other / forked or not / released or not
     # clones stack in case it is private or public ipa stack and installs external stack via apt-get
     
-    if stack_name in FHG_STACKS_PRIVATE:    # stack is private ipa stack
+    if stack_name in FHG_STACKS_PRIVATE:    
+        # stack is private ipa stack
         print "Stack %s is a private ipa stack" %(stack_name)
-        if not stack_forked(githubuser, stack_name):    # check if stack is forked for user or not
-            print "  Stack %s is not forked for user %s" %(stack_name, githubuser)
-            githubuser = 'ipa320'
-            if stack_released(stack_name, rosdistro_obj.release_name, env):  # stack is released
-                print "    Using released version"
-                call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
-                return "released"
-                ###return ''
-            print "    Using 'ipa320' stack instead\n"    # stack is not released, using 'ipa320' fork
-        call('git clone -v -v -v git@github.com:%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone private stack [%s]'%(stack_name))
-        return ""
-        ###return ''
         
-    elif stack_name in FHG_STACKS_PUBLIC:   # stack is public ipa stack
+        # check if stack is forked for user or not
+        if not stack_forked(githubuser, stack_name):    
+            print "  Stack %s is not forked for user %s"%(stack_name, githubuser)
+        
+            if stack_released(stack_name, rosdistro_obj.release_name, env):  
+                # stack is released
+                print "    Using released version"
+                call('sudo apt-get install %s --yes'
+                        %(stack_to_deb(stack_name, rosdistro_obj.release_name)), 
+                        env, 'Install released version')
+                return "released"
+
+            # stack is not released, using 'ipa320' fork
+            print "    Using 'ipa320' stack instead\n"    
+            githubuser = 'ipa320'
+        
+        call('git clone -v -v -v git@github.com:%s/%s.git %s/%s'
+                %(githubuser, stack_name, overlay_dir, stack_name), 
+                env, 'Clone private stack [%s]'%(stack_name))
+        return ""
+        
+    elif stack_name in FHG_STACKS_PUBLIC:   
+        # stack is public ipa stack
         print "Stack %s is a public ipa stack" %(stack_name)
-        if not stack_forked(githubuser, stack_name):    # check if stack is forked for user or not
-            print "  Stack %s is not forked for user %s" %(stack_name, githubuser)
-            githubuser = 'ipa320'
-            if stack_released(stack_name, rosdistro_obj.release_name, env):  # stack is released
+
+        # check if stack is forked for user or not
+        if not stack_forked(githubuser, stack_name):    
+            print "  Stack %s is not forked for user %s"%(stack_name, githubuser)
+            
+            if stack_released(stack_name, rosdistro_obj.release_name, env):  
+                # stack is released
                 print "    Using released version"
-                call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
+                call('sudo apt-get install %s --yes'
+                       %(stack_to_deb(stack_name, rosdistro_obj.release_name)), 
+                       env, 'Install released version')
                 return "released"
-                ###return ''
-                #return '- git: {local-name: %s, uri: "git://github.com/ipa320/%s.git", version: %s}\n'%(stack_name, stack_name, rosdistro_obj.release_name)
-                #return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'release_%s'%rosdistro_obj.release_name)
-            print "    Using 'ipa320' stack instead\n"    # stack is not released, using 'ipa320' fork
-        call('git clone -v -v -v git://github.com/%s/%s.git %s/%s'%(githubuser, stack_name, overlay_dir, stack_name), env, 'Clone public stack [%s]'%(stack_name))
+
+            # stack is not released, using 'ipa320' fork
+            print "    Using 'ipa320' stack instead\n"    
+            githubuser = 'ipa320'
+        
+        call('git clone -v -v -v git://github.com/%s/%s.git %s/%s'
+                %(githubuser, stack_name, overlay_dir, stack_name), 
+                env, 'Clone public stack [%s]'%(stack_name))
         return ""
-        ###return  '- git: {local-name: %s, uri: "git://github.com/%s/%s.git", version: master}\n'%(stack_name, githubuser, stack_name)
         
-    elif stack_name in rosdistro_obj.stacks:    # stack is no ipa stack
+    elif stack_name in rosdistro_obj.stacks:    
+        # stack is no ipa stack
         print "Stack %s is not a ipa stack, using released version" %(stack_name)
-        call('sudo apt-get install %s --yes'%(stack_to_deb(stack_name, rosdistro_obj.release_name)), env, 'Install released version')
+        call('sudo apt-get install %s --yes'
+                %(stack_to_deb(stack_name, rosdistro_obj.release_name)), 
+                env, 'Install released version')
         return "released"
-        ###return stack_to_rosinstall(rosdistro_obj.stacks[stack_name], 'devel')
         
-    else:   # stack is not known stack
+    else:   
+        # stack is not known stack
         raise Exception("ERROR: Stack %s not found! This should never happen!"%(stack_name))
         
 
 def get_stack_xml(stack_name, overlay_dir):
-    #if os.path.exists(os.path.join(overlay_dir, stack_name, "stack.xml")):
+    # open stack.xml
     try:
         with open(os.path.join(overlay_dir, stack_name, "stack.xml"), 'r') as f:
             stack_xml = f.read() 
@@ -308,29 +324,6 @@ def get_stack_xml(stack_name, overlay_dir):
     return stack_xml
     
 
-    ###if not stack_forked(githubuser, stack_name):
-    ###    githubuser = "ipa320"
-
-    ####try:
-    ###git_auth = get_auth_keys('github', '/tmp/workspace')
-    #### try authentication on github
-    ###github_user = git_auth.group(1)
-    ###github_pw = git_auth.group(2)
-    ####s = "curl -u '" + github_user + ':' + github_pw + "' -X GET https://api.github.com/repos/" + githubuser + '/' + stack + 'contents/stack.xml'
-    ###s = "curl -X GET https://" + github_user + ':' + github_pw + "@api.github.com/repos/ipa320/" + stack + '/forks'
-    ###s = "curl -X GET https://" + github_user + ':' + github_pw + "@api.github.com/repos/" + githubuser + '/' + stack + '/contents/stack.xml'
-    ###answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    ###
-    ###ans_dict = ast.literal_eval(answer.replace("\n ", ""))
-
-    ###stack_xml = base64.decodestring(ans_dict['content'])
-
-    ####except :
-    ####    #TODO
-    ####    pass
-    ###return stack_xml
-    
-        
 def get_auth_keys(server, location):
     # get password/token from .gitconfig file
     with open(location + "/.gitconfig", "r") as f:
@@ -338,13 +331,12 @@ def get_auth_keys(server, location):
         # extract necessary data
         if server == "github":
             regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
-            #regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*token\s*=\s*([^\s]*).*"
+            #regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*token\s*=\s*([^\s]*).*" ##old way
             
         elif server == "jenkins":
             regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
         else:
-            print "ERROR: invalid server"
-            # TODO error raise
+            raise Exception("ERROR: %s is an invalid server"%server)
             
         auth_keys = re.match(regex, gitconfig, re.DOTALL)
         
@@ -436,18 +428,18 @@ def get_options(required, optional):
 
 
     # check if rosdistro exists
-#    if 'rosdistro' in ops and (not options.rosdistro or not options.rosdistro in UBUNTU_DISTRO_MAP.keys()):
-#        print 'You provided an invalid "--rosdistro %s" argument. Options are %s'%(options.rosdistro, UBUNTU_DISTRO_MAP.keys())
-#        return (None, args)
+    #if 'rosdistro' in ops and (not options.rosdistro or not options.rosdistro in UBUNTU_DISTRO_MAP.keys()):
+    #    print 'You provided an invalid "--rosdistro %s" argument. Options are %s'%(options.rosdistro, UBUNTU_DISTRO_MAP.keys())
+    #    return (None, args)
 
     # check if stacks exist
     #if 'stack' in ops and options.stack:
-        #distro_obj = rosdistro.Distro(get_rosdistro_file(options.rosdistro))
-        #for s in options.stack:
-            #if not s in distro_obj.stacks:
-                #print 'Stack "%s" does not exist in the %s disro file.'%(s, options.rosdistro)
-                #print 'You need to add this stack to the rosdistro file'
-                #return (None, args)
+    #    distro_obj = rosdistro.Distro(get_rosdistro_file(options.rosdistro))
+    #    for s in options.stack:
+    #        if not s in distro_obj.stacks:
+    #            print 'Stack "%s" does not exist in the %s disro file.'%(s, options.rosdistro)
+    #            print 'You need to add this stack to the rosdistro file'
+    #            return (None, args)
 
     # check if variant exists
     if 'variant' in ops and options.variant:
@@ -462,7 +454,7 @@ def get_options(required, optional):
 def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
     # create hudson instance
     if not hudson_obj:
-        info = get_auth_keys('jenkins', HOME_FOLDER) ################
+        info = get_auth_keys('jenkins', HOME_FOLDER)
         hudson_obj = hudson.Hudson(SERVER, info.group(1), info.group(2))
 
     finished = False
