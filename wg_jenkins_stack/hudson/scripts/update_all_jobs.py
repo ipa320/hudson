@@ -23,10 +23,12 @@ def main():
         
         # cancel pending jobs in queue and restart after update
         for item in hudson_instance.get_queue_info():
-            print "Cancel pending job %s"%(item['task']['name'])
-            pending_jobs.append(item['task']['name'])
-            if 'id' in item: #TODO for jobs without id
+            if 'id' in item: 
+                print "Cancel pending job %s"%(item['task']['name'])
+                pending_jobs.append(item['task']['name'])
                 hudson_instance.cancel_pending_job(item['id'])
+            else: #HACK TODO for jobs without id
+                print "Couldn't cancel pending job %s"%(item['task']['name'])
 
 
         all_jobs = hudson_instance.get_jobs()
