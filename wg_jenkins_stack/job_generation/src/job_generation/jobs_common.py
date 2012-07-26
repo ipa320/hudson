@@ -73,12 +73,10 @@ DELIM
 
 set -o errexit
 
-#scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
-scp jenkins@jenkins-test-server:/home-local/jenkins/.gitconfig $WORKSPACE/.gitconfig
+scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
 scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.ssh
 
-#git clone git://github.com/ipa320/hudson.git $WORKSPACE/hudson
-git clone git://github.com/fmw-jk/hudson.git $WORKSPACE/hudson
+git clone git://github.com/ipa320/hudson.git $WORKSPACE/hudson
 
 cd $WORKSPACE &amp;&amp; nice -n19 ionice -c2 -n7  $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu --ramdisk --ramdisk-size 20000M
 """
@@ -270,7 +268,7 @@ def get_stack(rosdistro_obj, stack_name, githubuser, overlay_dir, env):
             print "    Using 'ipa320' stack instead\n"    
             githubuser = 'ipa320'
         
-        call('git clone -v -v -v git@github.com:%s/%s.git %s/%s'
+        call('git clone git@github.com:%s/%s.git %s/%s'
                 %(githubuser, stack_name, overlay_dir, stack_name), 
                 env, 'Clone private stack [%s]'%(stack_name))
         return ""
@@ -295,7 +293,7 @@ def get_stack(rosdistro_obj, stack_name, githubuser, overlay_dir, env):
             print "    Using 'ipa320' stack instead\n"    
             githubuser = 'ipa320'
         
-        call('git clone -v -v -v git://github.com/%s/%s.git %s/%s'
+        call('git clone git://github.com/%s/%s.git %s/%s'
                 %(githubuser, stack_name, overlay_dir, stack_name), 
                 env, 'Clone public stack [%s]'%(stack_name))
         return ""
