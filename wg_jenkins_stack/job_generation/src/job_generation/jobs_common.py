@@ -202,8 +202,7 @@ def stack_forked(githubuser, stack):
             "@api.github.com/repos/ipa320/" + stack + '/forks?per_page=999'
     answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
 
-    m = re.search('"message": "Not Found"', answer)
-    if m:
+    if re.search('"message": "Not Found"', answer):
         # stack doen't exist for ipa320
         print "Stack %s not found!"%stack
         return False
@@ -214,16 +213,32 @@ def stack_forked(githubuser, stack):
 
     else:
         # look for github username in fork list
-        m = re.search("/"+githubuser+"/", answer)
+        if re.search("/"+githubuser+"/", answer):
+            # github username found -> stack forked
+            return True
         
-        if not m:
+        else:
+            # search for subforks
+            answer_list = ast.literal_eval(answer)
+            for entry in json.loads(answer):
+                if entry['forks'] > 0:
+                    # search for github username in subforks
+                    s = "curl -X GET https://" + github_user + ':' + github_pw + \
+                            "@api.github.com/repos/" + entry['owner']['login'] + \
+                            '/' + stack + '/forks?per_page=999'
+
+                    answer_sub = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, 
+                                                  stderr=subprocess.PIPE).communicate()[0]
+
+                    if re.search("/"+githubuser+"/", answer_sub):
+                        # found github username in subforks
+                        return True
+
+
+
             # github username not found
             print "Stack " + stack + " is not forked for user " + githubuser +  "!"
             return False
-        
-        else:
-            # github username found -> stack forked
-            return True
     
 
 def stack_released(stack_name, rosdistro, env):
