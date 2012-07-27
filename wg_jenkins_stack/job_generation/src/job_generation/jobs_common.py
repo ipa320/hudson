@@ -16,6 +16,7 @@ import socket
 import yaml
 import base64
 import ast
+import json
 
 
 
@@ -219,7 +220,6 @@ def stack_forked(githubuser, stack):
         
         else:
             # search for subforks
-            answer_list = ast.literal_eval(answer)
             for entry in json.loads(answer):
                 if entry['forks'] > 0:
                     # search for github username in subforks
