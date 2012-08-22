@@ -186,5 +186,14 @@ SHUTDOWN_SCRIPT
       <defaultContentIsScript>true</defaultContentIsScript> 
     </hudson.plugins.emailext.ExtendedEmailPublisher> 
   </publishers>
-  <buildWrappers/>
+  <buildWrappers>
+    <hudson.plugins.build__timeout.BuildTimeoutWrapper>
+      <timeoutMinutes>180</timeoutMinutes>
+      <failBuild>false</failBuild>
+      <writingDescription>false</writingDescription>
+      <timeoutPercentage>0</timeoutPercentage>
+      <timeoutType>absolute</timeoutType>
+      <timeoutMinutesElasticDefault>3</timeoutMinutesElasticDefault>
+    </hudson.plugins.build__timeout.BuildTimeoutWrapper>
+  </buildWrappers>
 </project>
