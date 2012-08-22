@@ -12,6 +12,7 @@ import shlex
 import os
 import stat
 import socket
+import json
 
 HOME_FOLDER = ''
 
@@ -177,24 +178,42 @@ def stack_forked(githubuser, stack):
     # try authentication on github
     github_user = git_auth.group(1)
     github_pw = git_auth.group(2)
-    s = 'curl -u "' + github_user + ':' + github_pw + '" -X GET https://api.github.com/repos/ipa320/' + stack + '/forks?per_page=999'
-    #s = 'curl -X GET https://' + github_user + ':' + github_pw + '@api.github.com/repos/ipa320/' + stack + '/forks?per_page=999'
+    #s = 'curl -u "' + github_user + ':' + github_pw + '" -X GET \
+    #        https://api.github.com/repos/ipa320/' + stack + '/forks?per_page=999'
+    s = 'curl -X GET https://' + github_user + ':' + github_pw + \
+            '@api.github.com/repos/ipa320/' + stack + '/forks?per_page=999'
     answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
     
-    m = re.search('"message": "Not Found"', answer)
-    if m:
+    if re.search('"message": "Not Found"', answer):
         print "<p><font color='#FF0000'>ERROR:"
         print "Stack <b>" + stack + " </b>could not be found. Please check spelling!</font>"
         return False  
+    
     elif githubuser == "ipa320":
         return True
+    
     else:
-        m = re.search("/"+githubuser+"/", answer)
-        if not m:
+        if re.search("/"+githubuser+"/", answer): 
+            return True
+        
+        else:
+            # search for subforks
+            for entry in json.loads(answer):
+                if entry['forks'] > 0:
+                    # search for github username in subforks
+                    s = "curl -X GET https://" + github_user + ':' + github_pw + \
+                            "@api.github.com/repos/" + entry['owner']['login'] + \
+                            '/' + stack + '/forks?per_page=999'
+
+                    answer_sub = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE,
+                                                  stderr=subprocess.PIPE).communicate()[0]
+
+                    if re.search("/"+githubuser+"/", answer_sub):
+                        # found github username in subforks
+                        return True
+
             print "<p><font color='#FF0000'>ERROR:"
             print "Stack <b>" + stack + " </b>is not fork for user " + githubuser +  "! Please fork it first on github.com</font>"
             return False
-        else:
-            return True
 
 main()
