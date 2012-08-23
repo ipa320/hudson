@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Build of bringup layer for electric on cob3-3 for testing hardware</description>
+  <logRotator>
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>cob3-3</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+
+# configure
+testdir=build-$BUILD_NUMBER-from-$BUILD_ID
+echo $testdir
+mkdir $WORKSPACE/$testdir
+COUNT=$(cat /proc/cpuinfo | grep &apos;processor&apos; | wc -l)
+COUNT=$(echo &quot;$COUNT*2&quot; | bc)
+export ROS_PARALLEL_JOBS=-j$COUNT
+
+# checkout
+rosinstall -j4 $WORKSPACE/$testdir /opt/ros/electric /u/robot/git/care-o-bot/cob_calibration_data /u/robot/git/care-o-bot/kuka_lbr_ros https://raw.github.com/ipa320/setup/master/repositories/bringup.rosinstall
+
+# build
+source $WORKSPACE/$testdir/setup.bash
+nice -n 10 rosmake --skip-blacklist --status-rate=0 cob_bringup
+
+# exit if rosmake doesn&apos;t succeed
+if [ $? -ne 0 ]
+  then exit 1
+fi
+
+# if everythin is fine, then link latest build from ~/git/care-o-bot
+mkdir -p ~/git
+rm -rf ~/git/care-o-bot
+ln -sf $WORKSPACE/$testdir ~/git/care-o-bot
+
+#test
+#testing is done in test job</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <au.com.centrumsystems.hudson.plugin.buildpipeline.trigger.BuildPipelineTrigger>
+      <downstreamProjectNames>electric__ipa320__hardwaretest__cob3-3_test_auto</downstreamProjectNames>
+    </au.com.centrumsystems.hudson.plugin.buildpipeline.trigger.BuildPipelineTrigger>
+    <hudson.plugins.emailext.ExtendedEmailPublisher>
+      <recipientList>hudson@ipa.fhg.de</recipientList>
+      <configuredTriggers>
+        <hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+          <email>
+            <recipientList></recipientList>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>false</sendToDevelopers>
+            <sendToRequester>false</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>true</sendToRecipientList>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+        <hudson.plugins.emailext.plugins.trigger.StillFailingTrigger>
+          <email>
+            <recipientList></recipientList>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>false</sendToDevelopers>
+            <sendToRequester>false</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>true</sendToRecipientList>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.StillFailingTrigger>
+      </configuredTriggers>
+      <contentType>default</contentType>
+      <defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
+      <defaultContent>$DEFAULT_CONTENT
+
+</defaultContent>
+    </hudson.plugins.emailext.ExtendedEmailPublisher>
+  </publishers>
+  <buildWrappers/>
+</project>
