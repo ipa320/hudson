@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Build of brinup layer for electric on lucid, amd64&#xd;
+&#xd;
+If successfull or unstable triggers build jobs on robots.</description>
+  <logRotator>
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>20</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty>
+      <projectUrl>https://github.com/ipa320/cob_robots/</projectUrl>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>build_prio</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+
+sudo chown -R jenkins:jenkins $WORKSPACE
+rm -rf $WORKSPACE/test_results
+rm -rf $WORKSPACE/test_output
+rm -rf $WORKSPACE/hudson
+
+cat &gt; $WORKSPACE/script.sh &lt;&lt;DELIM
+#!/usr/bin/env bash
+set -o errexit
+echo &quot;_________________________________BEGIN SCRIPT______________________________________&quot;
+echo &quot;&quot;
+echo &quot;***********************************************************************************&quot;
+echo &quot;INSTALLING ros distribution, bzr and python-pycurl&quot;
+nice -n19 ionice -c2 -n7 sudo apt-get install bzr --yes
+nice -n19 ionice -c2 -n7 sudo apt-get install ros-electric-ros --yes
+nice -n19 ionice -c2 -n7 sudo apt-get install python-pycurl curl --yes
+echo &quot;***********************************************************************************&quot;
+echo &quot;&quot;
+
+source /opt/ros/electric/setup.sh
+
+export INSTALL_DIR=/tmp/install_dir
+export WORKSPACE=/tmp/ros
+export ROS_TEST_RESULTS_DIR=/tmp/ros/test_results
+export JOB_NAME=$JOB_NAME
+export BUILD_NUMBER=$BUILD_NUMBER
+export HUDSON_URL=$HUDSON_URL
+export ROS_PACKAGE_PATH=\$INSTALL_DIR/ros_release:/opt/ros/electric/stacks
+
+#######################
+# HACK
+sudo mkdir -p /opt/ros/electric/stacks/ros_comm/tools/rostest/scripts
+sudo ln -s /opt/ros/electric/stacks/ros_comm/tools/rostest/bin/roslaunch-check.py /opt/ros/electric/stacks/ros_comm/tools/rostest/scripts/roslaunch-check.py
+#######################
+
+mkdir -p \$INSTALL_DIR
+cd \$INSTALL_DIR
+
+cp /tmp/workspace/.gitconfig ~/.gitconfig
+cp -r /tmp/workspace/.ssh ~/.ssh
+sudo chmod 600 ~/.ssh/id_rsa.pub ~/.ssh/id_rsa
+
+sudo mkdir ros_release
+sudo mv -f /tmp/workspace/hudson/wg_jenkins_stack/* ./ros_release
+
+echo &quot;&quot;
+echo &quot;-----------------------------------------------------------------------------------&quot;
+echo &quot;RUNNING run_auto_stack_prerelease_devel.py&quot;
+nice -n19 ionice -c2 -n7 rosrun job_generation run_auto_stack_prerelease_devel.py --stack cob_robots --rosdistro electric --githubuser ipa320 --email fmw@ipa.fhg.de --repeat 0  
+echo &quot;-----------------------------------------------------------------------------------&quot;
+echo &quot;&quot;
+
+echo &quot;_________________________________END SCRIPT_______________________________________&quot;
+DELIM
+
+set -o errexit
+
+scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
+scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.ssh
+
+git clone git://github.com/ipa320/hudson.git $WORKSPACE/hudson
+
+cd $WORKSPACE &amp;&amp; nice -n19 ionice -c2 -n7  $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=lucid --arch=amd64 --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu --ramdisk --ramdisk-size 20000M
+
+     </command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.BuildTrigger>
+      <childProjects>electric__ipa320__hardwaretest__cob3-3_build,electric__ipa320__hardwaretest__cob3-6_build,electric__ipa320__hardwaretest__desire_build</childProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+      </threshold>
+    </hudson.tasks.BuildTrigger>
+    <hudson.tasks.junit.JUnitResultArchiver>
+      <testResults>test_results/**/_hudson/*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <testDataPublishers/>
+    </hudson.tasks.junit.JUnitResultArchiver>
+    <hudson.plugins.emailext.ExtendedEmailPublisher>
+      <recipientList>hudson@ipa.fhg.de</recipientList>
+      <configuredTriggers>
+        <hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+          <email>
+            <recipientList></recipientList>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>false</sendToDevelopers>
+            <sendToRequester>false</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>true</sendToRecipientList>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+        <hudson.plugins.emailext.plugins.trigger.StillFailingTrigger>
+          <email>
+            <recipientList></recipientList>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>false</sendToDevelopers>
+            <sendToRequester>false</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>true</sendToRecipientList>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.StillFailingTrigger>
+      </configuredTriggers>
+      <contentType>default</contentType>
+      <defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
+      <defaultContent>$DEFAULT_CONTENT
+
+</defaultContent>
+    </hudson.plugins.emailext.ExtendedEmailPublisher>
+  </publishers>
+  <buildWrappers/>
+</project>
