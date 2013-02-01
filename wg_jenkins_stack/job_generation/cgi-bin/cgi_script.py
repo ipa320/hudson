@@ -162,14 +162,14 @@ def stack_forked(githubuser, stack):
     
     # get token from jenkins' .gitconfig file for private github forks
     try:
-        gitconfig = open("%s/.gitconfig"%HOME_FOLDER, "r") 
+        gitconfig = open("%s/jenkins-config/.gitconfig"%HOME_FOLDER, "r") 
         gitconfig = gitconfig.read()
     except IOError as err:
         print "<b>ERROR" + err + "</b>"
         return False
     
     # extract necessary data
-    regex = ".*\[jenkins]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
+    regex = ".*\[github]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
     git_auth = re.match(regex, gitconfig, re.DOTALL)
     if git_auth == None:
         print "<b>ERROR: No match found in 'gitconfig'</b>"
