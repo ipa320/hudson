@@ -100,7 +100,7 @@ else:
 
 # list of public and private IPA Fraunhofer stacks
 FHG_STACKS_PUBLIC = ['bride','cob_android', 'cob_extern', 'cob_common', 'cob_calibration', 'cob_calibration_data',  'cob_driver', 'cob_driver_sandbox', 'cob_robots', 'cob_environments', 'cob_industrial', 'cob_simulation', 'cob_manipulation', 'cob_manipulation_sandbox', 'cob_object_manipulation', 'cob_navigation', 'cob_perception_common', 'cob_environment_perception', 'cob_people_perception', 'cob_object_perception', 'cob_scenario_states', 'cob_scenario_tools', 'cob_scenarios', 'cob_web', 'cob_command_tools', 'cob_tutorials', 'ipa_canopen', 'ipa_canopen_tutorials', 'schunk_modular_robotics', 'schunk_robots', 'schunk_simulation', 'srs_common', 'srs_public', 'cob_substitute', 'cob_perception_data']
-FHG_STACKS_PRIVATE = ['cob_manipulation_intern', 'cob_navigation_intern', 'cob_environment_perception_intern', 'cob_object_perception_intern', 'cob_scenarios_intern', 'cob_sandbox_intern', 'cob_bringup_sandbox_intern', 'interaid', 'srs', 'r3cop', 'autopnp', 'baer_automation','cob_karto']
+FHG_STACKS_PRIVATE = ['cob_manipulation_intern', 'cob_navigation_intern', 'cob_environment_perception_intern', 'cob_object_perception_intern', 'cob_scenarios_intern', 'cob_sandbox_intern', 'cob_bringup_sandbox_intern', 'interaid', 'srs', 'r3cop', 'autopnp', 'baer_automation','cob_karto','bsh']
 
 PRIO_ARCH = "i386"
 PRIO_UBUNTUDISTRO = "natty"
