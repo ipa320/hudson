@@ -65,7 +65,7 @@ sudo chmod 600 ~/.ssh/id_rsa.pub ~/.ssh/id_rsa
 
 sudo mkdir ros_release
 sudo mv -f /tmp/workspace/hudson/wg_jenkins_stack/* ./ros_release
-""" 
+"""
 
 
 SHUTDOWN_SCRIPT = """
@@ -79,7 +79,7 @@ scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.
 
 git clone git://github.com/ipa320/hudson.git $WORKSPACE/hudson
 
-cd $WORKSPACE &amp;&amp; nice -n19 ionice -c2 -n7  $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-kitchen-server:3142/de.archive.ubuntu.com/ubuntu --ramdisk --ramdisk-size 20000M
+cd $WORKSPACE &amp;&amp; nice -n19 ionice -c2 -n7  $WORKSPACE/hudson/wg_jenkins_stack/hudson/scripts/devel_run_chroot.py --chroot-dir $HOME/chroot --distro=UBUNTUDISTRO --arch=ARCH --debug-chroot  --hdd-scratch=/home/rosbuild/install_dir --script=$WORKSPACE/script.sh --repo-url http://cob-jenkins-server:3142/de.archive.ubuntu.com/ubuntu --ramdisk --ramdisk-size 20000M
 """
 
 # the supported Ubuntu distro's for each ros distro
@@ -109,17 +109,17 @@ PRIO_UBUNTUDISTRO = "natty"
 ADMIN_EMAIL = "hudson@ipa.fhg.de"
 
 EMAIL_TRIGGER="""
-        <hudson.plugins.emailext.plugins.trigger.WHENTrigger> 
-          <email> 
-            <recipientList></recipientList> 
-            <subject>$PROJECT_DEFAULT_SUBJECT</subject> 
-            <body>$PROJECT_DEFAULT_CONTENT</body> 
-            <sendToDevelopers>SEND_DEVEL</sendToDevelopers> 
-            <sendToRecipientList>true</sendToRecipientList> 
-            <contentTypeHTML>false</contentTypeHTML> 
-            <script>true</script> 
-          </email> 
-        </hudson.plugins.emailext.plugins.trigger.WHENTrigger> 
+        <hudson.plugins.emailext.plugins.trigger.WHENTrigger>
+          <email>
+            <recipientList></recipientList>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>SEND_DEVEL</sendToDevelopers>
+            <sendToRecipientList>true</sendToRecipientList>
+            <contentTypeHTML>false</contentTypeHTML>
+            <script>true</script>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.WHENTrigger>
 """
 
 
@@ -145,7 +145,7 @@ def get_depends_one(stack_name, overlay_dir, spaces=""):
     stack_xml = get_stack_xml(stack_name, overlay_dir)
     # convert dependencies to list
     depends_one = [str(d) for d in stack_manifest.parse(stack_xml).depends]
-    
+
     print spaces, 'Dependencies of stack %s:'%stack_name
     for dep in depends_one:
         print spaces+"  ", str(dep)
@@ -164,9 +164,9 @@ def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_
 
             #add stack to resolved depends by appending stack to the right list in depends_all
             depends_all[get_stack_membership(stack)].append(stack)
-            
+
             # clone or install stack & get all depends for not released stacks
-            if get_stack(rosdistro_obj, stack, githubuser, overlay_dir, env) != "released": 
+            if get_stack(rosdistro_obj, stack, githubuser, overlay_dir, env) != "released":
                 # resolve dependencies for cloned stack
                 return_str += "\n" + " "*2*start_depth + str(start_depth) + " + Included %s to dependencies"%stack + \
                        get_depends_all(get_depends_one(stack, overlay_dir), depends_all, githubuser, overlay_dir,
@@ -174,10 +174,10 @@ def get_depends_all(stack_list, depends_all, githubuser, overlay_dir, rosdistro_
             else:
                 # apt-get resolves dependencies of released stacks
                 return_str += "\n" + " "*2*start_depth + str(start_depth) + " + Included %s to dependencies"%stack
-    
+
         else: # stack already cloned/installed
             return_str += "\n" + " "*2*start_depth + str(start_depth) + " - %s already included"%stack
-    
+
     return return_str
 
 
@@ -209,7 +209,7 @@ def stack_forked(githubuser, stack):
         return False
 
     elif githubuser == "ipa320":
-        # stack exist 
+        # stack exist
         return True
 
     else:
@@ -217,7 +217,7 @@ def stack_forked(githubuser, stack):
         if re.search("/"+githubuser+"/", answer):
             # github username found -> stack forked
             return True
-        
+
         else:
             # search for subforks
             for entry in json.loads(answer):
@@ -227,7 +227,7 @@ def stack_forked(githubuser, stack):
                             "@api.github.com/repos/" + entry['owner']['login'] + \
                             '/' + stack + '/forks?per_page=999'
 
-                    answer_sub = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, 
+                    answer_sub = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE,
                                                   stderr=subprocess.PIPE).communicate()[0]
 
                     if re.search("/"+githubuser+"/", answer_sub):
@@ -239,7 +239,7 @@ def stack_forked(githubuser, stack):
             # github username not found
             print "Stack " + stack + " is not forked for user " + githubuser +  "!"
             return False
-    
+
 
 def stack_released(stack_name, rosdistro, env):
 
@@ -248,12 +248,12 @@ def stack_released(stack_name, rosdistro, env):
 
     # simulate installation via apt-get
     err_msg = call('sudo apt-get -s install %s'%pkg_name, env, ignore_fail=True, quiet=True)
-    
+
     # look for phrase in err_msg
     if "E: Unable to locate package %s"%pkg_name in err_msg:
         print '%s is not released'%stack_name
         return False
-    
+
     else:
         print '%s is released'%stack_name
         return True
@@ -262,80 +262,80 @@ def stack_released(stack_name, rosdistro, env):
 def get_stack(rosdistro_obj, stack_name, githubuser, overlay_dir, env):
     # check if stack is private, public or other / forked or not / released or not
     # clones stack in case it is private or public ipa stack and installs external stack via apt-get
-    
-    if stack_name in FHG_STACKS_PRIVATE:    
+
+    if stack_name in FHG_STACKS_PRIVATE:
         # stack is private ipa stack
         print "Stack %s is a private ipa stack" %(stack_name)
-        
+
         # check if stack is forked for user or not
-        if not stack_forked(githubuser, stack_name):    
+        if not stack_forked(githubuser, stack_name):
             print "  Stack %s is not forked for user %s"%(stack_name, githubuser)
-        
-            if stack_released(stack_name, rosdistro_obj.release_name, env):  
+
+            if stack_released(stack_name, rosdistro_obj.release_name, env):
                 # stack is released
                 print "    Using released version"
                 call('sudo apt-get install %s --yes'
-                        %(stack_to_deb(stack_name, rosdistro_obj.release_name)), 
+                        %(stack_to_deb(stack_name, rosdistro_obj.release_name)),
                         env, 'Install released version')
                 return "released"
 
             # stack is not released, using 'ipa320' fork
-            print "    Using 'ipa320' stack instead\n"    
+            print "    Using 'ipa320' stack instead\n"
             githubuser = 'ipa320'
-        
+
         call('git clone git@github.com:%s/%s.git %s/%s'
-                %(githubuser, stack_name, overlay_dir, stack_name), 
+                %(githubuser, stack_name, overlay_dir, stack_name),
                 env, 'Clone private stack [%s]'%(stack_name))
         return ""
-        
-    elif stack_name in FHG_STACKS_PUBLIC:   
+
+    elif stack_name in FHG_STACKS_PUBLIC:
         # stack is public ipa stack
         print "Stack %s is a public ipa stack" %(stack_name)
 
         # check if stack is forked for user or not
-        if not stack_forked(githubuser, stack_name):    
+        if not stack_forked(githubuser, stack_name):
             print "  Stack %s is not forked for user %s"%(stack_name, githubuser)
-            
-            if stack_released(stack_name, rosdistro_obj.release_name, env):  
+
+            if stack_released(stack_name, rosdistro_obj.release_name, env):
                 # stack is released
                 print "    Using released version"
                 call('sudo apt-get install %s --yes'
-                       %(stack_to_deb(stack_name, rosdistro_obj.release_name)), 
+                       %(stack_to_deb(stack_name, rosdistro_obj.release_name)),
                        env, 'Install released version')
                 return "released"
 
             # stack is not released, using 'ipa320' fork
-            print "    Using 'ipa320' stack instead\n"    
+            print "    Using 'ipa320' stack instead\n"
             githubuser = 'ipa320'
-        
+
         call('git clone git://github.com/%s/%s.git %s/%s'
-                %(githubuser, stack_name, overlay_dir, stack_name), 
+                %(githubuser, stack_name, overlay_dir, stack_name),
                 env, 'Clone public stack [%s]'%(stack_name))
         return ""
-        
-    elif stack_name in rosdistro_obj.stacks:    
+
+    elif stack_name in rosdistro_obj.stacks:
         # stack is no ipa stack
         print "Stack %s is not a ipa stack, using released version" %(stack_name)
         call('sudo apt-get install %s --yes'
-                %(stack_to_deb(stack_name, rosdistro_obj.release_name)), 
+                %(stack_to_deb(stack_name, rosdistro_obj.release_name)),
                 env, 'Install released version')
         return "released"
-        
-    else:   
+
+    else:
         # stack is not known stack
         raise Exception("ERROR: Stack %s not found! This should never happen!"%(stack_name))
-        
+
 
 def get_stack_xml(stack_name, overlay_dir):
     # open stack.xml
     try:
         with open(os.path.join(overlay_dir, stack_name, "stack.xml"), 'r') as f:
-            stack_xml = f.read() 
-    except EnvironmentError:   
+            stack_xml = f.read()
+    except EnvironmentError:
         raise Exception("ERROR: stack.xml of stack %s not found! This should never happen!"%(stack_name))
 
     return stack_xml
-    
+
 
 def get_auth_keys(server, location):
     # get password/token from .gitconfig file
@@ -345,14 +345,14 @@ def get_auth_keys(server, location):
         if server == "github":
             regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
             #regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*token\s*=\s*([^\s]*).*" ##old way
-            
+
         elif server == "jenkins":
             regex = ".*\[" + server + "]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
         else:
             raise Exception("ERROR: %s is an invalid server"%server)
-            
+
         auth_keys = re.match(regex, gitconfig, re.DOTALL)
-        
+
     return auth_keys
 
 
@@ -401,10 +401,10 @@ def get_options(required, optional):
                           help="Build everything from source, don't use Debian packages")
     if 'delete' in ops:
         parser.add_option('--delete', dest = 'delete', default=False, action='store_true',
-                          help='Delete jobs from Hudson')    
+                          help='Delete jobs from Hudson')
     if 'wait' in ops:
         parser.add_option('--wait', dest = 'wait', default=False, action='store_true',
-                          help='Wait for running jobs to finish to reconfigure them')    
+                          help='Wait for running jobs to finish to reconfigure them')
     if 'rosinstall' in ops:
         parser.add_option('--rosinstall', dest = 'rosinstall', default=None, action='store',
                           help="Specify the rosinstall file that refers to unreleased code.")
@@ -422,12 +422,12 @@ def get_options(required, optional):
                           help="Stack is not forked for given githubuser")
 
     (options, args) = parser.parse_args()
-    
+
 
     # make repeat an int
     if 'repeat' in ops:
         options.repeat = int(options.repeat)
-    
+
     # check if required arguments are there
     for r in required:
         if not eval('options.%s'%r):
@@ -479,8 +479,8 @@ def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
             else:
                 start=False
             exists = hudson_obj.job_exists(job_name)
-            
-            # cancel all jobs of stack in the build queue 
+
+            # cancel all jobs of stack in the build queue
             if 'pipe' in job_name:
                 build_queue = hudson_obj.get_queue_info()
                 job_name_stem = job_name.replace('pipe', '')
@@ -491,7 +491,7 @@ def schedule_jobs(jobs, wait=False, delete=False, start=False, hudson_obj=None):
                             print "Canceling pending job %s from build queue <br>"%(pending_job['task']['name'])
 
             # job is already running
-            if exists and hudson_obj.job_is_running(job_name):           
+            if exists and hudson_obj.job_is_running(job_name):
                 hudson_obj.stop_running_job(job_name)
                 jobs_todo[job_name] = jobs[job_name]
                 print "Job %s is running! Stopping job to reconfigure <br>"%job_name
