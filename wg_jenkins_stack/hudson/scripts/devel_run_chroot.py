@@ -19,7 +19,7 @@ valid_redhat_distros = ['fedora-15']
 
 # mock requires patched version https://bugs.launchpad.net/ubuntu/+source/mock/+bug/600564
 # also you must be a member of mock group
-# usermod -a -G mock myusername 
+# usermod -a -G mock myusername
 def local_check_call(cmd, display_output=False):
     if not display_output:
         with open(os.devnull, 'w') as fh:
@@ -56,7 +56,7 @@ def local_call(cmd, display_output=False):
     return p.returncode
 #    else:
 #        return subprocess.call(cmd, stderr = subprocess.STDOUT)
-    
+
 
 def get_mount_points(pattern = "chroot"):
     mnt = subprocess.Popen("mount", stdout=subprocess.PIPE)
@@ -102,7 +102,7 @@ def kill_processes(processes, level=''):
 def add_binfmg_misc_mounts(mounts):
     """
     binfmg_misc gets mounted inside the chroot and prevents cleanup
-    add this for all proc mounts at the top.  
+    add this for all proc mounts at the top.
     """
 
     additions = [os.path.join(m, 'sys', 'fs', 'binfmt_misc') for m in mounts if m.endswith('proc')]
@@ -116,7 +116,7 @@ def clean_up_chroots():
     if len(mounts) > 0:
         print "Cleaning up mount points", mounts
     else:
-        print "No mounts need cleaning" 
+        print "No mounts need cleaning"
         return True
 
     mounted_processes = get_chroot_processes(mounts)
@@ -234,7 +234,7 @@ class ChrootInstance:
 
 
         print "ready to redhat chroot..."
-        
+
         cmd = ['/usr/bin/mock', '--init','--resultdir', '/tmp/result', '--configdir', '/home/tfoote/rcom/ros_release/hudson/mock_configs']
         print cmd
         print "This will take a few minutes.  Please be patient."
@@ -246,7 +246,7 @@ class ChrootInstance:
         cmd = ['sudo', 'apt-get', 'install', 'debootstrap']
         print cmd
         self.check_call(cmd)
-        
+
 
         deboot_url = 'us.archive.ubuntu.com/ubuntu'
         if self.distro in valid_debian_distros:
@@ -277,7 +277,7 @@ class ChrootInstance:
         self.check_call(cmd)
 
 
-        
+
         if self.distro in valid_ubuntu_distros:
             # Move sources.list to apt-proxy
             sources=os.path.join(self.chroot_path, 'etc', 'apt', 'sources.list.d', 'bootstrap.list')
@@ -298,7 +298,7 @@ class ChrootInstance:
 
             #print "adding v-launchpad-jochen-sprickerhof-de/pcl gpg key"
             #cmd = ['apt-key', 'adv', '--keyserver', 'keyserver.ubuntu.com', '--recv-key', '19274DEF']
-            #self.execute(cmd) 
+            #self.execute(cmd)
 
             self.add_ros_sources()
 
@@ -314,11 +314,11 @@ class ChrootInstance:
             tf.write("#!/bin/sh\n")
             tf.write("exit 0\n")
             tf.flush()
-            
+
             startstop=os.path.join(self.chroot_path,'sbin/start-stop-daemon')
             print "disabling start-stop", startstop
             self.check_call(['sudo', 'cp', tf.name, startstop])
-            
+
             invokerc=os.path.join(self.chroot_path,'usr/sbin/invoke-rc.d')
             print "disabling start-stop", invokerc
             self.check_call(['sudo', 'cp', tf.name, invokerc])
@@ -398,7 +398,7 @@ grub-pc grub-pc/install_devices_empty boolean true
         with tempfile.NamedTemporaryFile() as tf:
             print "Adding packages.ros.org as source"
             #tf.write("deb http://packages.ros.org/ros-shadow-fixed/ubuntu %s main\n" % self.distro)
-            tf.write("deb http://cob-kitchen-server:3142/packages.ros.org/ros/ubuntu %s main\n" % self.distro)
+            tf.write("deb http://cob-jenkins-server:3142/packages.ros.org/ros/ubuntu %s main\n" % self.distro)
             tf.write("deb http://ros.informatik.uni-freiburg.de/packages/ros/ubuntu/ %s main\n" % self.distro)
             tf.write("deb http://packages.ros.org/ros/ubuntu %s main\n" % self.distro)
             tf.flush()
@@ -406,7 +406,7 @@ grub-pc grub-pc/install_devices_empty boolean true
             print "Runing cmd", cmd
             self.check_call(cmd)
 
-            
+
         print "adding packages.ros.org gpg key"
         key_file = 'tmp/ros.key'
         abs_key_file =os.path.join(self.chroot_path, key_file)
@@ -414,11 +414,11 @@ grub-pc grub-pc/install_devices_empty boolean true
         #with open(abs_key_file) as f:
         #    print "key file:", f.read()
         cmd = ['apt-key', 'add', os.path.join('/', key_file)]
-        self.execute(cmd) 
+        self.execute(cmd)
 
     def add_wg_sources(self):
-        """ 
-        Add wg-packages to apt sources for nvidia-current drivers.   
+        """
+        Add wg-packages to apt sources for nvidia-current drivers.
         """
         nvidia_source=os.path.join(self.chroot_path, 'etc', 'apt', 'sources.list.d', 'wg.list')
         with tempfile.NamedTemporaryFile() as tf:
@@ -429,16 +429,16 @@ grub-pc grub-pc/install_devices_empty boolean true
             print "Runing cmd", cmd
             self.check_call(cmd)
 
-            
+
         print "adding wg gpg key"
         key_file = 'tmp/wg.key'
         abs_key_file =os.path.join(self.chroot_path, key_file)
         urllib.urlretrieve('http://wgs1.willowgarage.com/wg-packages/wg.key', abs_key_file)
-        
+
         #with open(abs_key_file) as f:
         #    print "key file:", f.read()
         cmd = ['apt-key', 'add', os.path.join('/', key_file)]
-        self.execute(cmd) 
+        self.execute(cmd)
 
     def debian_setup_ssh_client(self):
         print 'Setting up ssh client'
@@ -455,7 +455,7 @@ grub-pc grub-pc/install_devices_empty boolean true
             local_tmp = os.path.join(local_tmp_dir, "rosbuild_ssh.tar.gz")
             print "retrieving %s to %s"%(self.ssh_key_path, local_tmp)
             shutil.copy(self.ssh_key_path, local_tmp)
-            
+
             if not os.path.exists(tardestdir):
                 os.makedirs(tardestdir)
             print "untarring %s"%local_tmp
@@ -472,7 +472,7 @@ grub-pc grub-pc/install_devices_empty boolean true
         self.execute(["apt-get", "update"], robust=True)
         cmd = "apt-get install subversion -y --force-yes".split()
         self.execute(cmd)
-        
+
         cmd = "svn co https://code.ros.org/svn/ros/stacks/rosorg/trunk/rosbrowse/certs /tmp/chroot_certs".split()
         self.execute(cmd)
         print "successfully checked out certs"
@@ -480,7 +480,7 @@ grub-pc grub-pc/install_devices_empty boolean true
         cmd = "mkdir -p /home/rosbuild/.subversion/auth/svn.ssl.server".split()
         self.execute(cmd)
 
-        
+
         cmd = ["bash", '-c', "cp /tmp/chroot_certs/* /home/rosbuild/.subversion/auth/svn.ssl.server/"]
         self.execute(cmd, display=True)
 
@@ -494,7 +494,7 @@ grub-pc grub-pc/install_devices_empty boolean true
         self.check_call(["sudo", "mkdir", "-p", os.path.join(self.ws_remote_path, "../ros")]);
         self.check_call(['sudo', 'mount', '--bind', self.host_workspace, self.ws_remote_path])
         #backwards compatability /tmp/ros
-        self.check_call(['sudo', 'mount', '--bind', self.host_workspace, os.path.join(self.ws_remote_path, "../ros")])        
+        self.check_call(['sudo', 'mount', '--bind', self.host_workspace, os.path.join(self.ws_remote_path, "../ros")])
         cmd = ['chown', '-R', 'rosbuild:rosbuild', self.mount_path]
         self.execute(cmd)
 
@@ -508,18 +508,18 @@ grub-pc grub-pc/install_devices_empty boolean true
 
 
     def write_back_workspace(self):
-        
+
         print "unmounting workspace %s"%self.ws_remote_path
         self.call(['ls', self.ws_remote_path])
 
         self.call(['sudo', 'umount', '-f', self.ws_remote_path])
         #backwards compatability /tmp/ros
-        self.call(['sudo', 'umount', '-f', os.path.join(self.ws_remote_path, "../ros")])       
+        self.call(['sudo', 'umount', '-f', os.path.join(self.ws_remote_path, "../ros")])
 
         print "Cleaning up permissions on workspace."
         self.call(['sudo', 'chown', '-R', '%d:%d'%(os.geteuid(), os.geteuid()), self.host_workspace])
 
-        
+
         if self.scratch_dir:
             print "Cleaning up scratch mount %s"%self.hdd_remote_mount
             self.call(['sudo', 'umount', '-f', self.hdd_remote_mount])
@@ -530,11 +530,11 @@ grub-pc grub-pc/install_devices_empty boolean true
                 print >>sys.stderr, "self.local_scratch_dir should have existed if we get here."
 
     def manual_init(self):
-        
+
 
         print "Starting init"
         if self.clear_chroot and os.path.isdir(self.chroot_path):
-            print"Clean build requested and directory exists cleaning up old path first." 
+            print"Clean build requested and directory exists cleaning up old path first."
             self.clean()
             self.bootstrap()
         elif not os.path.isdir(self.chroot_path):
@@ -546,11 +546,11 @@ grub-pc grub-pc/install_devices_empty boolean true
 
         # Even if we're reusing the chroot, we re-mount /proc and /sys.
         self.mount_proc_sys()
-        
+
         self.replecate_workspace()
 
 
-    
+
 
     def __enter__(self):
         return self
@@ -560,7 +560,7 @@ grub-pc grub-pc/install_devices_empty boolean true
                 print "Command failed, shutting down chroot:\n-------------------------------------------\n%s\n------------------------------------------\n"%traceback.extract_tb(tb)
             else:
                 print "Exception in chroot, shutting down chroot"
-            
+
         self.shutdown()
 
     def print_profile(self):
@@ -614,13 +614,13 @@ grub-pc grub-pc/install_devices_empty boolean true
 def run_chroot(options, path, workspace, hdd_tmp_dir):
     with ChrootInstance(options.distro, options.arch, path, workspace, clear_chroot = not options.persist, ssh_key_path=options.ssh_key_path, use_wg_sources = options.use_wg_sources, scratch_dir = options.hdd_scratch, hdd_tmp_dir=hdd_tmp_dir, debug_chroot= options.debug_chroot, repo_url=options.repo_url) as chrti:
 
-        #initialization here so that if it throws the cleanup is called.  
+        #initialization here so that if it throws the cleanup is called.
         chrti.manual_init()
         print "returning early for debug"
 
 
         cmd = "apt-get update".split()
-        chrti.execute(cmd, robust=True) # continue 
+        chrti.execute(cmd, robust=True) # continue
 
         cmd = "apt-get install -y --force-yes build-essential python-yaml cmake subversion mercurial bzr git-core wget python-setuptools".split()
         chrti.execute(cmd)
@@ -662,19 +662,19 @@ def run_chroot(options, path, workspace, hdd_tmp_dir):
 
             cmd = ["xterm", "bash"]
             print chrti.execute(cmd)
-            
+
 
         print chrti.print_profile()
 
 
-        
+
 class TempRamFS:
     def __init__(self, path, size_str):
         self.path = path
         self.size= size_str
-        
+
     def __enter__(self):
-        
+
         cmd = ['sudo', 'mkdir', '-p', self.path]
         local_check_call(cmd)
         cmd = ['sudo', 'mount', '-t', 'tmpfs', '-o', 'size=%s,mode=0755'%self.size, 'tmpfs', self.path]
@@ -687,7 +687,7 @@ class TempRamFS:
                 print >> sys.stderr, "Command failed, closing out ramdisk"
             else:
                 print >> sys.stderr, "Caught exception, closing out ramdisk"
-            
+
         cmd = ['sudo', 'umount', '-f', self.path]
         if not local_call(cmd):
             print "WARNING: UNCLEAN TMPFS CHROOT UNMONT"
@@ -750,7 +750,7 @@ path = os.path.join(options.chroot_dir, os.getenv("JOB_NAME", "job_name_unset"))
 
 
 
-print "chroot path", path    
+print "chroot path", path
 print "parameters"
 print "distro", options.distro
 print "arch", options.arch
