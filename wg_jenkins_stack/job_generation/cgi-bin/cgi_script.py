@@ -17,17 +17,17 @@ import json
 HOME_FOLDER = ''
 
 def main():
-    
+
     global HOME_FOLDER
     rosrelease = []
     repositories = []
-    
+
     # Local HOME path
-    if socket.gethostname() == "cob-kitchen-server":
+    if socket.gethostname() == "cob-jenkins-server":
         HOME_FOLDER = '/home/jenkins'
     else:
         HOME_FOLDER = '/home-local/jenkins'
-    
+
     print "Content-Type: text/html\n\n"     # HTML is following
 
     form = cgi.FieldStorage() # keys from HTML form
@@ -38,13 +38,13 @@ def main():
         print "Please fill in your Github username and email address."
         print '<p><input type=button value="Back" onClick="history.back()">'
         return
-    
+
     # if available check other parameters
     else:
         print "<p>Creating jobs for:<br>"
-        print "<ul><p>Username: ", form["username"].value  
+        print "<ul><p>Username: ", form["username"].value
         print "<p>Email: ", form["email"].value, "</ul>"
-    
+
     # get chosen releases
     releases = form.getlist('release')
     if releases == []:
@@ -55,22 +55,22 @@ def main():
     else:
         for release in releases:
             rosrelease = rosrelease[:] + [release]
-    
+
     # check chosen stacks
     stacks = form.getlist('stack')
-    
+
     if stacks == []:
         print "<H1>ERROR<H1>"
         print "You have to select at least one stack! <br>"
         print '<input type=button value="Back" onClick="history.back()">'
         return
-    else:    
+    else:
         for stack in stacks:
             if valid_stack(form["username"].value, stack):
                 repositories = repositories[:] + [stack]
-    
+
     # printing planed job creations
-    print "<p>Creating jobs to test:<br><ul>"    
+    print "<p>Creating jobs to test:<br><ul>"
     for stack in repositories:
         print "- ", stack, "<br>"
     print "</ul>"
@@ -91,18 +91,18 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
 
     results = """<p>JOB CREATION RESULTS<br>
 ====================<br>\n"""
-    
+
     for release in ROSRELEASES:
         for repo in REPOSITORIES:
             results = results + "<br>"
 
             # call generate_prerelease.py with parameters: 'stack', 'rosdistro', 'githubuser', 'email'
-            
+
             script = "generate_prerelease.py "
             parameters = "--stack %s --rosdistro %s --githubuser %s --email %s"%(repo, release, githubuser, email)
 
             # !!!if you want to allow creating jobs for unforked stacks:!!!
-            #    change update_all_jobs.py script, because there the jobowner has to be the stackowner! 
+            #    change update_all_jobs.py script, because there the jobowner has to be the stackowner!
             try:
                 if not stack_forked(githubuser, repo):
                     results = results + "<b>" + repo + "</b>" + ": stack is not forked<br>"
@@ -114,7 +114,7 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
             except:
                 results = results + "<b>Error: Checking whether stack %s is forked failed</b>"%repo
                 results = results + "Skipped job generation for %s!"%repo
-            
+
             if del_stacks:
                 parameters = parameters + " --delete"
             bash_script = os.path.join("/tmp", "bash_script.bash")
@@ -132,13 +132,13 @@ def spawn_jobs(githubuser, email, REPOSITORIES, ROSRELEASES, del_stacks=False):
             results = results + "<br>" + out + "<br>"
             if err != None:
                 results = results + "ERROR: " + err + "<br>"
-    
+
     return results
 
 
 def valid_stack(githubuser, stack):
     # function to check if inserted stack is available
-    
+
     # correct common mistakes
     stack = stack.lower()
     stack = stack.replace('-', '_')
@@ -159,22 +159,22 @@ def valid_stack(githubuser, stack):
 
 def stack_forked(githubuser, stack):
     # function to check if stack is forked on Github.com
-    
+
     # get token from jenkins' .gitconfig file for private github forks
     try:
-        gitconfig = open("%s/jenkins-config/.gitconfig"%HOME_FOLDER, "r") 
+        gitconfig = open("%s/jenkins-config/.gitconfig"%HOME_FOLDER, "r")
         gitconfig = gitconfig.read()
     except IOError as err:
         print "<b>ERROR" + err + "</b>"
         return False
-    
+
     # extract necessary data
     regex = ".*\[github]\s*user\s*=\s*([^\s]*)\s*password\s*=\s*([^\s]*).*"
     git_auth = re.match(regex, gitconfig, re.DOTALL)
     if git_auth == None:
         print "<b>ERROR: No match found in 'gitconfig'</b>"
         raise
-    
+
     # try authentication on github
     github_user = git_auth.group(1)
     github_pw = git_auth.group(2)
@@ -183,19 +183,19 @@ def stack_forked(githubuser, stack):
     s = 'curl -X GET https://' + github_user + ':' + github_pw + \
             '@api.github.com/repos/ipa320/' + stack + '/forks?per_page=999'
     answer = subprocess.Popen(s, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    
+
     if re.search('"message": "Not Found"', answer):
         print "<p><font color='#FF0000'>ERROR:"
         print "Stack <b>" + stack + " </b>could not be found. Please check spelling!</font>"
-        return False  
-    
+        return False
+
     elif githubuser == "ipa320":
         return True
-    
+
     else:
-        if re.search("/"+githubuser+"/", answer): 
+        if re.search("/"+githubuser+"/", answer):
             return True
-        
+
         else:
             # search for subforks
             for entry in json.loads(answer):

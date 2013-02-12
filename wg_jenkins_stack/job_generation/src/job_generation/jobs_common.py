@@ -74,8 +74,8 @@ DELIM
 
 set -o errexit
 
-scp jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
-scp -r jenkins@cob-kitchen-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.ssh
+scp jenkins@cob-jenkins-server:/home/jenkins/jenkins-config/.gitconfig $WORKSPACE/.gitconfig
+scp -r jenkins@cob-jenkins-server:/home/jenkins/jenkins-config/.ssh $WORKSPACE/.ssh
 
 git clone git://github.com/ipa320/hudson.git $WORKSPACE/hudson
 
@@ -93,7 +93,7 @@ UBUNTU_DISTRO_MAP = ['lucid', 'natty', 'oneiric']
 SERVER = 'http://%s:8080'%socket.gethostname()
 
 # Local HOME path
-if socket.gethostname() == "cob-kitchen-server":
+if socket.gethostname() == "cob-jenkins-server":
     HOME_FOLDER = '/home/jenkins'
 else:
     HOME_FOLDER = '/home-local/jenkins'

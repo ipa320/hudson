@@ -13,7 +13,7 @@
     <org.jenkinsci.plugins.scripttrigger.ScriptTrigger>
       <spec>* * * * *</spec>
       <script>#/bin/bash
-wget http://cob-kitchen-server:3142
+wget http://cob-jenkins-server:3142
 
 
 </script>
